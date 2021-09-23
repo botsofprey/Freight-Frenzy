@@ -46,7 +46,7 @@ public class TeleOpMotorDriver implements MotorDriver {
 	
 	@Override
 	public void moveRobot(double x, double y, double a, LinearOpMode mode) {
-//		a *= -0.5;
+		a *= -0.5;
 		if (trueNorth) {
 			double heading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 			mode.telemetry.addData("heading", heading);
@@ -77,7 +77,6 @@ public class TeleOpMotorDriver implements MotorDriver {
 		for (double power : powers) {
 			scaleFactor = Math.max(Math.abs(power), scaleFactor);
 		}
-//		scaleFactor *= 3;
 		for (int i = 0; i < powers.length; i++) {
 			powers[i] /= scaleFactor;
 		}
