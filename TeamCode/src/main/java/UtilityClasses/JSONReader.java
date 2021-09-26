@@ -1,18 +1,36 @@
 package UtilityClasses;
 
+import android.util.Log;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.io.FileReader;
+import java.io.InputStream;
 
 public class JSONReader {
 	private JsonObject jsonObject;
 	
-	public JSONReader(String fileName) throws Exception {
+	public JSONReader(HardwareMap hardwareMap, String fileName) {
 		JsonParser parser = new JsonParser();
-		JsonElement element = parser.parse(new FileReader(fileName));
+		JsonElement element = null;
+		try {
+			InputStream in = hardwareMap.appContext.getAssets().open(fileName);
+			byte[] buffer = new byte[in.available()];
+			in.read(buffer);
+			in.close();
+			
+			element = parser.parse(new String(buffer));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		assert element != null;
 		jsonObject = element.getAsJsonObject();
 	}
 	

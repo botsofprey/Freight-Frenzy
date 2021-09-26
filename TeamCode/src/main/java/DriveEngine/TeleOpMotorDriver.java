@@ -14,7 +14,7 @@ import UtilityClasses.Vec2d;
 
 import static DataFiles.DriveBaseConstants.*;
 
-public class TeleOpMotorDriver implements MotorDriver {
+public class TeleOpMotorDriver {
 	private static final int FRONT_LEFT_DRIVE = 0;
 	private static final int FRONT_RIGHT_DRIVE = 1;
 	private static final int BACK_RIGHT_DRIVE = 2;
@@ -23,6 +23,7 @@ public class TeleOpMotorDriver implements MotorDriver {
 	
 	private boolean trueNorth;
 	private BNO055IMU imu;
+	private DcMotor[] motors = new DcMotor[4];
 	
 	public TeleOpMotorDriver(HardwareMap hw, boolean trueNorthEnabled) {
 		for (int i = 0; i < 4; i++) {
@@ -44,12 +45,10 @@ public class TeleOpMotorDriver implements MotorDriver {
 		imu.initialize(parameters);
 	}
 	
-	@Override
-	public void moveRobot(double x, double y, double a, LinearOpMode mode) {
+	public void moveRobot(double x, double y, double a) {
 		a *= -0.5;
 		if (trueNorth) {
 			double heading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-			mode.telemetry.addData("heading", heading);
 			Vec2d movementVector = new Vec2d(x, y);
 			movementVector.convertToAngleMagnitude();
 			movementVector.angle -= heading;
