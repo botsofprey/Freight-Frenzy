@@ -1,44 +1,38 @@
 package LearnJava;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 @TeleOp(name="Motor Test", group="LearnJava")
 public class HelloWorld extends LinearOpMode {
-    private DcMotor leftMotor;
-    private DcMotor rightMotor;
-    private DistanceSensor distanceSensor;
+    
+    private DcMotorEx leftMotor;//to use motor encoders, use the DcMotorEx class
+    //it has all of the functions DcMotor has, but it can also use encoders
+    
+    TankDrive driveBase;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        leftMotor = hardwareMap.get(DcMotor.class, "left_motor");
-        rightMotor = hardwareMap.get(DcMotor.class, "right_motor");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "distance_sensor");
+        leftMotor = hardwareMap.get(DcMotorEx.class, "left_motor");
 
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        
+        driveBase = new TankDrive(hardwareMap);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-
-        while (opModeIsActive()) {
-            telemetry.addData("distance", distanceSensor.getDistance(DistanceUnit.INCH));
-            telemetry.update();
-//            double motorPower = -gamepad1.left_stick_y / 2.0;
-//            double turnPower = gamepad1.left_stick_x / 2.0;
-//
-//            leftMotor.setPower(motorPower + turnPower);
-//            rightMotor.setPower(motorPower - turnPower);
-
-        }
+        
+        
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);//this stops the motor and defines its current position as zero
+        leftMotor.setTargetPosition(1000);//this sets the motor's target 1000 ticks forward
+        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);//the motor is told to go to the target location
+        leftMotor.setVelocity(200);//sets the maximum number of ticks per second the motor can move
+        
+        while (leftMotor.isBusy()) {}//waits for the motor to finish moving before continuing
     }
 }
