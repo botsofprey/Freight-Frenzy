@@ -1,11 +1,9 @@
 package DriveEngine;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import UtilityClasses.Encoder;
-import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
 import UtilityClasses.Vec2d;
 

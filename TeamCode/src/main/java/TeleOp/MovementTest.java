@@ -1,19 +1,15 @@
 package TeleOp;
 
-import com.google.gson.Gson;
-
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import java.io.FileReader;
-import java.io.InputStream;
 
 import DriveEngine.Localizer;
 import DriveEngine.TeleOpMotorDriver;
 import UtilityClasses.Controller;
 
 @TeleOp(name="MovementTest", group="TeleOp")
-//@Disabled
+@Disabled
 public class MovementTest extends LinearOpMode {
 	
 	private TeleOpMotorDriver driveBase;
