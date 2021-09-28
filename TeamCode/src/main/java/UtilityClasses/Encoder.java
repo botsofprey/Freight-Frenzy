@@ -13,12 +13,14 @@ public class Encoder {
 	private int position;
 	private long timer;
 	private int deltaTicks;
-	private int deltaTime;
+	private long deltaTime;
 	
 	private double ticksPerRevolution;
 	private double ticksPerDegree;
 	private double wheelDiameter;
 	private double ticksPerInch;
+	
+	private static final int NANOSECONDS_PER_SECOND = 1_000_000_000;
 	
 	private void initFromConfigFile(HardwareMap hardwareMap, String fileName) {
 		JSONReader fileReader = null;
@@ -46,7 +48,7 @@ public class Encoder {
 		position = 0;
 		deltaTime = 0;
 		deltaTicks = 0;
-		timer = System.currentTimeMillis();
+		timer = System.nanoTime();
 	}
 	
 	public Encoder(HardwareMap hardwareMap, DcMotor motor, String fileName) {
@@ -63,9 +65,9 @@ public class Encoder {
 	
 	public void update() {
 		int newTicks = encoder.getCurrentPosition() * direction;
-		long newTime = System.currentTimeMillis();
+		long newTime = System.nanoTime();
 		deltaTicks = newTicks - position;
-		deltaTime = (int)(newTime - timer);
+		deltaTime = (newTime - timer);
 		position = newTicks;
 		timer = newTime;
 	}
@@ -89,7 +91,7 @@ public class Encoder {
 		return position / ticksPerDegree;
 	}
 	public double getCurrentTicksPerSecond() {
-		return deltaTicks / (deltaTime * 1000.0);
+		return deltaTicks / (double)(deltaTime * NANOSECONDS_PER_SECOND);
 	}
 	public double getCurrentInchesPerSecond() {
 		return getCurrentTicksPerSecond() / ticksPerInch;
