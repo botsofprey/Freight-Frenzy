@@ -1,5 +1,6 @@
 package LearnJava;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -20,20 +21,41 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 
 public class TankDrive {
-	//todo add variables such as motors here:
-	
-	
-	public TankDrive(HardwareMap hardwareMap) {//todo use this to initialize motors and set them up
-	
+	private static final double TICKS_PER_INCH = 560.0 / (4 * Math.PI);
+
+	public DcMotorEx leftMotor;
+	public DcMotorEx rightMotor;
+	private LinearOpMode mode;
+
+	public TankDrive(HardwareMap hardwareMap, LinearOpMode mode) {
+		leftMotor = hardwareMap.get(DcMotorEx.class, "left_motor");
+		rightMotor = hardwareMap.get(DcMotorEx.class, "right_motor");
+		this.mode = mode;
+
+		leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+		rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 	}
 	
 	public void move(double inches, double inchesPerSecond) {//todo make this function move the robot the given distance forward, at the given speed
-	
+		leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);//this stops the motor and defines its current position as zero
+		rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+		leftMotor.setTargetPosition((int)(inches * TICKS_PER_INCH));//this sets the motor's target 1000 ticks forward
+		rightMotor.setTargetPosition((int)(inches * TICKS_PER_INCH));
+
+		leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);//the motor is told to go to the target location
+		rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+		leftMotor.setVelocity(inchesPerSecond * TICKS_PER_INCH);//sets the maximum number of ticks per second the motor can move
+		rightMotor.setVelocity(inchesPerSecond * TICKS_PER_INCH);
+
+		while (leftMotor.isBusy() && mode.opModeIsActive()) {}//waits for the motor to finish moving before continuing
+		while (rightMotor.isBusy() && mode.opModeIsActive()) {}//waits for the motor to finish moving before continuing
 	}//todo once you are done, run this a few times to see if it is more consistent than using power and time
 	
 	public void turnLeft(double degrees, double inchesPerSecond) {//todo makes the robot turn to the left by the given amount, inches per second refer to how fast the wheels are spinning
 		//tip: make the robot spin around without using encoders and watch how the wheels move, this should give you an idea of how far the wheels should move to make the robot rotate 360 degrees
-	
+
 	}//todo test the robot a few times and see if it is consistently working
 	
 	public void turnRight(double degrees, double inchesPerSecond) {//todo this is just like turnLeft, but the robot turns right
