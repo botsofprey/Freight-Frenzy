@@ -1,5 +1,7 @@
 package UtilityClasses;
 
+import androidx.annotation.NonNull;
+
 public class Matrix {
 	private double[][] data;
 	private int height;
@@ -95,5 +97,10 @@ public class Matrix {
 		height = result.height;
 		width = result.width;
 		return this;
+	}
+	
+	@NonNull
+	public Matrix clone() {
+		return new Matrix(this.data);
 	}
 }
