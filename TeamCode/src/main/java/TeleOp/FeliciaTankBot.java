@@ -34,12 +34,12 @@ public class FeliciaTankBot extends LinearOpMode {
 		waitForStart();
 		
 		while (opModeIsActive()) {
-			double leftPower = gamepad1.left_stick_y;
-			double rightPower = gamepad1.right_stick_y;
-			leftFront.setPower(leftPower);
-			leftBack.setPower(leftPower);
-			rightFront.setPower(rightPower);
-			rightBack.setPower(rightPower);
+			double power = gamepad1.left_stick_y;
+			double turn = -gamepad1.right_stick_x;
+			leftFront.setPower(power + turn);
+			leftBack.setPower(power + turn);
+			rightFront.setPower(power - turn);
+			rightBack.setPower(power - turn);
 			telemetry.update();
 		}
 	}

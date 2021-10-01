@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class TankDrive {
 	private static final double TICKS_PER_INCH = 560.0 / (4 * Math.PI);
+	private static final double TRACK_WIDTH = 11;
 
 	public DcMotorEx leftMotor;
 	public DcMotorEx rightMotor;
@@ -36,11 +37,11 @@ public class TankDrive {
 		rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 	}
 	
-	public void move(double inches, double inchesPerSecond) {//todo make this function move the robot the given distance forward, at the given speed
+	public void move(double inches, double inchesPerSecond) {
 		leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);//this stops the motor and defines its current position as zero
 		rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-		leftMotor.setTargetPosition((int)(inches * TICKS_PER_INCH));//this sets the motor's target 1000 ticks forward
+		leftMotor.setTargetPosition((int)(inches * TICKS_PER_INCH));
 		rightMotor.setTargetPosition((int)(inches * TICKS_PER_INCH));
 
 		leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);//the motor is told to go to the target location
@@ -51,16 +52,32 @@ public class TankDrive {
 
 		while (leftMotor.isBusy() && mode.opModeIsActive()) {}//waits for the motor to finish moving before continuing
 		while (rightMotor.isBusy() && mode.opModeIsActive()) {}//waits for the motor to finish moving before continuing
-	}//todo once you are done, run this a few times to see if it is more consistent than using power and time
+		mode.sleep(250);
+	}
 	
-	public void turnLeft(double degrees, double inchesPerSecond) {//todo makes the robot turn to the left by the given amount, inches per second refer to how fast the wheels are spinning
-		//tip: make the robot spin around without using encoders and watch how the wheels move, this should give you an idea of how far the wheels should move to make the robot rotate 360 degrees
+	public void turnLeft(double degrees, double inchesPerSecond) {
+		double turnInches = TRACK_WIDTH * Math.PI * degrees / 360;
 
-	}//todo test the robot a few times and see if it is consistently working
+		leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);//this stops the motor and defines its current position as zero
+		rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+		leftMotor.setTargetPosition((int)(-turnInches * TICKS_PER_INCH));
+		rightMotor.setTargetPosition((int)(turnInches * TICKS_PER_INCH));
+
+		leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);//the motor is told to go to the target location
+		rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+		leftMotor.setVelocity(inchesPerSecond * TICKS_PER_INCH);//sets the maximum number of ticks per second the motor can move
+		rightMotor.setVelocity(inchesPerSecond * TICKS_PER_INCH);
+
+		while (leftMotor.isBusy() && mode.opModeIsActive()) {}//waits for the motor to finish moving before continuing
+		while (rightMotor.isBusy() && mode.opModeIsActive()) {}//waits for the motor to finish moving before continuing
+		mode.sleep(250);
+	}
 	
-	public void turnRight(double degrees, double inchesPerSecond) {//todo this is just like turnLeft, but the robot turns right
-	
-	}//todo once you make this function, rewrite the code you wrote last Friday using this class, it should work more consistently now
+	public void turnRight(double degrees, double inchesPerSecond) {
+		turnLeft(-degrees, inchesPerSecond);
+	}
 	
 	public void turnToAngle(double angle, double inchesPerSecond) {//todo update some of the functions you have already written so that the robot keeps track of its heading(what angle it is turned to)
 		//todo continued: use a variable to store this value, this function should use the robot's current heading and the given desired heading to find how it should turn
