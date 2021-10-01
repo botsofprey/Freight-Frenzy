@@ -43,6 +43,10 @@ public class TeleOpMotorDriver {
 		imu = hw.get(BNO055IMU.class, IMU_NAME);
 		imu.initialize(parameters);
 	}
+
+	public void toggleTrueNorth() {
+		trueNorth = !trueNorth;
+	}
 	
 	public void moveRobot(double x, double y, double a) {
 		a *= -0.5;

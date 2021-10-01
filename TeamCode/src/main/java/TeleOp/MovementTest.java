@@ -9,7 +9,6 @@ import DriveEngine.TeleOpMotorDriver;
 import UtilityClasses.Controller;
 
 @TeleOp(name="MovementTest", group="TeleOp")
-@Disabled
 public class MovementTest extends LinearOpMode {
 	
 	private TeleOpMotorDriver driveBase;
@@ -29,6 +28,9 @@ public class MovementTest extends LinearOpMode {
 		
 		while (opModeIsActive()) {
 			controller1.update();
+			if (controller1.aReleased) {
+				driveBase.toggleTrueNorth();
+			}
 			driveBase.moveRobot(
 					controller1.leftStick.x, controller1.leftStick.y, controller1.rightStick.x
 			);
