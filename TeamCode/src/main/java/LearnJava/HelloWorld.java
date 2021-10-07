@@ -1,11 +1,11 @@
 package LearnJava;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
-@TeleOp(name="Motor Test", group="LearnJava")
+@Autonomous(name="Motor Test", group="LearnJava")
 public class HelloWorld extends LinearOpMode {
     TankDrive driveBase;
     DcMotor spinMotor;
@@ -13,13 +13,11 @@ public class HelloWorld extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         driveBase = new TankDrive(hardwareMap, this);
-        spinMotor = hardwareMap.get(DcMotor.class, "Carosol");
+        spinMotor = hardwareMap.get(DcMotor.class, "Carousel");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-
-
 
         //Move forward
         driveBase.move(24, 12);
@@ -30,15 +28,33 @@ public class HelloWorld extends LinearOpMode {
         //Push duck into box thing
         driveBase.move(40, 12);
 
+        //Backward to turn toward Carosol
+        driveBase.move(-10, 7.5);
 
-        driveBase.move(10, 3);
+        //Turn towards carosol
+        driveBase.turnRight(50, 12);
 
-        driveBase.turnRight(105, 12);
+        //Move to carosol but not all the way
+        driveBase.move(24, 12);
 
-        driveBase.move(18, 12);
+        //re angle
+        driveBase.turnRight(45, 8);
 
+        //move to carosol
+        driveBase.move(3, 6);
+
+        //Spin carosol
         spinMotor.setPower(1);
         sleep(5000);
+        spinMotor.setPower(0);
 
+        //Back up to go to warehouse
+        driveBase.move(-6, 12);
+
+        //Straighten up
+        driveBase.turnLeft(72, 12);
+
+        //Back up into warehouse
+        driveBase.move(-125, 300);
     }
 }
