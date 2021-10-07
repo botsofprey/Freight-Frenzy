@@ -78,11 +78,6 @@ public class TankDrive {
 	public void turnRight(double degrees, double inchesPerSecond) {
 		turnLeft(-degrees, inchesPerSecond);
 	}
-	
-	public void turnToAngle(double angle, double inchesPerSecond) {//todo update some of the functions you have already written so that the robot keeps track of its heading(what angle it is turned to)
-		//todo continued: use a variable to store this value, this function should use the robot's current heading and the given desired heading to find how it should turn
-	
-	}//todo test the function once it is done
 }
 
 //if you finish early, you can look through some of the other code files

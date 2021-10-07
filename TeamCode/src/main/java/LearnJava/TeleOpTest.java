@@ -39,13 +39,17 @@ public class TeleOpTest extends LinearOpMode {
 			leftMotor.setPower(power + turn);
 			rightMotor.setPower(power - turn);
 
-			if (controller1.aHeld) {
-				spinMotor.setPower(1);
+			if (controller1.aPressed) {
+				switch ((int)Math.round(spinMotor.getPower())) {
+					case 1:
+						spinMotor.setPower(0);
+						break;
+					case 0:
+						spinMotor.setPower(1);
+						break;
+				}
 			}
-			else {
-				spinMotor.setPower(0);
-			}
-
+			                                  
 			telemetry.update();
 		}
 	}

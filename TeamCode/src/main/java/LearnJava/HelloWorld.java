@@ -3,17 +3,22 @@ package LearnJava;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 @Autonomous(name="Motor Test", group="LearnJava")
 public class HelloWorld extends LinearOpMode {
     TankDrive driveBase;
     DcMotor spinMotor;
+    DistanceSensor distanceSensor;
 
     @Override
     public void runOpMode() throws InterruptedException {
         driveBase = new TankDrive(hardwareMap, this);
         spinMotor = hardwareMap.get(DcMotor.class, "Carousel");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distance_sensor");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -32,17 +37,22 @@ public class HelloWorld extends LinearOpMode {
         driveBase.move(-10, 7.5);
 
         //Turn towards carosol
-        driveBase.turnRight(50, 12);
+        driveBase.turnRight(60, 12);
 
-        //Move to carosol but not all the way
-        driveBase.move(24, 12);
+        //Move towards wall to re angle
+        driveBase.move(22, 12);
 
-        //re angle
-        driveBase.turnRight(45, 8);
+        //re angle against the wall
+        driveBase.turnRight(145, 8);
+
+        //angle towards carosol using wall
+            //----Set power right motor and wait 3 seconds
+        telemetry.addData("Distance from wall (inches)", distanceSensor.getDistance(DistanceUnit.INCH));
+        telemetry.update();
 
         //move to carosol
-        driveBase.move(3, 6);
-
+        driveBase.move(-6, 6);
+/*
         //Spin carosol
         spinMotor.setPower(1);
         sleep(5000);
@@ -56,5 +66,6 @@ public class HelloWorld extends LinearOpMode {
 
         //Back up into warehouse
         driveBase.move(-125, 300);
+        */
     }
 }

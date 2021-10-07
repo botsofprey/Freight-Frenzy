@@ -1,10 +1,20 @@
 package TeleOp;
 
+import static DataFiles.DriveBaseConstants.IMU_NAME;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
+import UtilityClasses.Vec2d;
 
 @TeleOp(name = "Mecanum Drive", group = "TeleOp")
 //@Disabled
@@ -21,14 +31,55 @@ public class MecanumDrive extends LinearOpMode {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
+//        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        BNO055IMU imu;
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "AdafruitIMUCalibration.json";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = hardwareMap.get(BNO055IMU.class, IMU_NAME);
+        imu.initialize(parameters);
+
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
+
+        double heading;
+        double prevHeading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 
         while (opModeIsActive()) {
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;
             double a = -gamepad1.right_stick_x;
+            //a *= 0.5;
+
+            heading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+            Vec2d movementVector = new Vec2d(x, y);
+            movementVector.convertToAngleMagnitude();
+            movementVector.angle -= heading;
+            movementVector.convertToXY();
+//            x = movementVector.x;
+//            y = movementVector.y;
+//            if (a == 0) {
+//                double diff = heading - prevHeading;
+//                diff = Math.abs(diff) < 0.1 ? 0 : diff;
+//                diff /= 90;
+//                a += diff;
+//            }
+//            else {
+//                prevHeading = heading;
+//            }
+
             double[] powers = {
                     x + y + a,
                     x - y + a,
@@ -49,6 +100,7 @@ public class MecanumDrive extends LinearOpMode {
         for (double power : powers) {
             scale = Math.max(scale, Math.abs(power));
         }
+        scale *= 2;
         for (int i = 0; i < powers.length; i++) {
             powers[i] /= scale;
         }
