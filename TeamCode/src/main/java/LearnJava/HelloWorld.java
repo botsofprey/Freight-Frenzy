@@ -2,8 +2,10 @@ package LearnJava;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -12,14 +14,18 @@ import DriveEngine.BadMecanumAuto;
 
 @Autonomous(name="Motor Test", group="LearnJava")
 public class HelloWorld extends LinearOpMode {
-    BadMecanumAuto driveBase;
-    DcMotor spinMotor;
-    DistanceSensor distanceSensor;
+    private BadMecanumAuto driveBase;
+    private DcMotor spinMotor;
+    private DistanceSensor distanceSensor;
+    private Servo numberBlue;
+    private CRServo letterGrape;
 
     @Override
     public void runOpMode() throws InterruptedException {
         driveBase = new BadMecanumAuto(hardwareMap, this);
         spinMotor = hardwareMap.get(DcMotor.class, "Carousel");
+
+        numberBlue = hardwareMap.get(Servo.class, "colourSix");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -27,6 +33,8 @@ public class HelloWorld extends LinearOpMode {
 
         //Move forward
         driveBase.move(24, 12);
+
+        numberBlue.setPosition(0.5);
 
 //        //Turn towards duck
 //        driveBase.turnRight(75, 8);
@@ -68,5 +76,15 @@ public class HelloWorld extends LinearOpMode {
         //Back up into warehouse
         driveBase.move(-125, 300);
         */
+    }
+
+    public int[] Sort(int[] input) {
+        int[] test = { 5, 1, 4, 7, 3 };
+        //1, 3, 4, 5, 7
+        int minimum = test[0];
+        for (int i = 0; i < test.length; i++) {
+
+        }
+        return test;
     }
 }
