@@ -83,31 +83,20 @@ public class BadMecanumAuto {
 		}
 	}
 
-	public void turnToAngle(double angle) {
-		this.angle = angle;
-	}
-
-	public void update() {
-		double heading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-		double angleDiff = angle - heading;
-		angleDiff *= 0.01;
+	public void turnLeft(double power) {
 		double[] powers = {
-				-angleDiff,
-				angleDiff,
-				angleDiff,
-				-angleDiff
+				-power,
+				power,
+				power,
+				-power,
 		};
-		double scale = 1;
-		for (int i = 0; i < motors.length; i++) {
-			powers[i] += motors[i].getPower();
-			scale = Math.max(scale, Math.abs(powers[i]));
-		}
-		for (int i = 0; i < motors.length; i++) {
-			powers[i] /= scale;
-		}
 		for (int i = 0; i < motors.length; i++) {
 			motors[i].setPower(powers[i]);
 		}
+	}
+
+	public void turnRight(double power) {
+		turnLeft(-power);
 	}
 
 	public void move(double inches, double inchesPerSecond) {

@@ -79,8 +79,8 @@ public class HelloWorld extends LinearOpMode {
     }
 
     public int[] Sort(int[] input) {
-        int[] test = { 5, 1, 4, 7, 3 };
-        //1, 3, 4, 5, 7
+        int[] test = { 8636, 2432, 483, 7654, 1145 };
+        //483, 1145, 2432, 7654, 8636
         int minimum = test[0];
         for (int i = 0; i < test.length; i++) {
 
