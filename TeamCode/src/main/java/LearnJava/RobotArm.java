@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-
+@Deprecated
 public class RobotArm {
 	public static final double TICKS_PER_DEGREE = 1120. / 360.;
 
