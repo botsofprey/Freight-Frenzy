@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-
+@Deprecated
 public class ServoTest {
 	private DigitalChannel touchSensor;
 	private DcMotor motor;

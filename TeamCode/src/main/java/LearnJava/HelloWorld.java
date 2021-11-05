@@ -2,39 +2,27 @@ package LearnJava;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import DriveEngine.BadMecanumAuto;
 
 
 @Autonomous(name="Motor Test", group="LearnJava")
 public class HelloWorld extends LinearOpMode {
-    private BadMecanumAuto driveBase;
-    private DcMotor spinMotor;
-    private DistanceSensor distanceSensor;
-    private Servo numberBlue;
-    private CRServo letterGrape;
+    TankDrive tankDrive;
+    Lift lift;
+    Carousel carousel;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        driveBase = new BadMecanumAuto(hardwareMap, this);
-        spinMotor = hardwareMap.get(DcMotor.class, "Carousel");
+        tankDrive = new TankDrive(hardwareMap, this);
+        lift = new Lift(hardwareMap, this);
+        carousel = new Carousel(hardwareMap);
 
-        numberBlue = hardwareMap.get(Servo.class, "colourSix");
+
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
 
-        //Move forward
-        driveBase.move(24, 12);
-
-        numberBlue.setPosition(0.5);
+        lift.dropFreight();
 
 //        //Turn towards duck
 //        driveBase.turnRight(75, 8);
@@ -76,16 +64,5 @@ public class HelloWorld extends LinearOpMode {
         //Back up into warehouse
         driveBase.move(-125, 300);
         */
-    }
-
-    public int[] Sort(int[] input) {
-        int[] test = { 8636, 2432, 483, 7654, 1145 };
-        //483, 1145, 2432, 7654, 8636
-        int minimum = test[0];
-        for (int i = 0; i < test.length; i++) {
-
-        }
-        return test;
-
     }
 }
