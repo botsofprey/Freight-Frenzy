@@ -1,0 +1,10 @@
+{
+  "frontLeftDriveMotorName": "front_left_drive_motor",
+  "frontRightDriveMotorName": "front_right_drive_motor",
+  "backRightDriveMotorName": "back_right_drive_motor",
+  "backLeftDriveMotorName": "back_left_drive_motor",
+  "frontLeftDriveMotorDirection": "forward",
+  "frontRightDriveMotorDirection": "reverse",
+  "backRightDriveMotorDirection": "reverse",
+  "backLeftDriveMotorDirection": "forward"
+}
