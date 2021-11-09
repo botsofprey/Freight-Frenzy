@@ -99,6 +99,20 @@ public class Matrix {
 		return this;
 	}
 	
+	public Matrix transpose() {
+		double[][] newData = new double[width][height];
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				newData[j][i] = data[i][j];
+			}
+		}
+		data = newData;
+		int temp = width;
+		width = height;
+		height = temp;
+		return this;
+	}
+	
 	@NonNull
 	public Matrix clone() {
 		return new Matrix(this.data);
