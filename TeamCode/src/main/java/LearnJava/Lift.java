@@ -1,6 +1,7 @@
 package LearnJava;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -11,8 +12,7 @@ public class Lift {
 	private static final double TICKS_PER_INCH = 537.7 / (0.91 * Math.PI);
 
 
-	private Servo bucketWall;
-
+	private CRServo bucketWall;
 
 	private DcMotorEx slide;
 	private LinearOpMode mode;
@@ -23,14 +23,14 @@ public class Lift {
 		slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		slide.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		bucketWall = hardwareMap.get(Servo.class, "bucket");
+		bucketWall = hardwareMap.get(CRServo.class, "bucket");
+		bucketWall.setDirection(DcMotorSimple.Direction.REVERSE);
 
 		mode = opMode;
 	}
 
 	public void move(double height, double inchesPerSecond) {
 		height -= 7 ;
-
 		slide.setTargetPosition((int)(height * TICKS_PER_INCH));
 		slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		slide.setVelocity(inchesPerSecond * TICKS_PER_INCH);
@@ -38,13 +38,34 @@ public class Lift {
 		while(mode.opModeIsActive() && slide.isBusy());
 	}
 
+	public void moveUp(){
+		slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		slide.setPower(1);
+	}
+	public void moveDown(){
+		slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		slide.setPower(-1);
+	}
+	public void brake(){
+		slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		slide.setPower(0);
+	}
+
 	public double getCurrentHeight(){
 		return 7 + slide.getCurrentPosition() / TICKS_PER_INCH;
 	}
 
 	public void dropFreight() {
-		bucketWall.setPosition(1);
-		mode.sleep(1000);
-		bucketWall.setPosition(0);
+		bucketWall.setPower(1);
+		mode.sleep(2500);
+		bucketWall.setPower(0);
+	}
+
+	public void spinServo() {
+		bucketWall.setPower(1);
+	}
+
+	public void stopServo() {
+		bucketWall.setPower(0);
 	}
 }

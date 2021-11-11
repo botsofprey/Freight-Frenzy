@@ -1,5 +1,6 @@
 package LearnJava;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import UtilityClasses.Controller;
 
 @TeleOp(name = "Test Op Mode")
+@Disabled
 public class TestOPMode extends LinearOpMode {
 
 	public void runOpMode(){

@@ -31,6 +31,11 @@ public class MecanumDrive extends LinearOpMode {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 //        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -62,12 +67,14 @@ public class MecanumDrive extends LinearOpMode {
             double y = -gamepad1.left_stick_y;
             double a = -gamepad1.right_stick_x;
             //a *= 0.5;
-
+/*
             heading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
             Vec2d movementVector = new Vec2d(x, y);
             movementVector.convertToAngleMagnitude();
             movementVector.angle -= heading;
             movementVector.convertToXY();
+
+ */
 //            x = movementVector.x;
 //            y = movementVector.y;
 //            if (a == 0) {
@@ -81,10 +88,10 @@ public class MecanumDrive extends LinearOpMode {
 //            }
 
             double[] powers = {
-                    x + y + a,
-                    x - y + a,
-                    x + y - a,
-                    x - y - a
+                    -x + y - a,
+                    -x - y - a,
+                    -x + y + a,
+                    -x - y + a
             };
             normalize(powers);
 
@@ -100,7 +107,7 @@ public class MecanumDrive extends LinearOpMode {
         for (double power : powers) {
             scale = Math.max(scale, Math.abs(power));
         }
-        scale *= 2;
+        //scale *= 2;
         for (int i = 0; i < powers.length; i++) {
             powers[i] /= scale;
         }

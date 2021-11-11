@@ -3,53 +3,54 @@ package LearnJava;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import UtilityClasses.Controller;
 
 @TeleOp(name = "cheeseburger", group = "TeleOp")
 public class TeleOpTest extends LinearOpMode {
-	DcMotor leftMotor;
-	DcMotor rightMotor;
-	DcMotor spinMotor;
+	private Controller controller1;
+	private Carousel roundabout;
+	private Lift lift;
+	private TankDrive drive;
 
-	Controller controller1;
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		leftMotor = hardwareMap.get(DcMotor.class, "left_motor");
-		rightMotor = hardwareMap.get(DcMotor.class, "right_motor");
-		spinMotor = hardwareMap.get(DcMotor.class, "Carousel");
-
-		leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-		rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-		spinMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-
 		controller1 = new Controller(gamepad1);
+		roundabout = new Carousel(hardwareMap);
+		lift = new Lift(hardwareMap, this);
+		drive = new TankDrive(hardwareMap, this);
+
 
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 		waitForStart();
 
 		while (opModeIsActive()) {
-			controller1.update();
-
-			double power = controller1.leftStick.y;
-			double turn = controller1.rightStick.x;
-			leftMotor.setPower(power + turn);
-			rightMotor.setPower(power - turn);
+			//drive
+			drive.leftMotor.setPower(controller1.leftStick.y + controller1.rightStick.x);
+			drive.rightMotor.setPower(controller1.leftStick.y - controller1.rightStick.x);
 
 			if (controller1.aPressed) {
-				switch ((int)Math.round(spinMotor.getPower())) {
-					case 1:
-						spinMotor.setPower(0);
-						break;
-					case 0:
-						spinMotor.setPower(1);
-						break;
-				}
+				roundabout.rotate();
+			} else if (controller1.aReleased) {
+				roundabout.stop();
 			}
-			                                  
+
+			if (controller1.leftTriggerHeld){
+				lift.moveDown();
+			} else if (controller1.rightTriggerHeld) {
+				lift.moveUp();
+			} else {
+				lift.brake();
+			}
+			telemetry.addData("left trigger", controller1.leftTriggerHeld);
+			telemetry.addData("right trigger", controller1.rightTriggerHeld);
+
+			controller1.update();
 			telemetry.update();
 		}
 	}

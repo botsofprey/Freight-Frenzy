@@ -24,6 +24,8 @@ public class HelloWorld extends LinearOpMode {
 
         lift.dropFreight();
 
+        sleep(10000);
+
 //        //Turn towards duck
 //        driveBase.turnRight(75, 8);
 //
