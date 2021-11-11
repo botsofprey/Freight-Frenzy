@@ -10,9 +10,16 @@ public class Path {
 	private Location start;
 	private Location end;
 
+	private double m;
+	private double b;
+	private double pathLength;
+
+
+
 	public Path(Location s, Location e) {
 		start = s;
 		end = e;
+		calculateConstants();
 	}
 
 	public Path(Location location) {
@@ -38,10 +45,12 @@ public class Path {
 
 	public void setStart(Location start) {
 		this.start = start;
+		calculateConstants();
 	}
 
 	public void setEnd(Location end) {
 		this.end = end;
+		calculateConstants();
 	}
 
 	private double interpolate(double a, double b, double t) {
@@ -57,6 +66,31 @@ public class Path {
 				start.getHeading() + interpolate(0, rotatedEndAngle, t)
 		);
 		return new Location(x, y, a);
+	}
+
+	public double reverse_interpolate(Location location) {
+		double newM = -1 / m;
+		double newB = location.getY() - newM * location.getX();
+
+		double x = (b - newB) / (newM - m);
+		return (start.getX() - x) / (start.getX() - end.getX());
+	}
+
+	public Location getTargetLocation(Location location, double distance) {
+		double t = reverse_interpolate(location);
+		double e = location.distanceToLocation(interpolateLocation(t));
+		double distForward = Math.sqrt(distance * distance - e * e);
+		Location targetLocation = interpolateLocation(Math.min(t + distForward / pathLength, 1));
+		double r = location.distanceToLocation(end) /
+				Math.toRadians(Location.normalizeHeading(end.getHeading() - start.getHeading()));
+		targetLocation.setHeading(r);
+		return targetLocation;
+	}
+
+	private void calculateConstants() {
+		m = (start.getY() - end.getY()) / (start.getX() - end.getX());
+		b = start.getY() - m * start.getX();
+		pathLength = start.distanceToLocation(end);
 	}
 
 
