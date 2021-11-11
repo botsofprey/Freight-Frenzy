@@ -59,13 +59,18 @@ public class Location {
 	}
 	
 	private void normalizeHeading() {
-		heading %= 360;
-		if (heading < -180) {
-			heading += 360;
+		heading = normalizeHeading(heading);
+	}
+
+	public static double normalizeHeading(double h) {
+		h %= 360;
+		if (h < -180) {
+			h += 360;
 		}
-		else if (heading >= 180) {
-			heading -= 360;
+		else if (h >= 180) {
+			h -= 360;
 		}
+		return h;
 	}
 	
 	

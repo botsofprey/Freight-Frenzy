@@ -11,14 +11,14 @@ import UtilityClasses.Matrix;
 
 public class MecanumDrive {
 	private static final double FRONT_LEFT_DRIVE_MOTOR = 0;
-	private static final double FRONT_RIGHT_DRIVE_MOTOR = 1;
+	private static final double BACK_LEFT_DRIVE_MOTOR = 1;
 	private static final double BACK_RIGHT_DRIVE_MOTOR = 2;
-	private static final double BACK_LEFT_DRIVE_MOTOR = 3;
+	private static final double FRONT_RIGHT_DRIVE_MOTOR = 3;
 	private static final String[] MOTOR_NAMES = {
 			"frontLeftDriveMotor",
-			"frontRightDriveMotor",
+			"backLeftDriveMotor",
 			"backRightDriveMotor",
-			"backLeftDriveMotor"
+			"frontRightDriveMotor"
 	};
 	
 	
@@ -107,6 +107,10 @@ public class MecanumDrive {
 			);
 		}
 		currentLocation.add(deltaLocation);
+	}
+
+	private void correctTrajectory() {
+
 	}
 	
 	public void update() {
