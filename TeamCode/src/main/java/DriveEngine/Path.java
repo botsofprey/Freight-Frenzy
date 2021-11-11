@@ -9,6 +9,7 @@ import UtilityClasses.Location;
 public class Path {
 	private Location start;
 	private Location end;
+	private double error;
 
 	private double m;
 	private double b;
@@ -16,22 +17,39 @@ public class Path {
 
 
 
-	public Path(Location s, Location e) {
+	public Path(Location s, Location e, double error) {
 		start = s;
 		end = e;
+		this.error = error;
 		calculateConstants();
 	}
 
+	public Path(Location s, Location e) {
+		this(s, e, 1.5);
+	}
+
+	public Path(Location location, double error) {
+		this(location, location, error);
+	}
+
 	public Path(Location location) {
-		this(location, location);
+		this(location, 1.5);
+	}
+
+	public Path(double error) {
+		this(new Location(0, 0, 0), error);
 	}
 
 	public Path() {
-		this(new Location(0, 0, 0));
+		this(1.5);
+	}
+
+	public Path(Path prevPath, double error) {
+		this(prevPath.end, error);
 	}
 
 	public Path(Path prevPath) {
-		this(prevPath.end);
+		this(prevPath, 1.5);
 	}
 
 
@@ -43,6 +61,10 @@ public class Path {
 		return end;
 	}
 
+	public double getError() {
+		return error;
+	}
+
 	public void setStart(Location start) {
 		this.start = start;
 		calculateConstants();
@@ -51,6 +73,10 @@ public class Path {
 	public void setEnd(Location end) {
 		this.end = end;
 		calculateConstants();
+	}
+
+	public void setError(double error) {
+		this.error = error;
 	}
 
 	private double interpolate(double a, double b, double t) {

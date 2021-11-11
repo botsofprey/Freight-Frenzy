@@ -1,5 +1,5 @@
 {
-  "ticks_per_revolution": 537.6,
-  "wheel_radius": 2,
-  "max_rpm": 340.0
+  "ticks_per_revolution": 537.7,
+  "wheel_diameter": 3.78,
+  "max_rpm": 312.0
 }

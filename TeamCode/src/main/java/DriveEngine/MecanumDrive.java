@@ -1,5 +1,6 @@
 package DriveEngine;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -34,11 +35,18 @@ public class MecanumDrive {
 	private double wheelDiameter;
 	private double trackWidth;
 	private double trackLength;
+	private double maxSpeed;
+
+	private Path path;
+	private boolean isMoving;
+
+	private LinearOpMode mode;
 	
 	
-	public MecanumDrive(HardwareMap hw, String fileName) {
+	public MecanumDrive(HardwareMap hw, String fileName, LinearOpMode m) {
 		initFromConfig(hw, fileName);
-		
+
+		mode = m;
 		previousPositions = new long[] { 0, 0, 0, 0 };
 		motorSpeeds = new double[] { 0, 0, 0, 0 };
 		previousTime = System.nanoTime();
@@ -55,6 +63,13 @@ public class MecanumDrive {
 			driveMotors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 			driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 		}
+		JSONReader motorReader = new JSONReader(hw, reader.getString("driveMotorFile"));
+		encoderCPR = motorReader.getDouble("ticks_per_revolution");
+		wheelDiameter = motorReader.getDouble("wheel_diameter");
+		maxSpeed =
+				Math.sqrt(2) * Math.PI * wheelDiameter * motorReader.getDouble("max_rpm") / 30;
+		trackWidth = motorReader.getDouble("trackWidth");
+		trackLength = motorReader.getDouble("trackLength");
 	}
 	
 	private void updateLocation() {//  calculate new position from odometry data
@@ -65,6 +80,7 @@ public class MecanumDrive {
 		long currentTime = System.nanoTime();
 		
 		long deltaTime = currentTime - previousTime;
+		previousTime = currentTime;
 		double timeDiff = deltaTime / 1_000_000_000.0;//convert nanoseconds to seconds
 		double[] rotationAngles = new double[4];
 		for (int i = 0; i < 4; i++) {
@@ -110,15 +126,78 @@ public class MecanumDrive {
 	}
 
 	private void correctTrajectory() {
-
+		if (currentLocation.distanceToLocation(path.getEnd()) < path.getError()) {
+			isMoving = false;
+			for (int i = 0; i < 4; i++) {
+				driveMotors[i].setPower(0);
+			}
+			return;
+		}
+		Location targetLocation = path.getTargetLocation(currentLocation, 0.01 * maxSpeed);
+		double r = targetLocation.getHeading();
+		targetLocation.subXY(currentLocation);
+		double sinA = Math.sin(Math.toRadians(currentLocation.getHeading()));
+		double cosA = Math.cos(Math.toRadians(currentLocation.getHeading()));
+		Matrix reverseRotation = new Matrix(new double[][]{
+				{	cosA,	sinA	},
+				{	-sinA,	cosA	}
+		});
+		Matrix rotation = new Matrix(new double[][]{
+				{	cosA,	-sinA	},
+				{	sinA,	cosA	}
+		});
+		double wheelPosition = (trackLength + trackWidth) * 0.5;
+		Matrix inverseKinematics = new Matrix(new double[][]{
+				{	1,	-1,	-wheelPosition	},
+				{	1,	1,	-wheelPosition	},
+				{	1,	-1,	wheelPosition	},
+				{	1,	1,	wheelPosition	}
+		});
+		double[] movementVector = new Matrix(new double[][]{
+				{targetLocation.getX()},
+				{targetLocation.getY()}
+		}).mul(reverseRotation).transpose().getData()[0];
+		double theta = Math.acos(Math.max(
+				1 - Math.hypot(movementVector[0], movementVector[1]) / (2.0 * r * r),
+				-1
+		));
+		double xm = r * theta * Math.cos(theta / 2.0);
+		double ym = -r * theta * Math.sin(theta / 2.0);
+		double[] robotMovement = new Matrix(new double[][]{ {xm}, {ym} })
+				.mul(rotation).transpose().getData()[0];
+		double[] driveBasePowers = new Matrix(new double[][]{
+				{ robotMovement[1] },
+				{ -robotMovement[0] },
+				{ theta }
+		}).mul(inverseKinematics).scale(2.0 / wheelDiameter).transpose().getData()[0];
+		for (int i = 0; i < 4; i++) {
+			driveMotors[i].setPower(driveBasePowers[i]);
+		}
 	}
 	
 	public void update() {
 		updateLocation();
+		if (isMoving) {
+			correctTrajectory();
+		}
 	}
-	
+
+
+	public void moveToLocation(Location location) {
+		path = new Path(currentLocation, location);
+		isMoving = true;
+		while (mode.opModeIsActive() && isMoving) {
+			if (System.nanoTime() - previousTime > 10_000_000) {
+				update();
+			}
+		}
+	}
 	
 	public Location getCurrentLocation() {
 		return currentLocation;
+	}
+
+	public boolean isMoving() {
+		return isMoving;
 	}
 }

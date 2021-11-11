@@ -49,6 +49,11 @@ public class Location {
 		normalizeHeading();
 		return this;
 	}
+	public Location subXY(Location location) {
+		x -= location.x;
+		y -= location.y;
+		return this;
+	}
 	
 	public double distanceToLocation(Location location) {
 		return Math.hypot(x - location.x, y - location.y);
