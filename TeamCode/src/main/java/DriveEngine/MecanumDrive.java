@@ -43,9 +43,10 @@ public class MecanumDrive {
 	private LinearOpMode mode;
 	
 	
-	public MecanumDrive(HardwareMap hw, String fileName, LinearOpMode m) {
+	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m) {
 		initFromConfig(hw, fileName);
 
+		currentLocation = startLocation;
 		mode = m;
 		previousPositions = new long[] { 0, 0, 0, 0 };
 		motorSpeeds = new double[] { 0, 0, 0, 0 };
