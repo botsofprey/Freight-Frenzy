@@ -3,6 +3,7 @@ package DriveEngine;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -11,14 +12,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import UtilityClasses.Vec2d;
 
-import static DataFiles.DriveBaseConstants.*;
-
 public class TeleOpMotorDriver {
 	private static final int FRONT_LEFT_DRIVE = 0;
 	private static final int FRONT_RIGHT_DRIVE = 1;
 	private static final int BACK_RIGHT_DRIVE = 2;
 	private static final int BACK_LEFT_DRIVE = 3;
 	private static final double SQRT_ONE_HALF = Math.sqrt(2) / 2.0;
+	private static final String[] MOTOR_NAMES = {};
+	private static final DcMotorSimple.Direction[] MOTOR_DIRECTIONS = {};
 	
 	private boolean trueNorth;
 	private BNO055IMU imu;
@@ -40,7 +41,7 @@ public class TeleOpMotorDriver {
 		parameters.loggingTag = "IMU";
 		parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 		
-		imu = hw.get(BNO055IMU.class, IMU_NAME);
+		imu = hw.get(BNO055IMU.class, "");
 		imu.initialize(parameters);
 	}
 

@@ -1,7 +1,5 @@
 package TeleOp;
 
-import static DataFiles.DriveBaseConstants.IMU_NAME;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -51,7 +49,7 @@ public class MecanumDrive extends LinearOpMode {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-        imu = hardwareMap.get(BNO055IMU.class, IMU_NAME);
+        imu = hardwareMap.get(BNO055IMU.class, "");
         imu.initialize(parameters);
 
 

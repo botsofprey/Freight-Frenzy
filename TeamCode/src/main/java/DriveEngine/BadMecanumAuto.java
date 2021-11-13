@@ -5,15 +5,8 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import static DataFiles.DriveBaseConstants.*;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-
-import UtilityClasses.PIDController;
 
 public class BadMecanumAuto {
 	private static final double TICKS_PER_INCH = 560.0 / ((4 * Math.PI) * (Math.sqrt(2)/2));
@@ -33,8 +26,8 @@ public class BadMecanumAuto {
 		this.mode = mode;
 
 		for (int i = 0; i < motors.length; i++) {
-			motors[i] = hw.get(DcMotorEx.class, MOTOR_NAMES[i]);
-			motors[i].setDirection(MOTOR_DIRECTIONS[i]);
+			motors[i] = hw.get(DcMotorEx.class, "");
+			motors[i].setDirection(DcMotorSimple.Direction.FORWARD);
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		}
 
@@ -46,7 +39,7 @@ public class BadMecanumAuto {
 		parameters.loggingTag = "IMU";
 		parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-		imu = hw.get(BNO055IMU.class, IMU_NAME);
+		imu = hw.get(BNO055IMU.class, "");
 		imu.initialize(parameters);
 		angle = 0;
 	}
