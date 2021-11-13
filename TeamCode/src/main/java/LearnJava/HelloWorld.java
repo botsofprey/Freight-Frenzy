@@ -3,6 +3,9 @@ package LearnJava;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import Subsystems.Carousel;
+import Subsystems.Lift;
+
 
 @Autonomous(name="Motor Test", group="LearnJava")
 public class HelloWorld extends LinearOpMode {
