@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.io.IOException;
+
 public class DriveMotor {
 	private DcMotorEx motor;
 	private double ticksPerRevolution;
@@ -15,7 +17,7 @@ public class DriveMotor {
 	
 	private double targetPower;
 	
-	public void initializeFromConfigFile(HardwareMap hw, String fileName) {
+	public void initializeFromConfigFile(HardwareMap hw, String fileName) throws IOException {
 		JSONReader reader = new JSONReader(hw, fileName);
 		ticksPerRevolution = reader.getDouble("ticks_per_revolution");
 		double wheelRadius = reader.getDouble("wheel_radius");
@@ -24,7 +26,7 @@ public class DriveMotor {
 	}
 	
 	public DriveMotor(HardwareMap hw, DcMotorEx m, String fileName,
-	                  double frictionRatio) {
+	                  double frictionRatio) throws IOException {
 		motor = m;
 		motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		this.frictionRatio = frictionRatio;
@@ -32,7 +34,7 @@ public class DriveMotor {
 	}
 	
 	public DriveMotor(HardwareMap hw, String motorName, String fileName,
-	                  double frictionRatio) {
+	                  double frictionRatio) throws IOException {
 		this(hw, hw.get(DcMotorEx.class, motorName), fileName, frictionRatio);
 	}
 	

@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.io.IOException;
+
 import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
 import UtilityClasses.Matrix;
@@ -44,17 +46,19 @@ public class MecanumDrive {
 	
 	
 	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m) {
+		mode = m;
+		
 		initFromConfig(hw, fileName);
 
 		currentLocation = startLocation;
-		mode = m;
 		previousPositions = new long[] { 0, 0, 0, 0 };
 		motorSpeeds = new double[] { 0, 0, 0, 0 };
 		previousTime = System.nanoTime();
 	}
 	
 	private void initFromConfig(HardwareMap hw, String fileName) {
-		JSONReader reader = new JSONReader(hw, fileName);
+		JSONReader reader = null;
+		reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			driveMotors[i] = hw.get(DcMotorEx.class, reader.getString(MOTOR_NAMES[i] + "Name"));
 			driveMotors[i].setDirection(
@@ -64,13 +68,14 @@ public class MecanumDrive {
 			driveMotors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 			driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 		}
+		trackWidth = reader.getDouble("trackWidth");
+		trackLength = reader.getDouble("trackLength");
+		
 		JSONReader motorReader = new JSONReader(hw, reader.getString("driveMotorFile"));
 		encoderCPR = motorReader.getDouble("ticks_per_revolution");
 		wheelDiameter = motorReader.getDouble("wheel_diameter");
 		maxSpeed =
 				Math.sqrt(2) * Math.PI * wheelDiameter * motorReader.getDouble("max_rpm") / 30;
-		trackWidth = motorReader.getDouble("trackWidth");
-		trackLength = motorReader.getDouble("trackLength");
 	}
 	
 	private void updateLocation() {//  calculate new position from odometry data

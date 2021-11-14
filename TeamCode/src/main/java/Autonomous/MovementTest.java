@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.MecanumDrive;
+import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
 
 @Autonomous(name="mecanum drive test", group="Autonomous")
