@@ -1,7 +1,9 @@
 package Subsystems;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import UtilityClasses.HardwareWrappers.MotorController;
 
 public class Intake {
 	public static final int INTAKE_BUTTON = 0;
@@ -19,10 +21,14 @@ public class Intake {
 	private int state;
 
 
-	private DcMotor intakeMotor;
+	private MotorController intakeMotor;
 
-	public Intake(HardwareMap hw) {
-		intakeMotor = hw.get(DcMotor.class, "intakeMotor");
+	private LinearOpMode mode;
+
+	public Intake(HardwareMap hw, LinearOpMode m) {
+		mode = m;
+
+		intakeMotor = new MotorController(hw, "intakeMotor", mode);
 		state = 0;
 	}
 

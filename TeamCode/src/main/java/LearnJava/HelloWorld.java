@@ -17,7 +17,7 @@ public class HelloWorld extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         tankDrive = new TankDrive(hardwareMap, this);
         lift = new Lift(hardwareMap, this);
-        carousel = new Carousel(hardwareMap);
+        carousel = new Carousel(hardwareMap, this);
 
 
 

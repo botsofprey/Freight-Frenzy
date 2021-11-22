@@ -1,4 +1,4 @@
-package UtilityClasses;
+package UtilityClasses.HardwareWrappers;
 
 import android.view.Display;
 
@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.io.IOException;
+
+import UtilityClasses.JSONReader;
 
 public class DriveMotor {
 	private DcMotorEx motor;

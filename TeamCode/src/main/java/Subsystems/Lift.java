@@ -1,7 +1,6 @@
 package Subsystems;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -9,34 +8,39 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import UtilityClasses.HardwareWrappers.MagneticLimitSwitch;
+import UtilityClasses.HardwareWrappers.MotorController;
+import UtilityClasses.HardwareWrappers.ServoController;
+
 public class Lift {
 	private static final double TICKS_PER_INCH = 537.7 / (0.91 * Math.PI);
 
 
-	private DigitalChannel limitSwitch;
+	private MagneticLimitSwitch limitSwitch;
 
-	private CRServo bucketWall;
+	private ServoController bucketWall;
 
-	private DcMotorEx slide;
+	private MotorController slide;
 	private LinearOpMode mode;
 
 	public Lift(HardwareMap hardwareMap, LinearOpMode opMode) {
-		slide = hardwareMap.get(DcMotorEx.class, "Slider");
+		mode = opMode;
+
+		slide = new MotorController(hardwareMap, "Slider", mode);
 		slide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 		slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		slide.setDirection(DcMotorSimple.Direction.REVERSE);
 
-		bucketWall = hardwareMap.get(CRServo.class, "bucket");
-		bucketWall.setDirection(DcMotorSimple.Direction.REVERSE);
+		bucketWall = new ServoController(hardwareMap, "bucket", mode);
+		bucketWall.setDirection(Servo.Direction.REVERSE);
 
-		limitSwitch = hardwareMap.get(DigitalChannel.class, "limit");
-
-		mode = opMode;
+		limitSwitch = new MagneticLimitSwitch(hardwareMap, "liftLimit", mode);
 	}
 
 	private void zeroSlider(){
 		if(limitSwitch.getState()){
 			slide.setPower(0.25);
+
 			while(mode.opModeIsActive() && limitSwitch.getState());
 		}
 
@@ -76,17 +80,9 @@ public class Lift {
 	}
 
 	public void dropFreight() {
-		bucketWall.setPower(1);
+		bucketWall.setPosition(1);
 		mode.sleep(2500);
-		bucketWall.setPower(0);
-	}
-
-	public void spinServo() {
-		bucketWall.setPower(1);
-	}
-
-	public void stopServo() {
-		bucketWall.setPower(0);
+		bucketWall.setPosition(0);
 	}
 
 	void update(){

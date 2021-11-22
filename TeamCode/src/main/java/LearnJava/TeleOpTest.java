@@ -18,7 +18,7 @@ public class TeleOpTest extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		controller1 = new Controller(gamepad1);
-		roundabout = new Carousel(hardwareMap);
+		roundabout = new Carousel(hardwareMap, this);
 		lift = new Lift(hardwareMap, this);
 		drive = new TankDrive(hardwareMap, this);
 
