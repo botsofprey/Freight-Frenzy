@@ -57,26 +57,19 @@ public class MecanumDrive {
 	}
 	
 	private void initFromConfig(HardwareMap hw, String fileName) {
-		JSONReader reader = null;
-		reader = new JSONReader(hw, fileName);
+		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");
-			try {
-				driveMotors[i] = hw.get(DcMotorEx.class, motorName);
-				driveMotors[i].setDirection(
-						reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
-								DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE
-				);
-				driveMotors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-				driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-			}
-			catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				mode.telemetry.addData("Could not reach motor", MOTOR_NAMES[i]);
-			}
+			driveMotors[i] = hw.get(DcMotorEx.class, motorName);
+			driveMotors[i].setDirection(
+					reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
+							DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE
+			);
+			driveMotors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+			driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 		}
-		trackWidth = reader.getDouble("trackWidth");
-		trackLength = reader.getDouble("trackLength");
+		trackWidth = reader.getDouble("trackWidth") / 2.0;
+		trackLength = reader.getDouble("trackLength") / 2.0;
 		
 		JSONReader motorReader = new JSONReader(hw, reader.getString("driveMotorFile"));
 		encoderCPR = motorReader.getDouble("ticks_per_revolution");
@@ -88,13 +81,7 @@ public class MecanumDrive {
 	private void updateLocation() {//  calculate new position from odometry data
 		long[] positions = new long[4];
 		for (int i = 0; i < 4; i++) {
-			try {
-				positions[i] = driveMotors[i].getCurrentPosition();
-			}
-			catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				mode.telemetry.addData("Could not reach motor", MOTOR_NAMES[i]);
-			}
+			positions[i] = driveMotors[i].getCurrentPosition();
 		}
 		long currentTime = System.nanoTime();
 		
@@ -155,13 +142,7 @@ public class MecanumDrive {
 		if (currentLocation.distanceToLocation(path.getEnd()) < path.getError()) {
 			isMoving = false;
 			for (int i = 0; i < 4; i++) {
-				try {
-					driveMotors[i].setPower(0);
-				}
-				catch (IllegalArgumentException e) {
-					e.printStackTrace();
-					mode.telemetry.addData("Could not reach motor", MOTOR_NAMES[i]);
-				}
+				driveMotors[i].setPower(0);
 			}
 			return;
 		}
@@ -203,13 +184,7 @@ public class MecanumDrive {
 				{ theta }
 		}).mul(inverseKinematics).scale(2.0 / wheelDiameter).transpose().getData()[0];
 		for (int i = 0; i < 4; i++) {
-			try {
-				driveMotors[i].setPower(driveBasePowers[i]);
-			}
-			catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				mode.telemetry.addData("Could not reach motor", MOTOR_NAMES[i]);
-			}
+			driveMotors[i].setPower(driveBasePowers[i]);
 		}
 	}
 	
