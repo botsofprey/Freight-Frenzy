@@ -67,14 +67,14 @@ public class Location {
 		heading = normalizeHeading(heading);
 	}
 
-	public static double normalizeHeading(double h) {
+	public static double normalizeHeading(double h) {/*
 		h %= 360;
 		if (h < -180) {
 			h += 360;
 		}
 		else if (h >= 180) {
 			h -= 360;
-		}
+		}*/
 		return h;
 	}
 	

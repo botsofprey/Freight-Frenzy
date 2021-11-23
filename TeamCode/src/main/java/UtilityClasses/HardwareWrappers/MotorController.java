@@ -17,6 +17,7 @@ public class MotorController {
 	private void error(Exception e) {
 		e.printStackTrace();
 		mode.telemetry.addData("Could not access motor", name);
+		throw new Error("Could not access motor: " + name);
 	}
 
 	public MotorController(HardwareMap hw, String motorName, LinearOpMode m) {

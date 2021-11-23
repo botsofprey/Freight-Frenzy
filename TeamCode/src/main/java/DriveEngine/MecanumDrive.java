@@ -1,13 +1,22 @@
 package DriveEngine;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import java.io.IOException;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import java.io.IOException;
+import java.util.List;
+
+import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
 import UtilityClasses.Matrix;
@@ -25,7 +34,7 @@ public class MecanumDrive {
 	};
 	
 	
-	private volatile DcMotorEx[] driveMotors = new DcMotorEx[4];
+	private volatile MotorController[] driveMotors = new MotorController[4];
 	
 	private volatile Location currentLocation;
 	
@@ -43,12 +52,33 @@ public class MecanumDrive {
 	private boolean isMoving;
 
 	private LinearOpMode mode;
+
+	private BNO055IMU imu;
 	
 	
 	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m) {
 		mode = m;
 		
 		initFromConfig(hw, fileName);
+
+		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+		parameters.mode                = BNO055IMU.SensorMode.IMU;
+		parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+		parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+		parameters.loggingEnabled      = false;
+
+		// Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+		// on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+		// and named "imu".
+		imu = hw.get(BNO055IMU.class, "imu");
+
+		imu.initialize(parameters);
+
+		List<LynxModule> allHubs = hw.getAll(LynxModule.class);
+		for (LynxModule hub : allHubs) {
+			hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+		}
 
 		currentLocation = startLocation;
 		previousPositions = new long[] { 0, 0, 0, 0 };
@@ -60,11 +90,12 @@ public class MecanumDrive {
 		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");
-			driveMotors[i] = hw.get(DcMotorEx.class, motorName);
+			driveMotors[i] = new MotorController(hw, motorName, mode);
 			driveMotors[i].setDirection(
 					reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
 							DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE
 			);
+			driveMotors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			driveMotors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 			driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 		}
@@ -97,24 +128,21 @@ public class MecanumDrive {
 			motorDistances[i] = Math.PI * wheelDiameter * positions[i] / encoderCPR;
 			motorSpeeds[i] = rotationAngles[i] / timeDiff;
 		}
-		double rotation = Math.sqrt(0.5) * (trackLength + trackWidth) /
-				(trackLength * trackLength + trackWidth * trackWidth) *
-				((motorDistances[2] - motorDistances[0] +
-						motorDistances[3] - motorDistances[1]) / 4);
-		currentLocation.addHeading(Math.toDegrees(rotation));
+		double rotation = ((motorDistances[2] - motorDistances[0] +
+				motorDistances[3] - motorDistances[1]) / 4);
+
+		double[] movementVectors = {
+				motorDistances[0] + motorDistances[1] + motorDistances[2] + motorDistances[3],
+				motorDistances[0] - motorDistances[1] + motorDistances[2] - motorDistances[3],
+				rotation
+		};
+		movementVectors[0] *= -0.25;
+		movementVectors[1] *= -0.25;
+		movementVectors[2] = Math.toDegrees(movementVectors[2]);
+
+		Location deltaLocation =
+				new Location(movementVectors[1], movementVectors[0], movementVectors[2]);
 		/*
-		double wheelPosition = (trackLength + trackWidth) * 0.5;
-		Matrix kinematics = new Matrix(new double[][]{
-				{ 1, 1, 1, 1 },
-				{ -1, 1, -1, 1 },
-				{ -1 / wheelPosition, -1 / wheelPosition, 1 / wheelPosition, 1 / wheelPosition }
-		});
-		Matrix wheelRotations = new Matrix(new double[][]{rotationAngles}).transpose();
-		double[] movementVectors = kinematics.mul(wheelRotations)
-				.scale(wheelDiameter / 2)
-				.transpose()
-				.getData()[0];
-		
 		Location deltaLocation;
 		double a = Math.toRadians(currentLocation.getHeading());
 		double cosA = Math.cos(a);
@@ -134,8 +162,8 @@ public class MecanumDrive {
 					r * (Math.sin(theta + a) - sinA),
 					Math.toDegrees(theta)
 			);
-		}
-		currentLocation.add(deltaLocation);*/
+		}*/
+		currentLocation.add(deltaLocation);
 	}
 
 	private void correctTrajectory() {
@@ -212,5 +240,30 @@ public class MecanumDrive {
 
 	public boolean isMoving() {
 		return isMoving;
+	}
+
+	public int[] getMotorLocations() {
+		int[] locations = new int[4];
+		for (int i = 0; i < 4; i++) {
+			locations[i] = driveMotors[i].getCurrentPosition();
+		}
+		return locations;
+	}
+
+	public void calibrate() {
+		long startTime = previousTime;
+		double[] speeds = { 1, 1, -1, -1 };
+		for (int i = 0; i < 4; i++) {
+			driveMotors[i].setPower(speeds[i]);
+		}
+		while (mode.opModeIsActive() && startTime + 10_000_000 > System.nanoTime()) {
+			update();
+		}
+		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC,
+				AxesOrder.XYZ, AngleUnit.DEGREES);
+		double angleRatio = angles.firstAngle / currentLocation.getHeading();
+		mode.telemetry.addData("Angle ratio", angleRatio);
+		mode.telemetry.update();
+		while (mode.opModeIsActive());
 	}
 }

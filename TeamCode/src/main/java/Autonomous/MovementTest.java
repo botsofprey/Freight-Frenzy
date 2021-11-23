@@ -3,6 +3,8 @@ package Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import java.util.Arrays;
+
 import DriveEngine.MecanumDrive;
 import UtilityClasses.Location;
 
@@ -19,11 +21,13 @@ public class MovementTest extends LinearOpMode {
 		telemetry.update();
 		waitForStart();
 
+		drive.calibrate();
+
 		//drive.moveToLocation(new Location(0, 24, 0));
 		while (opModeIsActive()) {
 			drive.update();
-			telemetry.addData("Location", drive.getCurrentLocation());
-			telemetry.update();
+			//telemetry.addData("Location", drive.getCurrentLocation());
+			//telemetry.update();
 		}
 	}
 }
