@@ -18,8 +18,8 @@ public class TeleOpTest extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		controller1 = new Controller(gamepad1);
-		roundabout = new Carousel(hardwareMap, this);
-		lift = new Lift(hardwareMap, this);
+		roundabout = new Carousel(hardwareMap, this, true);
+		lift = new Lift(hardwareMap, this, true);
 		drive = new TankDrive(hardwareMap, this);
 
 
@@ -36,14 +36,6 @@ public class TeleOpTest extends LinearOpMode {
 				roundabout.rotate();
 			} else if (controller1.aReleased) {
 				roundabout.stop();
-			}
-
-			if (controller1.leftTriggerHeld){
-				lift.moveDown();
-			} else if (controller1.rightTriggerHeld) {
-				lift.moveUp();
-			} else {
-				lift.brake();
 			}
 			telemetry.addData("left trigger", controller1.leftTriggerHeld);
 			telemetry.addData("right trigger", controller1.rightTriggerHeld);

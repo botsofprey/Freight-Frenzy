@@ -10,10 +10,11 @@ public class Carousel {
 	private CRServoController carousel;
 	private LinearOpMode mode;
 
-	public Carousel(HardwareMap hardwareMap, LinearOpMode m){
+	public Carousel(HardwareMap hardwareMap, LinearOpMode m, boolean errors){
 		mode = m;
 		try {
-			carousel = new CRServoController(hardwareMap, "carousel_servo", mode);
+			carousel = new CRServoController(hardwareMap,
+					"carousel_servo", mode, errors);
 		}
 		catch (IllegalArgumentException e) {
 			e.printStackTrace();
@@ -23,7 +24,7 @@ public class Carousel {
 
 	public void rotate() {
 		try {
-			carousel.setPower(0.4);
+			carousel.setPower(-0.4);
 		}
 		catch (IllegalArgumentException e) {
 			e.printStackTrace();

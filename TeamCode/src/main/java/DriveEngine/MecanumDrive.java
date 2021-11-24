@@ -56,10 +56,11 @@ public class MecanumDrive {
 	private BNO055IMU imu;
 	
 	
-	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m) {
+	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m,
+						boolean errors) {
 		mode = m;
 		
-		initFromConfig(hw, fileName);
+		initFromConfig(hw, fileName, errors);
 
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -86,11 +87,11 @@ public class MecanumDrive {
 		previousTime = System.nanoTime();
 	}
 	
-	private void initFromConfig(HardwareMap hw, String fileName) {
+	private void initFromConfig(HardwareMap hw, String fileName, boolean errors) {
 		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");
-			driveMotors[i] = new MotorController(hw, motorName, mode);
+			driveMotors[i] = new MotorController(hw, motorName, mode, errors);
 			driveMotors[i].setDirection(
 					reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
 							DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE

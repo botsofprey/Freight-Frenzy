@@ -14,21 +14,30 @@ public class MotorController {
 	public DcMotorEx motor;
 	private String name;
 
+	private boolean throwErrors;
+
 	private void error(Exception e) {
 		e.printStackTrace();
 		mode.telemetry.addData("Could not access motor", name);
-		throw new Error("Could not access motor: " + name);
+		if (throwErrors) {
+			throw new Error("Could not access motor: " + name);
+		}
 	}
 
-	public MotorController(HardwareMap hw, String motorName, LinearOpMode m) {
+	public MotorController(HardwareMap hw, String motorName, LinearOpMode m, boolean errors) {
 		mode = m;
 		name = motorName;
+		throwErrors = errors;
 
-		try {
+		if (errors) {
 			motor = hw.get(DcMotorEx.class, name);
 		}
-		catch (IllegalArgumentException e) {
-			error(e);
+		else {
+			try {
+				motor = hw.get(DcMotorEx.class, name);
+			} catch (IllegalArgumentException e) {
+				error(e);
+			}
 		}
 	}
 

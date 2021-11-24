@@ -1,6 +1,7 @@
 package Subsystems;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import UtilityClasses.HardwareWrappers.MotorController;
@@ -25,11 +26,12 @@ public class Intake {
 
 	private LinearOpMode mode;
 
-	public Intake(HardwareMap hw, LinearOpMode m) {
+	public Intake(HardwareMap hw, LinearOpMode m, boolean errors) {
 		mode = m;
 
-		intakeMotor = new MotorController(hw, "intakeMotor", mode);
-		state = 0;
+		intakeMotor = new MotorController(hw, "intakeMotor", mode, errors);
+		intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+		state = BRAKE;
 	}
 
 	public void intake() {
@@ -49,6 +51,10 @@ public class Intake {
 
 	public void switchState(int button) {
 		state = STATE_TABLE[state][button];
-		intakeMotor.setPower(state * MOTOR_POWER);
+		intakeMotor.setPower(getPowerFromState());
+	}
+
+	private double getPowerFromState() {
+		return state == 2 ? -MOTOR_POWER : (state * MOTOR_POWER);
 	}
 }

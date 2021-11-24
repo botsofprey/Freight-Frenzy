@@ -11,22 +11,30 @@ public class ServoController {
 
 	public Servo servo;
 	private String name;
+	private boolean throwErrors;
 
 	private void error(Exception e) {
 		e.printStackTrace();
 		mode.telemetry.addData("Could not access servo", name);
+		if (throwErrors) {
+			throw new Error("Could not access servo: " + name);
+		}
 	}
 
-	public ServoController(HardwareMap hw, String servoName, LinearOpMode m) {
+	public ServoController(HardwareMap hw, String servoName, LinearOpMode m, boolean errors) {
 		mode = m;
 		name = servoName;
+		throwErrors = errors;
 
-		servo = null;
-		try {
+		if (errors) {
 			servo = hw.get(Servo.class, name);
 		}
-		catch (IllegalArgumentException e) {
-			error(e);
+		else {
+			try {
+				servo = hw.get(Servo.class, name);
+			} catch (IllegalArgumentException e) {
+				error(e);
+			}
 		}
 	}
 

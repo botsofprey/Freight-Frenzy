@@ -15,7 +15,7 @@ public class MovementTest extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(0, 0, 0), this);
+				new Location(0, 0, 0), this, true);
 
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
