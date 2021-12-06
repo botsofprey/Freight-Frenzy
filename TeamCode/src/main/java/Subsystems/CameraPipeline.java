@@ -27,9 +27,11 @@ public class CameraPipeline extends OpenCvPipeline {
 		String ret = detector.detectAndDecode(input);
 		mode.telemetry.addData("Pipeline", "Detected");
 		mode.telemetry.addData("Pipeline", ret);
+		mode.telemetry.addData("Pipeline", qrCodeString);
 		mode.telemetry.update();
 
 		if (!ret.equals("")) {
+			qrCodeString = ret;
 			mode.sleep(3000);
 		}
 
