@@ -21,11 +21,14 @@ public class MovementTest extends LinearOpMode {
 		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this, true);
 		
-		CameraPipeline pipeline = new CameraPipeline();
+		CameraPipeline pipeline = new CameraPipeline(this);
 		Camera camera = new Camera(hardwareMap, "Webcam 1", pipeline, this);
-		
-		telemetry.addData("Status", "Initialized");
+
+		while (pipeline.getPointsString().equals(""));
+		telemetry.addData("Code", pipeline.getQrCodeString());
+		telemetry.addData("Points", pipeline.getPointsString());
 		telemetry.update();
+
 		waitForStart();
 		
 		//drive.calibrate();

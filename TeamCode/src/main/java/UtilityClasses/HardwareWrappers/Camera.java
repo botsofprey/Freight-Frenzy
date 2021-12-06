@@ -13,6 +13,8 @@ public class Camera {
 	private LinearOpMode mode;
 
 	public Camera(HardwareMap hw, String name, OpenCvPipeline pipeline, LinearOpMode m) {
+		m.telemetry.addData("Camera", "Initializing");
+		m.telemetry.update();
 		mode = m;
 		
 		WebcamName webcamName = hw.get(WebcamName.class, name);
@@ -20,6 +22,8 @@ public class Camera {
 		OpenCvCamera camera =
 				OpenCvCameraFactory.getInstance().createWebcam(webcamName);
 
+		mode.telemetry.addData("Camera", "Opening");
+		mode.telemetry.update();
 		camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 			@Override
 			public void onOpened() {
