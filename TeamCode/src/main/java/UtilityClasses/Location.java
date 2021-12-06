@@ -6,13 +6,11 @@ public class Location {
 	private double x;
 	private double y;
 	private double heading;//range [-180, 180)
-	private double rawHeading;
 	
 	public Location(double x, double y, double heading) {
 		this.x = x;
 		this.y = y;
 		this.heading = heading;
-		this.rawHeading = heading;
 		normalizeHeading();
 	}
 	
@@ -27,22 +25,15 @@ public class Location {
 	public double getX() { return x; }
 	public double getY() { return y; }
 	public double getHeading() { return heading; }
-	public double getRawHeading() { return rawHeading; }
 	
 	public void setX(double x) { this.x = x; }
 	public void setY(double y) { this.y = y; }
-	public void setHeading(double heading) {
-		this.heading = heading;
-		this.rawHeading = heading;
-		normalizeHeading();
-	}
-	public void setRawHeading(double rawHeading) { this.rawHeading = rawHeading; }
+	public void setHeading(double heading) { this.heading = heading; normalizeHeading(); }
 	
 	public Location addX(double dx) { x += dx; return this; }
 	public Location addY(double dy) { y += dy; return this; }
 	public Location addHeading(double dHeading) {
 		heading += dHeading;
-		rawHeading += dHeading;
 		normalizeHeading();
 		return this;
 	}
@@ -55,7 +46,6 @@ public class Location {
 		x += location.x;
 		y += location.y;
 		heading += location.heading;
-		rawHeading += location.rawHeading;
 		normalizeHeading();
 		return this;
 	}
@@ -77,14 +67,14 @@ public class Location {
 		heading = normalizeHeading(heading);
 	}
 
-	public static double normalizeHeading(double h) {
+	public static double normalizeHeading(double h) {/*
 		h %= 360;
 		if (h < -180) {
 			h += 360;
 		}
 		else if (h >= 180) {
 			h -= 360;
-		}
+		}*/
 		return h;
 	}
 	

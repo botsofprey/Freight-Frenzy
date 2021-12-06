@@ -47,48 +47,49 @@ public class MecanumDrive {
 	private double trackWidth;
 	private double trackLength;
 	private double maxSpeed;
-	
+
 	private Path path;
 	private boolean isMoving;
-	
+
 	private LinearOpMode mode;
-	
+
 	private BNO055IMU imu;
 	private double previousHeading;
 	private double numTurns;
 	
 	
 	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m,
-	                    boolean errors) {
+						boolean errors) {
 		mode = m;
 		
 		initFromConfig(hw, fileName, errors);
-		
+
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-		
+
 		parameters.mode                = BNO055IMU.SensorMode.IMU;
 		parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
 		parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
 		parameters.loggingEnabled      = false;
-		
+
 		// Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
 		// on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
 		// and named "imu".
 		imu = hw.get(BNO055IMU.class, "imu");
-		
+
 		imu.initialize(parameters);
-		
+
 		List<LynxModule> allHubs = hw.getAll(LynxModule.class);
 		for (LynxModule hub : allHubs) {
 			hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 		}
-		
+
+		previousHeading = 0;
+		numTurns = 0;
+
 		currentLocation = startLocation;
 		previousPositions = new long[] { 0, 0, 0, 0 };
 		motorSpeeds = new double[] { 0, 0, 0, 0 };
 		previousTime = System.nanoTime();
-		previousHeading = 0;
-		numTurns = 0;
 	}
 	
 	private void initFromConfig(HardwareMap hw, String fileName, boolean errors) {
@@ -135,7 +136,7 @@ public class MecanumDrive {
 		}
 		double rotation = ((motorDistances[2] - motorDistances[0] +
 				motorDistances[3] - motorDistances[1]) / 4);
-		
+
 		double[] movementVectors = {
 				motorDistances[0] + motorDistances[1] + motorDistances[2] + motorDistances[3],
 				motorDistances[0] - motorDistances[1] + motorDistances[2] - motorDistances[3],
@@ -144,7 +145,7 @@ public class MecanumDrive {
 		movementVectors[0] *= -0.25;
 		movementVectors[1] *= -0.25;
 		movementVectors[2] = Math.toDegrees(movementVectors[2]);
-		
+
 		Location deltaLocation =
 				new Location(movementVectors[1], movementVectors[0], movementVectors[2]);
 		/*
@@ -170,7 +171,7 @@ public class MecanumDrive {
 		}*/
 		currentLocation.add(deltaLocation);
 	}
-	
+
 	private void correctTrajectory() {
 		if (currentLocation.distanceToLocation(path.getEnd()) < path.getError()) {
 			isMoving = false;
@@ -233,8 +234,8 @@ public class MecanumDrive {
 		}
 		previousHeading = heading;
 	}
-	
-	
+
+
 	public void moveToLocation(Location location) {
 		path = new Path(currentLocation, location);
 		isMoving = true;
@@ -248,11 +249,11 @@ public class MecanumDrive {
 	public Location getCurrentLocation() {
 		return currentLocation;
 	}
-	
+
 	public boolean isMoving() {
 		return isMoving;
 	}
-	
+
 	public int[] getMotorLocations() {
 		int[] locations = new int[4];
 		for (int i = 0; i < 4; i++) {
@@ -260,24 +261,23 @@ public class MecanumDrive {
 		}
 		return locations;
 	}
-	
+
 	public void calibrate() {
-		update();
 		long startTime = previousTime;
 		double[] speeds = { 1, 1, -1, -1 };
 		for (int i = 0; i < 4; i++) {
 			driveMotors[i].setPower(speeds[i]);
 		}
-		while (mode.opModeIsActive() && startTime + 30_000_000_000L > System.nanoTime()) {
+		while (mode.opModeIsActive() && startTime + 10_000_000 > System.nanoTime()) {
 			update();
 		}
-		double angleRatio = (numTurns * 360 + previousHeading) / currentLocation.getRawHeading();
+		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC,
+				AxesOrder.XYZ, AngleUnit.DEGREES);
+		double angleRatio = angles.firstAngle / currentLocation.getHeading();
 		mode.telemetry.addData("Angle ratio", angleRatio);
-		mode.telemetry.addData("Raw heading", currentLocation.getRawHeading());
-		mode.telemetry.addData("IMU heading", numTurns * 360 + previousHeading);
 		mode.telemetry.update();
-		for (int i = 0; i < 4; i++) {
-			driveMotors[i].setPower(0);
-		}
+		while (mode.opModeIsActive());
 	}
+
+
 }
