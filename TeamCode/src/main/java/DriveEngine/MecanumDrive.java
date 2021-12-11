@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -35,10 +36,17 @@ public class MecanumDrive {
 	
 	
 	private volatile MotorController[] driveMotors = new MotorController[4];
+
+	private double Kt = 2.383 / 9.2;
+	private double R = 12 / 9.2;
+	private double Kv = 312 / (12 - 0.25 * R);
+	private double maxTorque;
+	private double buffer = 0.8;
 	
 	private volatile Location currentLocation;
 	
 	private double[] motorSpeeds;//  rad/s
+	private double[] motorRPMs;
 	private long[] previousPositions;//  ticks
 	private long previousTime;//  nanos
 	
@@ -56,6 +64,10 @@ public class MecanumDrive {
 	private BNO055IMU imu;
 	private double previousHeading;
 	private double numTurns;
+
+	private PIDCoefficients coefficients = new PIDCoefficients(0.5, 0, 0);
+	private PIDCoefficients headingCoefficients = new PIDCoefficients(0.5, 0, 0);
+	private double lookAheadDistance = 0.2;
 	
 	
 	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m,
@@ -133,6 +145,7 @@ public class MecanumDrive {
 			rotationAngles[i] = positions[i] / (encoderCPR * 2 * Math.PI);
 			motorDistances[i] = Math.PI * wheelDiameter * positions[i] / encoderCPR;
 			motorSpeeds[i] = rotationAngles[i] / timeDiff;
+			motorRPMs[i] = rotationAngles[i] * 2 * Math.PI;
 		}
 		double rotation = ((motorDistances[2] - motorDistances[0] +
 				motorDistances[3] - motorDistances[1]) / 4);
@@ -172,6 +185,49 @@ public class MecanumDrive {
 		currentLocation.add(deltaLocation);
 	}
 
+	private double[] getPowerRange(double currentRPM) {
+		double lower = (currentRPM / Kv - buffer * maxTorque * R / Kt) / 12.0;
+		double upper = (currentRPM / Kv + buffer * maxTorque * R / Kt) / 12.0;
+		return new double[]{ lower, upper };
+	}
+
+	private void adjustWheelPowers(double[] wheelPowers) {
+		double[][] wheelRanges = {
+				getPowerRange(motorRPMs[0]),
+				getPowerRange(motorRPMs[1]),
+				getPowerRange(motorRPMs[2]),
+				getPowerRange(motorRPMs[3])
+		};
+		double[] scaleFactors = new double[4];
+		for (int i = 0; i < 4; i++) {
+			double clampedValue =
+					Math.min(wheelRanges[i][1], Math.max(wheelRanges[i][0], wheelPowers[i]));
+			scaleFactors[i] = clampedValue / wheelPowers[i];
+		}
+		double maxDiff = 0;
+		int index = 0;
+		for (int i = 0; i < 4; i++) {
+			if (Math.abs(scaleFactors[i] - 1) > maxDiff) {
+				maxDiff = Math.abs(scaleFactors[i] - 1);
+				index = i;
+			}
+		}
+		for (int i = 0; i < 4; i++) {
+			wheelPowers[i] /= scaleFactors[index];
+		}
+	}
+
+	private void correctTrajectory() {
+		if (currentLocation.distanceToLocation(path.getEnd()) < path.getError()) {
+			isMoving = false;
+			for (int i = 0; i < 4; i++) {
+				driveMotors[i].setPower(0);
+			}
+			return;
+		}
+
+	}
+/*
 	private void correctTrajectory() {
 		if (currentLocation.distanceToLocation(path.getEnd()) < path.getError()) {
 			isMoving = false;
@@ -221,7 +277,7 @@ public class MecanumDrive {
 			driveMotors[i].setPower(driveBasePowers[i]);
 		}
 	}
-	
+	*/
 	public void update() {
 		updateLocation();
 		if (isMoving) {

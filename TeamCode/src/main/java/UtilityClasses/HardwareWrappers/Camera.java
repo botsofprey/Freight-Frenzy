@@ -9,18 +9,17 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class Camera {
+	private OpenCvCamera camera;
 
 	private LinearOpMode mode;
+	private boolean open = false;
 
 	public Camera(HardwareMap hw, String name, OpenCvPipeline pipeline, LinearOpMode m) {
-		m.telemetry.addData("Camera", "Initializing");
-		m.telemetry.update();
 		mode = m;
 		
 		WebcamName webcamName = hw.get(WebcamName.class, name);
 
-		OpenCvCamera camera =
-				OpenCvCameraFactory.getInstance().createWebcam(webcamName);
+		camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
 
 		mode.telemetry.addData("Camera", "Opening");
 		mode.telemetry.update();
@@ -29,6 +28,8 @@ public class Camera {
 			public void onOpened() {
 				camera.startStreaming(1920, 1080);
 				camera.setPipeline(pipeline);
+				mode.telemetry.addData("Status", "Camera running");
+				open = true;
 			}
 
 			@Override
@@ -37,5 +38,13 @@ public class Camera {
 				mode.telemetry.update();
 			}
 		});
+	}
+
+	public boolean isOpen() {
+		return open;
+	}
+
+	public void stop() {
+		camera.stopStreaming();
 	}
 }

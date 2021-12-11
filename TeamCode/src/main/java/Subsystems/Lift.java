@@ -55,6 +55,7 @@ public class Lift {
 		slide = new MotorController(hardwareMap, "Slider", mode, errors);
 		slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		slide.setDirection(DcMotorSimple.Direction.REVERSE);
+		slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 		bucketWall = new ServoController(hardwareMap, "bucket", mode, errors);
 		bucketWall.setPosition(1);
@@ -111,19 +112,21 @@ public class Lift {
 
 	public void up() {
 		modeCheck();
-		slide.setPower(1);
+		slide.setPower(0.5);
 	}
 
 	public void down() {
 		modeCheck();
 		if (limitSwitch.getState()) {
-			slide.setPower(-1);
+			slide.setPower(-0.2);
 		}
 	}
 
 	public void brake() {
 		modeCheck();
-		slide.setPower(0);
+		slide.setTargetPosition(slide.getCurrentPosition());
+		slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		usingEncoders = true;
 	}
 
 	public void positionUp() {

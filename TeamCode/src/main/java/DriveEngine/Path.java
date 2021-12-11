@@ -65,6 +65,8 @@ public class Path {
 		return error;
 	}
 
+	public double getPathLength() { return pathLength; }
+
 	public void setStart(Location start) {
 		this.start = start;
 		calculateConstants();

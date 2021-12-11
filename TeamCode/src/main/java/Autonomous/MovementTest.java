@@ -24,9 +24,7 @@ public class MovementTest extends LinearOpMode {
 		CameraPipeline pipeline = new CameraPipeline(this);
 		Camera camera = new Camera(hardwareMap, "Webcam 1", pipeline, this);
 
-		while (pipeline.getPointsString().equals(""));
-		telemetry.addData("Code", pipeline.getQrCodeString());
-		telemetry.addData("Points", pipeline.getPointsString());
+		while (opModeIsActive() && pipeline.getShippingElementLocation() == 0);
 		telemetry.update();
 
 		waitForStart();

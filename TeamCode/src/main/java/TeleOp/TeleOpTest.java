@@ -34,7 +34,7 @@ public class TeleOpTest extends LinearOpMode {
 			telemetry.update();
 			waitForStart();
 
-			lift.zeroSlider();
+			//lift.zeroSlider();
 
 			while (opModeIsActive()) {
 				controller1.update();
