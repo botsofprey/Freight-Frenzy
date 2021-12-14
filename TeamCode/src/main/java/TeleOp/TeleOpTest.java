@@ -16,6 +16,7 @@ public class TeleOpTest extends LinearOpMode {
 	private Intake intake;
 	private Carousel carousel;
 	private Controller controller1;
+	private Controller controller2;
 
 	private static final boolean throwErrors = true;
 
@@ -24,11 +25,12 @@ public class TeleOpTest extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		try {
 			drive = new TeleOpMotorDriver(hardwareMap, "RobotConfig.json",
-					false, this, throwErrors);
+					true, this, throwErrors);
 			lift = new Lift(hardwareMap, this, throwErrors);
 			intake = new Intake(hardwareMap, this, throwErrors);
 			carousel = new Carousel(hardwareMap, this, throwErrors);
 			controller1 = new Controller(gamepad1);
+			controller2 = new Controller(gamepad2);
 
 			telemetry.addData("Status", "Initialized");
 			telemetry.update();
@@ -38,32 +40,26 @@ public class TeleOpTest extends LinearOpMode {
 
 			while (opModeIsActive()) {
 				controller1.update();
+				controller2.update();
 
 				drive.moveRobot(controller1.leftStick.x, controller1.leftStick.y,
 						controller1.rightStick.x);
 
-				if (controller1.upPressed) {
-					lift.positionUp();
-				}
-				if (controller1.downPressed) {
-					lift.positionDown();
-				}
-
-				if (controller1.rightTriggerPressed) {
+				if (controller2.rightTriggerPressed) {
 					lift.up();
 				}
-				if (controller1.leftTriggerPressed) {
+				if (controller2.leftTriggerPressed) {
 					lift.down();
 				}
-				if (controller1.rightTriggerReleased || controller1.leftTriggerReleased) {
+				if (controller2.rightTriggerReleased || controller2.leftTriggerReleased) {
 					lift.brake();
 				}
 
-				if (controller1.aPressed) {
+				if (controller2.aPressed) {
 					intake.switchState(Intake.INTAKE_BUTTON);
 				}
 
-				if (controller1.bPressed) {
+				if (controller2.bPressed) {
 					intake.switchState(Intake.OUTTAKE_BUTTON);
 				}
 
@@ -71,14 +67,17 @@ public class TeleOpTest extends LinearOpMode {
 					lift.dropFreight();
 				}
 
-				if (controller1.xHeld) {
+				if (controller2.xHeld) {
 					carousel.rotate();
 				} else {
 					carousel.stop();
 				}
 
-				if (controller1.startPressed) {
-					drive.toggleSlowMode();
+				if (controller1.leftTriggerPressed) {
+					drive.slowMode();
+				}
+				if (controller1.leftTriggerReleased) {
+					drive.noSlowMode();
 				}
 
 				lift.update();

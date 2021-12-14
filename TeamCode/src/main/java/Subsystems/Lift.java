@@ -11,7 +11,7 @@ import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.HardwareWrappers.ServoController;
 
 public class Lift {
-	private static final double TICKS_PER_INCH = 537.7 / (0.945 * Math.PI) * (7.6 / 5.8);
+	private static final double TICKS_PER_INCH = 145.1 / (0.945 * Math.PI) * (7.6 / 5.8);
 
 	public static final int UP_BUTTON = 0;
 	public static final int DOWN_BUTTON = 1;
@@ -30,7 +30,6 @@ public class Lift {
 	private static final double[] POSITIONS = {
 			4.5,
 			6,
-			7,
 			8
 	};
 	private int position;
@@ -130,13 +129,15 @@ public class Lift {
 	}
 
 	public void positionUp() {
-		position = Math.min(3, position + 1);
-		move(POSITIONS[position]);
+		move(POSITIONS[2]);
+	}
+
+	public void positionMiddle() {
+		move(POSITIONS[1]);
 	}
 
 	public void positionDown() {
-		position = Math.max(0, position - 1);
-		move(POSITIONS[position]);
+		move(POSITIONS[0]);
 	}
 
 	public double getCurrentHeight(){

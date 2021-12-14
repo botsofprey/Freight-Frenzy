@@ -16,15 +16,17 @@ public class TractionCalibration extends LinearOpMode {
 
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
+		waitForStart();
 
-		double power = 0;
+		double power = 0.3;
+		drive.moveRobot(0, power, 0);
 
 		while (opModeIsActive()) {
 			controller.update();
 			telemetry.addData("power", power);
 
 			if (controller.aPressed) {
-				power += 0.05;
+				power += 0.01;
 				drive.moveRobot(0, power, 0);
 			}
 

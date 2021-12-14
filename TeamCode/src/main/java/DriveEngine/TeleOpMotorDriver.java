@@ -68,6 +68,8 @@ public class TeleOpMotorDriver {
 	}
 
 	public void toggleSlowMode() { slowMode = !slowMode; }
+	public void slowMode() { slowMode = true; }
+	public void noSlowMode() { slowMode = false; }
 	
 	public void moveRobot(double x, double y, double a) {
 		if (slowMode) {
@@ -77,7 +79,7 @@ public class TeleOpMotorDriver {
 		}
 		a *= -1;
 		if (trueNorth) {
-			double heading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ,
+			double heading = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX,
 					AngleUnit.DEGREES).firstAngle;
 			Vec2d movementVector = new Vec2d(x, y);
 			movementVector.convertToAngleMagnitude();
