@@ -1,5 +1,7 @@
 package UtilityClasses;
 
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+
 public class PIDController {
 	private volatile double targetPoint;
 	private volatile double Kp;
@@ -20,14 +22,14 @@ public class PIDController {
 		previousError = Double.NaN;
 	}
 	
+	public PIDController(PIDCoefficients coefficients) {
+		this(coefficients.p, coefficients.i, coefficients.d);
+	}
+	
 	public double getTargetPoint() {
 		return targetPoint;
 	}
-	public void setTargetPoint(double newTarget) {
-		targetPoint = newTarget;
-		previousTime = System.currentTimeMillis();
-		previousError = Double.NaN;
-	}
+	public void setTargetPoint(double newTarget) { targetPoint = newTarget; }
 	
 	public double getKp() { return Kp; }
 	public double getKi() { return Ki; }

@@ -21,6 +21,8 @@ import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
 import UtilityClasses.Matrix;
+import UtilityClasses.PIDController;
+import UtilityClasses.Vec2d;
 
 public class MecanumDrive {
 	private static final double FRONT_LEFT_DRIVE_MOTOR = 0;
@@ -33,6 +35,8 @@ public class MecanumDrive {
 			"backRightDriveMotor",
 			"frontRightDriveMotor"
 	};
+	
+	private static final double SQRT_ONE_HALF = Math.sqrt(0.5);
 	
 	
 	private volatile MotorController[] driveMotors = new MotorController[4];
@@ -65,9 +69,13 @@ public class MecanumDrive {
 	private double previousHeading;
 	private double numTurns;
 
-	private PIDCoefficients coefficients = new PIDCoefficients(0.5, 0, 0);
-	private PIDCoefficients headingCoefficients = new PIDCoefficients(0.5, 0, 0);
-	private double lookAheadDistance = 0.2;
+	private PIDCoefficients coefficients = new PIDCoefficients(0.1, 0.1, 0.2);
+	private PIDCoefficients headingCoefficients = new PIDCoefficients(0.01, 0.01, 0.02);
+	private PIDController xController = new PIDController(coefficients);
+	private PIDController yController = new PIDController(coefficients);
+	private PIDController hController = new PIDController(headingCoefficients);
+	private double lookAheadDistance = 6;
+	private double lookAheadLocation;
 	
 	
 	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m,
@@ -225,59 +233,20 @@ public class MecanumDrive {
 			}
 			return;
 		}
-
+		
+		double location = path.reverse_interpolate(currentLocation);
+		location += lookAheadLocation;
+		location = Math.min(location, 1);
+		Location target = path.interpolateLocation(location);
+		xController.setTargetPoint(target.getX());
+		yController.setTargetPoint(target.getY());
+		hController.setTargetPoint(target.getHeading());
+		double xMovement = xController.calculateAdjustment(currentLocation.getX());
+		double yMovement = xController.calculateAdjustment(currentLocation.getY());
+		double hMovement = xController.calculateAdjustment(currentLocation.getHeading());
+		moveRobot(xMovement, yMovement, hMovement);
 	}
-/*
-	private void correctTrajectory() {
-		if (currentLocation.distanceToLocation(path.getEnd()) < path.getError()) {
-			isMoving = false;
-			for (int i = 0; i < 4; i++) {
-				driveMotors[i].setPower(0);
-			}
-			return;
-		}
-		Location targetLocation = path.getTargetLocation(currentLocation, 0.01 * maxSpeed);
-		double r = targetLocation.getHeading();
-		targetLocation.subXY(currentLocation);
-		double sinA = Math.sin(Math.toRadians(currentLocation.getHeading()));
-		double cosA = Math.cos(Math.toRadians(currentLocation.getHeading()));
-		Matrix reverseRotation = new Matrix(new double[][]{
-				{	cosA,	sinA	},
-				{	-sinA,	cosA	}
-		});
-		Matrix rotation = new Matrix(new double[][]{
-				{	cosA,	-sinA	},
-				{	sinA,	cosA	}
-		});
-		double wheelPosition = (trackLength + trackWidth) * 0.5;
-		Matrix inverseKinematics = new Matrix(new double[][]{
-				{	1,	-1,	-wheelPosition	},
-				{	1,	1,	-wheelPosition	},
-				{	1,	-1,	wheelPosition	},
-				{	1,	1,	wheelPosition	}
-		});
-		double[] movementVector = new Matrix(new double[][]{
-				{targetLocation.getX()},
-				{targetLocation.getY()}
-		}).mul(reverseRotation).transpose().getData()[0];
-		double theta = Math.acos(Math.max(
-				1 - Math.hypot(movementVector[0], movementVector[1]) / (2.0 * r * r),
-				-1
-		));
-		double xm = r * theta * Math.cos(theta / 2.0);
-		double ym = -r * theta * Math.sin(theta / 2.0);
-		double[] robotMovement = new Matrix(new double[][]{ {xm}, {ym} })
-				.mul(rotation).transpose().getData()[0];
-		double[] driveBasePowers = new Matrix(new double[][]{
-				{ robotMovement[1] },
-				{ -robotMovement[0] },
-				{ theta }
-		}).mul(inverseKinematics).scale(2.0 / wheelDiameter).transpose().getData()[0];
-		for (int i = 0; i < 4; i++) {
-			driveMotors[i].setPower(driveBasePowers[i]);
-		}
-	}
-	*/
+	
 	public void update() {
 		updateLocation();
 		if (isMoving) {
@@ -295,6 +264,7 @@ public class MecanumDrive {
 	public void moveToLocation(Location location) {
 		path = new Path(currentLocation, location);
 		isMoving = true;
+		lookAheadLocation = lookAheadDistance / path.getPathLength();
 		while (mode.opModeIsActive() && isMoving) {
 			if (System.nanoTime() - previousTime > 10_000_000) {
 				update();
@@ -334,6 +304,26 @@ public class MecanumDrive {
 		mode.telemetry.update();
 		while (mode.opModeIsActive());
 	}
-
-
+	
+	public void moveRobot(double x, double y, double a) {
+		Vec2d movementVector = new Vec2d(x, y);
+		movementVector.convertToAngleMagnitude();
+		movementVector.angle -= currentLocation.getHeading();
+		movementVector.convertToXY();
+		x = movementVector.x;
+		y = movementVector.y;
+		
+		double rightVector = SQRT_ONE_HALF * (y + x);
+		double leftVector = SQRT_ONE_HALF * (y - x);
+		double[] powers = {
+				rightVector - a,
+				leftVector - a,
+				rightVector + a,
+				leftVector + a
+		};
+		adjustWheelPowers(powers);
+		for (int i = 0; i < powers.length; i++) {
+			driveMotors[i].setPower(powers[i]);
+		}
+	}
 }
