@@ -51,7 +51,8 @@ public class TeleOpTest extends LinearOpMode {
 				if (controller2.leftTriggerPressed) {
 					lift.down();
 				}
-				if (controller2.rightTriggerReleased || controller2.leftTriggerReleased) {
+				if (controller2.rightTriggerReleased && !controller2.leftTriggerPressed ||
+						controller2.leftTriggerReleased && !controller2.rightTriggerPressed) {
 					lift.brake();
 				}
 
