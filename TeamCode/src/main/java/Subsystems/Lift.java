@@ -44,12 +44,14 @@ public class Lift {
 
 	private boolean open;
 	private boolean usingEncoders;
+	private boolean braking;
 
 	public Lift(HardwareMap hardwareMap, LinearOpMode opMode, boolean errors) {
 		mode = opMode;
 		open = false;
 		usingEncoders = true;
 		position = 0;
+		braking = false;
 
 		slide = new MotorController(hardwareMap, "Slider", mode, errors);
 		slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -64,6 +66,7 @@ public class Lift {
 	}
 
 	public void zeroSlider(){
+		braking = false;
 		slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 		if(!limitSwitch.getState()){
@@ -82,6 +85,7 @@ public class Lift {
 	}
 
 	public void move(double height) {
+		braking = false;
 		usingEncoders = true;
 		height -= 5;
 		slide.setTargetPosition((int)(height * TICKS_PER_INCH));
@@ -92,16 +96,6 @@ public class Lift {
 		}
 	}
 
-	public void switchState(int button) {
-		modeCheck();
-		state = STATE_TABLE[state][button];
-		slide.setPower(getPowerFromState());
-	}
-
-	private double getPowerFromState() {
-		return state == 2 ? -MOTOR_POWER : (state * MOTOR_POWER);
-	}
-
 	private void modeCheck() {
 		if (usingEncoders) {
 			usingEncoders = false;
@@ -110,11 +104,13 @@ public class Lift {
 	}
 
 	public void up() {
+		braking = false;
 		modeCheck();
 		slide.setPower(0.5);
 	}
 
 	public void down() {
+		braking = false;
 		modeCheck();
 		if (limitSwitch.getState()) {
 			slide.setPower(-0.2);
@@ -122,10 +118,13 @@ public class Lift {
 	}
 
 	public void brake() {
-		modeCheck();
-		slide.setTargetPosition(slide.getCurrentPosition());
-		slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-		usingEncoders = true;
+		if (!braking) {
+			modeCheck();
+			slide.setTargetPosition(slide.getCurrentPosition());
+			slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+			usingEncoders = true;
+			braking = true;
+		}
 	}
 
 	public void positionUp() {

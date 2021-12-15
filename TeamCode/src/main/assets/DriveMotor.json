@@ -1,5 +1,8 @@
 {
   "ticks_per_revolution": 537.7,
   "wheel_diameter": 3.78,
-  "max_rpm": 312.0
+  "max_rpm": 312.0,
+  "no_load_current": 0.25,
+  "stall_torque": 2.383,
+  "stall_current": 9.2
 }

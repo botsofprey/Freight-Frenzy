@@ -21,7 +21,7 @@ public class Carousel {
 
 	public void rotate() {
 		carousel.setPower(-0.4);
-		carousel1.setPower(-0.4);
+		carousel1.setPower(0.4);
 	}
 
 	public void stop() {

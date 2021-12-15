@@ -41,9 +41,9 @@ public class MecanumDrive {
 	
 	private volatile MotorController[] driveMotors = new MotorController[4];
 
-	private double Kt = 2.383 / 9.2;
-	private double R = 12 / 9.2;
-	private double Kv = 312 / (12 - 0.25 * R);
+	private double Kt;
+	private double R;
+	private double Kv;
 	private double maxTorque;
 	private double buffer = 0.8;
 	
@@ -66,8 +66,6 @@ public class MecanumDrive {
 	private LinearOpMode mode;
 
 	private BNO055IMU imu;
-	private double previousHeading;
-	private double numTurns;
 
 	private PIDCoefficients coefficients = new PIDCoefficients(0.1, 0.1, 0.2);
 	private PIDCoefficients headingCoefficients = new PIDCoefficients(0.01, 0.01, 0.02);
@@ -76,6 +74,8 @@ public class MecanumDrive {
 	private PIDController hController = new PIDController(headingCoefficients);
 	private double lookAheadDistance = 6;
 	private double lookAheadLocation;
+
+	private boolean slowMode;
 	
 	
 	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m,
@@ -103,12 +103,12 @@ public class MecanumDrive {
 			hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 		}
 
-		previousHeading = 0;
-		numTurns = 0;
+		slowMode = false;
 
 		currentLocation = startLocation;
 		previousPositions = new long[] { 0, 0, 0, 0 };
 		motorSpeeds = new double[] { 0, 0, 0, 0 };
+		motorRPMs = new double[] { 0, 0, 0, 0 };
 		previousTime = System.nanoTime();
 	}
 	
@@ -127,12 +127,18 @@ public class MecanumDrive {
 		}
 		trackWidth = reader.getDouble("trackWidth") / 2.0;
 		trackLength = reader.getDouble("trackLength") / 2.0;
+		maxTorque = reader.getDouble("maxDriveTorque");
 		
 		JSONReader motorReader = new JSONReader(hw, reader.getString("driveMotorFile"));
 		encoderCPR = motorReader.getDouble("ticks_per_revolution");
 		wheelDiameter = motorReader.getDouble("wheel_diameter");
 		maxSpeed =
 				Math.sqrt(2) * Math.PI * wheelDiameter * motorReader.getDouble("max_rpm") / 30;
+		double stallCurrent = motorReader.getDouble("stall_current");
+		Kt = motorReader.getDouble("stall_torque") / stallCurrent;
+		R = 12 / stallCurrent;
+		Kv = motorReader.getDouble("max_rpm") /
+				(12 - motorReader.getDouble("no_load_current") * R);
 	}
 	
 	private void updateLocation() {//  calculate new position from odometry data
@@ -141,7 +147,7 @@ public class MecanumDrive {
 			positions[i] = driveMotors[i].getCurrentPosition();
 		}
 		long currentTime = System.nanoTime();
-		
+
 		long deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
 		double timeDiff = deltaTime / 1_000_000_000.0;//convert nanoseconds to seconds
@@ -155,8 +161,8 @@ public class MecanumDrive {
 			motorSpeeds[i] = rotationAngles[i] / timeDiff;
 			motorRPMs[i] = rotationAngles[i] * 2 * Math.PI;
 		}
-		double rotation = ((motorDistances[2] - motorDistances[0] +
-				motorDistances[3] - motorDistances[1]) / 4);
+		double rotation = Math.toRadians(imu.getAngularOrientation(AxesReference.INTRINSIC,
+				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - currentLocation.getHeading());
 
 		double[] movementVectors = {
 				motorDistances[0] + motorDistances[1] + motorDistances[2] + motorDistances[3],
@@ -252,12 +258,6 @@ public class MecanumDrive {
 		if (isMoving) {
 			correctTrajectory();
 		}
-		double heading = imu.getAngularOrientation(AxesReference.INTRINSIC,
-				AxesOrder.XYZ, AngleUnit.DEGREES).firstAngle;
-		if (previousHeading > 90 && heading < -90) {
-			numTurns++;
-		}
-		previousHeading = heading;
 	}
 
 
@@ -306,6 +306,11 @@ public class MecanumDrive {
 	}
 	
 	public void moveRobot(double x, double y, double a) {
+		if (slowMode) {
+			x /= 3;
+			y /= 3;
+			a /= 3;
+		}
 		Vec2d movementVector = new Vec2d(x, y);
 		movementVector.convertToAngleMagnitude();
 		movementVector.angle -= currentLocation.getHeading();
@@ -326,4 +331,7 @@ public class MecanumDrive {
 			driveMotors[i].setPower(powers[i]);
 		}
 	}
+
+	public void slowMode() { slowMode = true; }
+	public void noSlowMode() { slowMode = false; }
 }
