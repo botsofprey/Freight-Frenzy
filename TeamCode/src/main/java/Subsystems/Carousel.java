@@ -8,37 +8,24 @@ import UtilityClasses.HardwareWrappers.CRServoController;
 
 public class Carousel {
 	private CRServoController carousel;
+	private CRServoController carousel1;
 	private LinearOpMode mode;
 
 	public Carousel(HardwareMap hardwareMap, LinearOpMode m, boolean errors){
 		mode = m;
-		try {
-			carousel = new CRServoController(hardwareMap,
-					"carousel_servo", mode, errors);
-		}
-		catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			mode.telemetry.addData("Could not reach servo", "carousel_servo");
-		}
+		carousel = new CRServoController(hardwareMap,
+				"carousel_servo", mode, errors);
+		carousel1 = new CRServoController(hardwareMap,
+				"carousel1", mode, errors);
 	}
 
 	public void rotate() {
-		try {
-			carousel.setPower(-0.4);
-		}
-		catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			mode.telemetry.addData("Could not reach servo", "carousel_servo");
-		}
+		carousel.setPower(-0.4);
+		carousel1.setPower(-0.4);
 	}
 
 	public void stop() {
-		try {
-			carousel.setPower(0);
-		}
-		catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			mode.telemetry.addData("Could not reach servo", "carousel_servo");
-		}
+		carousel.setPower(0);
+		carousel1.setPower(0);
 	}
 }
