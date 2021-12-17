@@ -10,6 +10,7 @@ public class Path {
 	private Location start;
 	private Location end;
 	private double error;
+	private double angleError;
 
 	private double m;
 	private double b;
@@ -21,6 +22,7 @@ public class Path {
 		start = s;
 		end = e;
 		this.error = error;
+		this.angleError = error;
 		calculateConstants();
 	}
 
@@ -60,12 +62,20 @@ public class Path {
 	public Location getEnd() {
 		return end;
 	}
-
+	
 	public double getError() {
 		return error;
 	}
+	
+	public double getAngleError() {
+		return angleError;
+	}
 
 	public double getPathLength() { return pathLength; }
+	
+	public double getPathAngleChange() {
+		return Math.abs(Location.normalizeHeading(start.getHeading() - end.getHeading()));
+	}
 
 	public void setStart(Location start) {
 		this.start = start;
@@ -76,9 +86,13 @@ public class Path {
 		this.end = end;
 		calculateConstants();
 	}
-
+	
 	public void setError(double error) {
 		this.error = error;
+	}
+	
+	public void setAngleError(double angleError) {
+		this.angleError = angleError;
 	}
 
 	private double interpolate(double a, double b, double t) {

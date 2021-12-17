@@ -19,23 +19,29 @@ public class MovementTest extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(0, 0, 0), this, true);
+				new Location(0, 0, 0), true, this, true);
 		
-		CameraPipeline pipeline = new CameraPipeline(this);
-		Camera camera = new Camera(hardwareMap, "Webcam 1", pipeline, this);
+		//CameraPipeline pipeline = new CameraPipeline(this);
+		//Camera camera = new Camera(hardwareMap, "Webcam 1", pipeline, this);
 
-		while (opModeIsActive() && pipeline.getShippingElementLocation() == 0);
+		//while (opModeIsActive() && pipeline.getShippingElementLocation() == 0);
+		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 
 		waitForStart();
+		telemetry.addData("Status", "Running");
+		telemetry.update();
 		
-		//drive.calibrate();
-		
-		//drive.moveToLocation(new Location(0, 24, 0));
 		while (opModeIsActive()) {
-			//drive.update();
-			//telemetry.addData("Location", drive.getCurrentLocation());
-			//telemetry.update();
+			drive.update();
+			drive.moveToLocation(new Location(0, 48, 90));
+			sleep(100);
+			drive.moveToLocation(new Location(48, 48, -180));
+			sleep(100);
+			drive.moveToLocation(new Location(48, 0, -90));
+			sleep(100);
+			drive.moveToLocation(new Location(0, 0, 0));
+			sleep(100);
 		}
 	}
 }

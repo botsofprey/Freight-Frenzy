@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import UtilityClasses.HardwareWrappers.MotorController;
@@ -67,19 +68,22 @@ public class MecanumDrive {
 
 	private BNO055IMU imu;
 
-	private PIDCoefficients coefficients = new PIDCoefficients(0.1, 0.1, 0.2);
-	private PIDCoefficients headingCoefficients = new PIDCoefficients(0.01, 0.01, 0.02);
+	private PIDCoefficients coefficients = new PIDCoefficients(0.1, 0.025, 0.05);
+	private PIDCoefficients headingCoefficients =
+			new PIDCoefficients(0.01, 0.005, 0.005);
 	private PIDController xController = new PIDController(coefficients);
 	private PIDController yController = new PIDController(coefficients);
 	private PIDController hController = new PIDController(headingCoefficients);
-	private double lookAheadDistance = 6;
-	private double lookAheadLocation;
+	private double pointCoefficient;
+	
+	private long moveStart;
 
 	private boolean slowMode;
+	private boolean trueNorth;
 	
 	
-	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m,
-						boolean errors) {
+	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, boolean north,
+	                    LinearOpMode m, boolean errors) {
 		mode = m;
 		
 		initFromConfig(hw, fileName, errors);
@@ -104,8 +108,10 @@ public class MecanumDrive {
 		}
 
 		slowMode = false;
-
+		trueNorth = north;
+		
 		currentLocation = startLocation;
+		path = new Path(currentLocation, currentLocation);
 		previousPositions = new long[] { 0, 0, 0, 0 };
 		motorSpeeds = new double[] { 0, 0, 0, 0 };
 		motorRPMs = new double[] { 0, 0, 0, 0 };
@@ -123,7 +129,7 @@ public class MecanumDrive {
 			);
 			driveMotors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			driveMotors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-			driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+			driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		}
 		trackWidth = reader.getDouble("trackWidth") / 2.0;
 		trackLength = reader.getDouble("trackLength") / 2.0;
@@ -161,41 +167,41 @@ public class MecanumDrive {
 			motorSpeeds[i] = rotationAngles[i] / timeDiff;
 			motorRPMs[i] = rotationAngles[i] * 2 * Math.PI;
 		}
-		double rotation = Math.toRadians(imu.getAngularOrientation(AxesReference.INTRINSIC,
-				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - currentLocation.getHeading());
-
-		double[] movementVectors = {
-				motorDistances[0] + motorDistances[1] + motorDistances[2] + motorDistances[3],
-				motorDistances[0] - motorDistances[1] + motorDistances[2] - motorDistances[3],
-				rotation
-		};
-		movementVectors[0] *= -0.25;
-		movementVectors[1] *= -0.25;
-		movementVectors[2] = Math.toDegrees(movementVectors[2]);
-
-		Location deltaLocation =
-				new Location(movementVectors[1], movementVectors[0], movementVectors[2]);
-		/*
-		Location deltaLocation;
-		double a = Math.toRadians(currentLocation.getHeading());
-		double cosA = Math.cos(a);
-		double sinA = Math.sin(a);
-		if (movementVectors[2] == 0) {
-			deltaLocation = new Location(
-					movementVectors[0] * cosA - movementVectors[1] * sinA,
-					movementVectors[1] * cosA + movementVectors[0] * sinA,
-					0
-			);
+		double currentRotation = imu.getAngularOrientation(AxesReference.INTRINSIC,
+				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+		double rotation = Math.toRadians(currentLocation.getHeading() - currentRotation);
+		double xMovement =
+				(motorDistances[0] + motorDistances[1] +
+						motorDistances[2] + motorDistances[3]) * 0.25;
+		double yMovement =
+				(motorDistances[1] - motorDistances[0] +
+						motorDistances[3] - motorDistances[2]) * 0.25;
+		double currentHeading = -Math.toRadians(currentLocation.getHeading() + 90);
+		
+		Matrix vector = new Matrix(new double[][] {
+				{xMovement,
+				yMovement,
+				rotation}
+		});
+		Matrix PoseExponential = new Matrix(3, 3);
+		if (rotation != 0) {
+			PoseExponential = new Matrix(new double[][]{
+					{Math.sin(rotation) / rotation, (Math.cos(rotation) - 1) / rotation, 0},
+					{(1 - Math.cos(rotation)) / rotation, Math.sin(rotation) / rotation, 0},
+					{0, 0, 1}
+			});
 		}
-		else {
-			double theta = movementVectors[2];
-			double r = Math.hypot(movementVectors[0], movementVectors[1]) / theta;
-			deltaLocation = new Location(
-					r * (Math.cos(theta + a) - cosA),
-					r * (Math.sin(theta + a) - sinA),
-					Math.toDegrees(theta)
-			);
-		}*/
+		Matrix rotationMatrix = new Matrix(new double[][] {
+				{ Math.cos(currentHeading), -Math.sin(currentHeading),  0 },
+				{ Math.sin(currentHeading), Math.cos(currentHeading),   0 },
+				{ 0,                        0,                          1}
+		});
+		vector.mul(PoseExponential);
+		vector.mul(rotationMatrix);
+		double[] movementVectors = vector.getData()[0];
+		Location deltaLocation = new Location(movementVectors[0], movementVectors[1],
+				currentRotation - currentLocation.getHeading());
+		
 		currentLocation.add(deltaLocation);
 	}
 
@@ -232,24 +238,35 @@ public class MecanumDrive {
 	}
 
 	private void correctTrajectory() {
-		if (currentLocation.distanceToLocation(path.getEnd()) < path.getError()) {
+		if (currentLocation.distanceToLocation(path.getEnd()) < path.getError() &&
+				currentLocation.headingDifference(path.getEnd()) < path.getAngleError()) {
 			isMoving = false;
 			for (int i = 0; i < 4; i++) {
 				driveMotors[i].setPower(0);
 			}
+			xController.reset();
+			yController.reset();
+			hController.reset();
 			return;
 		}
-		
-		double location = path.reverse_interpolate(currentLocation);
-		location += lookAheadLocation;
-		location = Math.min(location, 1);
+		else if (currentLocation.distanceToLocation(path.getEnd()) < path.getError()) {
+			xController.reset();
+			yController.reset();
+		}
+		else if (currentLocation.headingDifference(path.getEnd()) < path.getAngleError()) {
+			hController.reset();
+		}
+
+		double location = Math.min((previousTime - moveStart) * pointCoefficient, 1);
 		Location target = path.interpolateLocation(location);
+		mode.telemetry.addData("target", target.toString());
+		mode.telemetry.addData("position", currentLocation.toString());
 		xController.setTargetPoint(target.getX());
 		yController.setTargetPoint(target.getY());
 		hController.setTargetPoint(target.getHeading());
 		double xMovement = xController.calculateAdjustment(currentLocation.getX());
-		double yMovement = xController.calculateAdjustment(currentLocation.getY());
-		double hMovement = xController.calculateAdjustment(currentLocation.getHeading());
+		double yMovement = yController.calculateAdjustment(currentLocation.getY());
+		double hMovement = hController.calculateAdjustment(currentLocation.getHeading());
 		moveRobot(xMovement, yMovement, hMovement);
 	}
 	
@@ -264,10 +281,14 @@ public class MecanumDrive {
 	public void moveToLocation(Location location) {
 		path = new Path(currentLocation, location);
 		isMoving = true;
-		lookAheadLocation = lookAheadDistance / path.getPathLength();
-		while (mode.opModeIsActive() && isMoving) {
+		moveStart = System.nanoTime();
+		pointCoefficient = Math.min(12.0 / path.getPathLength(), 90.0 / path.getPathAngleChange())
+				/ 1_000_000_000.0;
+		while (mode.opModeIsActive() && isMoving()) {
 			if (System.nanoTime() - previousTime > 10_000_000) {
+				mode.telemetry.addData("Status", "Moving");
 				update();
+				mode.telemetry.update();
 			}
 		}
 	}
@@ -311,12 +332,14 @@ public class MecanumDrive {
 			y /= 3;
 			a /= 3;
 		}
-		Vec2d movementVector = new Vec2d(x, y);
-		movementVector.convertToAngleMagnitude();
-		movementVector.angle -= currentLocation.getHeading();
-		movementVector.convertToXY();
-		x = movementVector.x;
-		y = movementVector.y;
+		if (trueNorth) {
+			Vec2d movementVector = new Vec2d(x, y);
+			movementVector.convertToAngleMagnitude();
+			movementVector.angle -= currentLocation.getHeading();
+			movementVector.convertToXY();
+			x = movementVector.x;
+			y = movementVector.y;
+		}
 		
 		double rightVector = SQRT_ONE_HALF * (y + x);
 		double leftVector = SQRT_ONE_HALF * (y - x);

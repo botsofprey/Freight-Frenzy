@@ -157,7 +157,5 @@ public class Lift {
 			modeCheck();
 			slide.setPower(0);
 		}
-		mode.telemetry.addData("Motor position", slide.getCurrentPosition() / 537.7);
-		mode.telemetry.addData("Motor height", getCurrentHeight());
 	}
 }

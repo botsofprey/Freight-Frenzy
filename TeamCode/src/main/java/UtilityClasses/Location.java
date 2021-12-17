@@ -59,6 +59,10 @@ public class Location {
 		return Math.hypot(x - location.x, y - location.y);
 	}
 	
+	public double headingDifference(Location location) {
+		return normalizeHeading(location.heading - heading);
+	}
+	
 	public double headingToLocation(Location location) {
 		return Math.toDegrees(Math.atan2(-x, y));
 	}
@@ -67,14 +71,14 @@ public class Location {
 		heading = normalizeHeading(heading);
 	}
 
-	public static double normalizeHeading(double h) {/*
+	public static double normalizeHeading(double h) {
 		h %= 360;
 		if (h < -180) {
 			h += 360;
 		}
 		else if (h >= 180) {
 			h -= 360;
-		}*/
+		}
 		return h;
 	}
 	

@@ -30,9 +30,9 @@ public class TeleOpTest extends LinearOpMode {
 			intake = new Intake(hardwareMap, this, throwErrors);
 			carousel = new Carousel(hardwareMap, this, throwErrors);
 			drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
-					new Location(0, 0, 0), this, throwErrors);
+					new Location(0, 0, 0), false, this, throwErrors);
 			controller1 = new Controller(gamepad1);
-			controller2 = new Controller(gamepad1);
+			controller2 = new Controller(gamepad2);
 
 			telemetry.addData("Status", "Initialized");
 			telemetry.update();

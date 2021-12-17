@@ -25,7 +25,7 @@ public class MecanumDrive extends LinearOpMode {
     public void runOpMode() {
         DriveEngine.MecanumDrive drive = new DriveEngine.MecanumDrive(hardwareMap,
                 "RobotConfig.json", new Location(0, 0, 0),
-                this, true);
+                true, this, true);
         Controller controller = new Controller(gamepad1);
 
         telemetry.addData("Status", "Initialized");
