@@ -79,6 +79,7 @@ public class MecanumDrive {
 	private long moveStart;
 
 	private boolean slowMode;
+	private boolean fastMode;
 	private boolean trueNorth;
 	
 	
@@ -108,10 +109,10 @@ public class MecanumDrive {
 		}
 
 		slowMode = false;
+		fastMode = false;
 		trueNorth = north;
 		
 		currentLocation = startLocation;
-		path = new Path(currentLocation, currentLocation);
 		previousPositions = new long[] { 0, 0, 0, 0 };
 		motorSpeeds = new double[] { 0, 0, 0, 0 };
 		motorRPMs = new double[] { 0, 0, 0, 0 };
@@ -325,12 +326,29 @@ public class MecanumDrive {
 		mode.telemetry.update();
 		while (mode.opModeIsActive());
 	}
+
+	public void coast() {
+		for (int i = 0; i < 4; i++) {
+			driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+		}
+	}
+
+	public void brake() {
+		for (int i = 0; i < 4; i++) {
+			driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		}
+	}
 	
 	public void moveRobot(double x, double y, double a) {
 		if (slowMode) {
 			x /= 3;
 			y /= 3;
 			a /= 3;
+		}
+		if (fastMode) {
+			x *= 3;
+			y *= 3;
+			a *= 3;
 		}
 		if (trueNorth) {
 			Vec2d movementVector = new Vec2d(x, y);
@@ -357,4 +375,6 @@ public class MecanumDrive {
 
 	public void slowMode() { slowMode = true; }
 	public void noSlowMode() { slowMode = false; }
+	public void fastMode() { fastMode = true; }
+	public void noFastMode() { fastMode = false; }
 }

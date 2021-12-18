@@ -58,6 +58,16 @@ public class TeleOpTest extends LinearOpMode {
 					lift.brake();
 				}
 
+				if (controller2.upPressed) {
+					lift.positionUp();
+				}
+				if (controller2.rightPressed) {
+					lift.positionMiddle();
+				}
+				if (controller2.downPressed) {
+					lift.positionDown();
+				}
+
 				if (controller2.aPressed) {
 					intake.switchState(Intake.INTAKE_BUTTON);
 				}
@@ -86,6 +96,7 @@ public class TeleOpTest extends LinearOpMode {
 				lift.update();
 				drive.update();
 				telemetry.addData("Location", drive.getCurrentLocation());
+				telemetry.addData("Height", lift.getTick());
 
 				telemetry.update();
 			}

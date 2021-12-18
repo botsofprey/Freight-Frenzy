@@ -27,10 +27,10 @@ public class Lift {
 	};
 	private int state;
 
-	private static final double[] POSITIONS = {
-			4.5,
-			6,
-			8
+	private static final int[] POSITIONS = {
+			150,
+			425,
+			800
 	};
 	private int position;
 
@@ -85,7 +85,7 @@ public class Lift {
 	}
 
 	public void move(double height) {
-		braking = false;
+		braking = true;
 		usingEncoders = true;
 		height -= 5;
 		slide.setTargetPosition((int)(height * TICKS_PER_INCH));
@@ -94,6 +94,17 @@ public class Lift {
 		while(mode.opModeIsActive() && slide.isBusy()) {
 			update();
 		}
+	}
+
+	public void rawMove(int height) {
+		braking = true;
+		usingEncoders = true;
+		slide.setTargetPosition(height);
+		slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+	}
+
+	public boolean isMoving() {
+		return slide.isBusy();
 	}
 
 	private void modeCheck() {
@@ -113,7 +124,7 @@ public class Lift {
 		braking = false;
 		modeCheck();
 		if (limitSwitch.getState()) {
-			slide.setPower(-0.2);
+			slide.setPower(-0.1);
 		}
 	}
 
@@ -128,19 +139,23 @@ public class Lift {
 	}
 
 	public void positionUp() {
-		move(POSITIONS[2]);
+		rawMove(POSITIONS[2]);
 	}
 
 	public void positionMiddle() {
-		move(POSITIONS[1]);
+		rawMove(POSITIONS[1]);
 	}
 
 	public void positionDown() {
-		move(POSITIONS[0]);
+		rawMove(POSITIONS[0]);
 	}
 
-	public double getCurrentHeight(){
+	public double getCurrentHeight() {
 		return 5 + slide.getCurrentPosition() / TICKS_PER_INCH;
+	}
+
+	public int getTick() {
+		return slide.getCurrentPosition();
 	}
 
 	public void dropFreight() {
@@ -149,13 +164,13 @@ public class Lift {
 	}
 
 	public void update() {
-		if (!limitSwitch.getState() && slide.getPower() < 0) {
-			modeCheck();
-			slide.setPower(0);
-		}
-		if (getCurrentHeight() >= 23 && slide.getPower() > 0) {
-			modeCheck();
-			slide.setPower(0);
-		}
+//		if (!limitSwitch.getState() && slide.getPower() < 0) {
+//			modeCheck();
+//			slide.setPower(0);
+//		}
+//		if (getCurrentHeight() >= 23 && slide.getPower() > 0) {
+//			modeCheck();
+//			slide.setPower(0);
+//		}
 	}
 }

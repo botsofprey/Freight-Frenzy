@@ -3,10 +3,6 @@ package Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.checkerframework.checker.units.qual.C;
-
-import java.util.Arrays;
-
 import DriveEngine.MecanumDrive;
 import Subsystems.CameraPipeline;
 import Subsystems.Carousel;
@@ -14,8 +10,8 @@ import Subsystems.Lift;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="mecanum drive test", group="Autonomous")
-public class MovementTest extends LinearOpMode {
+@Autonomous(name="Red Auto", group="Autonomous")
+public class RedAuto extends LinearOpMode {
 	private MecanumDrive drive;
 	private Carousel carousel;
 	private Lift lift;
@@ -43,15 +39,15 @@ public class MovementTest extends LinearOpMode {
 		telemetry.addData("Status", "Running");
 		telemetry.update();
 
-		drive.moveToLocation(new Location(-21.75, -9, 0));
+		drive.moveToLocation(new Location(35.5, -7.5, 0));
 
 		carousel.rotate();
 		sleep(5000);
 		carousel.stop();
 
-		drive.moveToLocation(new Location(32, -9, 0));
+		drive.moveToLocation(new Location(-21, -9, 0));
 		sleep(200);
-		drive.moveToLocation(new Location(32, -21, 0));
+		drive.moveToLocation(new Location(-21, -23, 0));
 		lift.up();
 		sleep(100);
 		lift.brake();
@@ -74,19 +70,15 @@ public class MovementTest extends LinearOpMode {
 		sleep(1000);
 		lift.positionDown();
 
-		drive.moveToLocation(new Location(60, -20, -90));
+		drive.moveToLocation(new Location(-49, -20, 90));
 		sleep(1000);
 		drive.fastMode();
 		drive.coast();
-		drive.moveRobot(1, 0, 0);
+		drive.moveRobot(-1, 0, 0);
 		sleep(1200);
 		drive.moveRobot(0, 0, 0);
 		drive.noFastMode();
 		sleep(1000);
 		drive.brake();
-
-		while (opModeIsActive()) {
-
-		}
-	}
+	} 
 }
