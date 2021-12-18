@@ -25,7 +25,7 @@ public class MovementTest extends LinearOpMode {
 	private static final boolean throwErrors = true;
 	
 	@Override
-	public void runOpMode() throws InterruptedException {
+	public void runOpMode() throws InterruptedException {//test
 		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), true, this, throwErrors);
 		carousel = new Carousel(hardwareMap, this, throwErrors);
