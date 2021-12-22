@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+@Deprecated
 public class BadMecanumAuto {
 	private static final double TICKS_PER_INCH = 560.0 / ((4 * Math.PI) * (Math.sqrt(2)/2));
 	private LinearOpMode mode;

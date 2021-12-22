@@ -11,7 +11,6 @@ public class Location {
 		this.x = x;
 		this.y = y;
 		this.heading = heading;
-		normalizeHeading();
 	}
 	
 	public Location(double x, double y) {
@@ -28,13 +27,12 @@ public class Location {
 	
 	public void setX(double x) { this.x = x; }
 	public void setY(double y) { this.y = y; }
-	public void setHeading(double heading) { this.heading = heading; normalizeHeading(); }
+	public void setHeading(double heading) { this.heading = heading; }
 	
 	public Location addX(double dx) { x += dx; return this; }
 	public Location addY(double dy) { y += dy; return this; }
 	public Location addHeading(double dHeading) {
 		heading += dHeading;
-		normalizeHeading();
 		return this;
 	}
 	public Location addXY(double dx, double dy) {
@@ -47,6 +45,12 @@ public class Location {
 		y += location.y;
 		heading += location.heading;
 		normalizeHeading();
+		return this;
+	}
+	public Location addWithoutNormalizing(Location location) {
+		x += location.x;
+		y += location.y;
+		heading += location.heading;
 		return this;
 	}
 	public Location subXY(Location location) {
@@ -67,7 +71,7 @@ public class Location {
 		return Math.toDegrees(Math.atan2(-x, y));
 	}
 	
-	private void normalizeHeading() {
+	public void normalizeHeading() {
 		heading = normalizeHeading(heading);
 	}
 

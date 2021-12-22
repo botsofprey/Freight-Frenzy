@@ -15,6 +15,7 @@ import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
 import UtilityClasses.Vec2d;
 
+@Deprecated
 public class TeleOpMotorDriver {
 	private static final int FRONT_LEFT_DRIVE = 0;
 	private static final int FRONT_RIGHT_DRIVE = 1;
