@@ -3,7 +3,7 @@ package DriveEngine;
 import UtilityClasses.Location;
 import UtilityClasses.Matrix;
 
-public class SplineCurve {//todo add heading interpolation
+public class SplineCurve {
 	public static final boolean FIRST_POINT = true;
 	public static final boolean SECOND_POINT = false;
 	
