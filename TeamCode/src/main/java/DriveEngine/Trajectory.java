@@ -92,5 +92,42 @@ public class Trajectory {
 		trajectory[trajectory.length - 1].vx = 0;
 		trajectory[trajectory.length - 1].vy = 0;
 		trajectory[trajectory.length - 1].vh = 0;
+		for (int i = trajectory.length - 1; i > 1; i--) {
+			double vx0 = trajectory[i - 1].vx;
+			double vx1 = trajectory[i].vx;
+			double x = trajectory[i].x - trajectory[i - 1].x;
+			double ax = (vx1 * vx1 - vx0 * vx0) / (2 * x);
+			double vy0 = trajectory[i - 1].vy;
+			double vy1 = trajectory[i].vy;
+			double y = trajectory[i].y - trajectory[i - 1].y;
+			double ay = (vy1 * vy1 - vy0 * vy0) / (2 * y);
+			double l = Math.hypot(ax, ay);
+			if (l > constraints.maxAcceleration) {
+				ax /= l;
+				ay /= l;
+				trajectory[i - 1].vx = Math.sqrt(vx1 * vx1 - 2 * ax * x);
+				trajectory[i - 1].vy = Math.sqrt(vy1 * vy1 - 2 * ay * y);
+			}
+			trajectory[i - 1].ax = ax;
+			trajectory[i - 1].ay = ay;
+			double vh0 = trajectory[i - 1].vh;
+			double vh1 = trajectory[i].vh;
+			double h = trajectory[i].h - trajectory[i - 1].h;
+			double ah = (vh1 * vh1 - vh0 * vh0) / (2 * h);
+			l = Math.abs(ah);
+			if (l > constraints.maxAngularAcceleration) {
+				ah /= l;
+				trajectory[i - 1].vh = Math.sqrt(vh1 * vh1 - 2 * ah * h);
+			}
+			trajectory[i - 1].ah = ah;
+		}
+		trajectory[0].t = 0;
+		for (int i = 1; i < trajectory.length; i++) {
+			double moveTime = 2 * (trajectory[i].x - trajectory[i - 1].x) /
+						(trajectory[i].vx + trajectory[i - 1].vx);
+			double turnTime = 2 * (trajectory[i].h - trajectory[i - 1].h) /
+					(trajectory[i].vh + trajectory[i - 1].vh);
+			trajectory[i].t = trajectory[i - 1].t + Math.max(moveTime, turnTime);
+		}
 	}
 }

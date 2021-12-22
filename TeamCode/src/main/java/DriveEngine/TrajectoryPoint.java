@@ -20,14 +20,6 @@ public class TrajectoryPoint {
 		h = location.getHeading();
 	}
 	
-	public double getDistance(TrajectoryPoint other) {
-		return Math.hypot(other.x - x, other.y - y);
-	}
-	
-	public double getVelocity() {
-		return Math.hypot(vx, vy);
-	}
-	
 	public void calculateVelocity(TrajectoryPoint next, DriveConstraints constraints) {
 		vx = next.x - x;
 		vy = next.y - y;

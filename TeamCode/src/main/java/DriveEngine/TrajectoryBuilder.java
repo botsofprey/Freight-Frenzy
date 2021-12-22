@@ -15,7 +15,8 @@ public class TrajectoryBuilder {
 		constraints = driveConstraints;
 	}
 	
-	public TrajectoryBuilder(Location start, double tangentAngle, double tangentMagnitude) {
+	public TrajectoryBuilder(Location start, double tangentAngle,
+							 double tangentMagnitude, DriveConstraints driveConstraints) {
 		waypoints.add(start);
 		tangents.add(new Location(tangentMagnitude * Math.cos(tangentAngle),
 				tangentMagnitude * Math.sin(tangentAngle)));
