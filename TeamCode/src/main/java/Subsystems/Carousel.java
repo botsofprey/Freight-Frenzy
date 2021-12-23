@@ -14,9 +14,9 @@ public class Carousel {
 	public Carousel(HardwareMap hardwareMap, LinearOpMode m, boolean errors){
 		mode = m;
 		carousel = new CRServoController(hardwareMap,
-				"carousel_servo", mode, errors);
+				"carousel_servo");
 		carousel1 = new CRServoController(hardwareMap,
-				"carousel1", mode, errors);
+				"carousel1");
 	}
 
 	public void rotate() {

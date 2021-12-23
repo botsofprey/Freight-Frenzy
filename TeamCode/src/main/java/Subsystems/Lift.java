@@ -13,26 +13,11 @@ import UtilityClasses.HardwareWrappers.ServoController;
 public class Lift {
 	private static final double TICKS_PER_INCH = 145.1 / (0.945 * Math.PI) * (7.6 / 5.8);
 
-	public static final int UP_BUTTON = 0;
-	public static final int DOWN_BUTTON = 1;
-
-	private static final double MOTOR_POWER = 1;
-	private static final int BRAKE = 0;
-	private static final int UP = 1;
-	private static final int DOWN = 2;
-	private static final int[][] STATE_TABLE = {
-			{ UP, DOWN },
-			{ BRAKE, DOWN },
-			{ UP, BRAKE }
-	};
-	private int state;
-
 	private static final int[] POSITIONS = {
 			150,
 			425,
 			800
 	};
-	private int position;
 
 
 	private MagneticLimitSwitch limitSwitch;
@@ -42,58 +27,44 @@ public class Lift {
 	private MotorController slide;
 	private LinearOpMode mode;
 
-	private boolean open;
 	private boolean usingEncoders;
 	private boolean braking;
 
 	public Lift(HardwareMap hardwareMap, LinearOpMode opMode, boolean errors) {
 		mode = opMode;
-		open = false;
 		usingEncoders = true;
-		position = 0;
 		braking = false;
 
 		slide = new MotorController(hardwareMap, "Slider", mode, errors);
 		slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		slide.setDirection(DcMotorSimple.Direction.REVERSE);
-		slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 		bucketWall = new ServoController(hardwareMap, "bucket", mode, errors);
 		bucketWall.setPosition(1);
 
-		limitSwitch = new MagneticLimitSwitch(hardwareMap, "liftLimit", mode, errors);
-		state = BRAKE;
+		limitSwitch = new MagneticLimitSwitch(hardwareMap, "liftLimit");
+
+		zeroSlider();
 	}
 
 	public void zeroSlider(){
 		braking = false;
 		slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-		if(!limitSwitch.getState()){
-			slide.setPower(0.25);
+		if(!limitSwitch.getState()){//lift is lower
+			slide.setPower(1);
 
-			while(mode.opModeIsActive() && !limitSwitch.getState());
+			while (mode.opModeIsActive() && !limitSwitch.getState());
+
+			slide.setPower(0);
+			mode.sleep(100);
 		}
 
-		slide.setPower(-0.1);
+		slide.setPower(-0.1);//lift is higher
 
-		while(mode.opModeIsActive() && limitSwitch.getState());
-
-		slide.setPower(0);
+		while (mode.opModeIsActive() && limitSwitch.getState());
 
 		slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-	}
-
-	public void move(double height) {
-		braking = true;
-		usingEncoders = true;
-		height -= 5;
-		slide.setTargetPosition((int)(height * TICKS_PER_INCH));
-		slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-		while(mode.opModeIsActive() && slide.isBusy()) {
-			update();
-		}
 	}
 
 	public void rawMove(int height) {
@@ -159,15 +130,15 @@ public class Lift {
 	}
 
 	public void dropFreight() {
-		bucketWall.setPosition(open ? 1 : 0);
-		open = !open;
+		bucketWall.setPosition(1 - bucketWall.getPosition());
 	}
 
 	public void update() {
-//		if (!limitSwitch.getState() && slide.getPower() < 0) {
-//			modeCheck();
-//			slide.setPower(0);
-//		}
+		if (!limitSwitch.getState() && slide.getPower() < 0) {
+			modeCheck();
+			slide.setPower(0);
+			slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		}
 //		if (getCurrentHeight() >= 23 && slide.getPower() > 0) {
 //			modeCheck();
 //			slide.setPower(0);

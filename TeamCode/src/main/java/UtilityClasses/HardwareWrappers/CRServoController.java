@@ -14,67 +14,26 @@ public class CRServoController {
 	private String name;
 	private boolean throwErrors;
 
-	private void error(Exception e) {
-		e.printStackTrace();
-		mode.telemetry.addData("Could not access CRServo", name);
-		if (throwErrors) {
-			throw new Error("Could not access CRServo: " + name);
-		}
-	}
-
-	public CRServoController(HardwareMap hw, String servoName, LinearOpMode m, boolean errors) {
-		mode = m;
+	public CRServoController(HardwareMap hw, String servoName) {
 		name = servoName;
-		throwErrors = errors;
 
-		if (errors) {
-			servo = hw.get(CRServo.class, name);
-		}
-		else {
-			try {
-				servo = hw.get(CRServo.class, name);
-			} catch (IllegalArgumentException e) {
-				error(e);
-			}
-		}
+		servo = hw.get(CRServo.class, name);
 	}
 
 	public void setPower(double position) {
-		try {
-			servo.setPower(position);
-		}
-		catch (NullPointerException e) {
-			error(e);
-		}
+		servo.setPower(position);
 	}
 
 	public double getPower() {
-		try {
-			return servo.getPower();
-		}
-		catch (NullPointerException e) {
-			error(e);
-			return 0;
-		}
+		return servo.getPower();
 	}
 
 	public void setDirection(DcMotorSimple.Direction direction) {
-		try {
-			servo.setDirection(direction);
-		}
-		catch (NullPointerException e) {
-			error(e);
-		}
+		servo.setDirection(direction);
 	}
 
 	public DcMotorSimple.Direction getDirection() {
-		try {
-			return servo.getDirection();
-		}
-		catch (NullPointerException e) {
-			error(e);
-			return DcMotorSimple.Direction.FORWARD;
-		}
+		return servo.getDirection();
 	}
 
 
