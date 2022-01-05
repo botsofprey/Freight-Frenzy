@@ -172,11 +172,11 @@ public class MecanumDrive {
 				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 		double rotation = Math.toRadians(currentLocation.getHeading() - currentRotation);
 		double xMovement =
-				(motorDistances[0] + motorDistances[1] +
-						motorDistances[2] + motorDistances[3]) * 0.25;
+				(motorDistances[0] + motorDistances[1] +//1.266 is a manually tuned constant
+						motorDistances[2] + motorDistances[3]) * 0.25 * 1.266;
 		double yMovement =
-				(motorDistances[1] - motorDistances[0] +
-						motorDistances[3] - motorDistances[2]) * 0.25;
+				(motorDistances[1] - motorDistances[0] +//0.833 is a manually tuned constant
+						motorDistances[3] - motorDistances[2]) * 0.25 * 0.833;
 		double currentHeading = -Math.toRadians(currentLocation.getHeading() + 90);
 		
 		Matrix vector = new Matrix(new double[][] {

@@ -13,7 +13,7 @@ public class Intake {
 	public static final int INTAKE_BUTTON = 0;
 	public static final int OUTTAKE_BUTTON = 1;
 
-	private static final double MOTOR_POWER = 1;
+	private static final double MOTOR_POWER = 0.75;
 	private static final int BRAKE = 0;
 	private static final int INTAKE = 1;
 	private static final int OUTTAKE = 2;
@@ -45,12 +45,14 @@ public class Intake {
 		intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 		state = BRAKE;
 
-		colorSensor = hw.get(ColorSensor.class, "color Intake");
+		//colorSensor = hw.get(ColorSensor.class, "color Intake");
 	}
 
 	public void intake() {
 		intakeMotor.setPower(MOTOR_POWER);
 		state = INTAKE;
+
+		mil = System.currentTimeMillis();
 	}
 
 	public void outtake() {
@@ -66,6 +68,7 @@ public class Intake {
 	public void switchState(int button) {
 		state = STATE_TABLE[state][button];
 		intakeMotor.setPower(getPowerFromState());
+		mil = System.currentTimeMillis();
 	}
 
 	private double getPowerFromState() {
@@ -92,16 +95,30 @@ public class Intake {
 	}
 
 	public void update() {
-		if (driverControl && state == INTAKE && detectColor()) {
-			mil = System.currentTimeMillis();
-			driverControl = false;
-		}
+		//if (state == INTAKE && detectColor() && System.currentTimeMillis() - mil >= 1000) {
+		//	brake();
+		//}
+	}
 
-		if (!driverControl && System.currentTimeMillis() - mil >= 1000) {
-			if (state == INTAKE) {
-				brake();
-			}
-			driverControl = true;
+	private double[] RGBToHSV(int r, int g, int b) {
+		if (r == g && r == b) {
+			return new double[] { 0, 0, 1 };
 		}
+		double scale = Math.max(r, Math.max(g, b));
+		double[] color = new double[] { r / scale, g / scale, b / scale };
+		double h = 0;
+		double max = 1.0;
+		double min = Math.min(color[0], Math.min(color[1], color[2]));
+		double diff = max - min;
+		if (scale == r) {
+			h = (60 * (color[1] - color[2]) / diff + 360) % 360;
+		}
+		if (scale == g) {
+			h = (60 * (color[2] - color[0]) / diff + 120) % 360;
+		}
+		if (scale == b) {
+			h = (60 * (color[0] - color[1]) / diff + 240) % 360;
+		}
+		return new double[] { h, diff, max };
 	}
 }

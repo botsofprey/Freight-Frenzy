@@ -9,10 +9,25 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import java.util.Objects;
 
 public class MotorController {
-	public DcMotorEx motor;
+	private DcMotorEx motor;
+	private MagneticLimitSwitch start = null;
+	private MagneticLimitSwitch end = null;
 
 	public MotorController(HardwareMap hw, String motorName, LinearOpMode m, boolean errors) {
 		motor = hw.get(DcMotorEx.class, motorName);
+	}
+
+	public void setStartSwitch(HardwareMap hw, String switchName) {
+		start = new MagneticLimitSwitch(hw, switchName);
+	}
+
+	public void setEndSwitch(HardwareMap hw, String switchName) {
+		end = new MagneticLimitSwitch(hw, switchName);
+	}
+
+	public void setSwitches(HardwareMap hw, String startName, String endName) {
+		start = new MagneticLimitSwitch(hw, startName);
+		end = new MagneticLimitSwitch(hw, endName);
 	}
 
 	public void setMode(DcMotor.RunMode runMode) {
@@ -20,6 +35,12 @@ public class MotorController {
 	}
 
 	public void setPower(double power) {
+		if (start != null && !start.getState() && power < 0) {
+			return;
+		}
+		if (end != null && !end.getState() && power > 0) {
+			return;
+		}
 		motor.setPower(power);
 	}
 
@@ -43,12 +64,25 @@ public class MotorController {
 		motor.setTargetPosition(targetPosition);
 	}
 
+	public void setPositionPIDFCoefficients(double p) {
+		motor.setPositionPIDFCoefficients(p);
+	}
+
 	public double getPower() {
 		return motor.getPower();
 	}
 
 	public boolean isBusy() {
 		return motor.isBusy();
+	}
+
+	public void update() {
+		if (start != null && !start.getState() && getPower() < 0) {
+			motor.setPower(0);
+		}
+		if (end != null && !end.getState() && getPower() > 0) {
+			motor.setPower(0);
+		}
 	}
 
 

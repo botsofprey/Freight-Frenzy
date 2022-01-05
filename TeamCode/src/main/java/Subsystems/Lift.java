@@ -1,26 +1,36 @@
 package Subsystems;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import UtilityClasses.HardwareWrappers.MagneticLimitSwitch;
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.HardwareWrappers.ServoController;
+import UtilityClasses.PIDController;
 
 public class Lift {
 	private static final double TICKS_PER_INCH = 145.1 / (0.945 * Math.PI) * (7.6 / 5.8);
 
 	private static final int[] POSITIONS = {
-			150,
-			425,
-			800
+			0,
+			350,
+			600
 	};
+	private static final RevBlinkinLedDriver.BlinkinPattern
+			downColor =  RevBlinkinLedDriver.BlinkinPattern.GREEN,
+			midColor = RevBlinkinLedDriver.BlinkinPattern.YELLOW,
+			upColor = RevBlinkinLedDriver.BlinkinPattern.RED;
 
 
-	private MagneticLimitSwitch limitSwitch;
+	private ModernRoboticsTouchSensor limitSwitch;
 
 	private ServoController bucketWall;
 
@@ -30,6 +40,17 @@ public class Lift {
 	private boolean usingEncoders;
 	private boolean braking;
 
+	private PIDController heightController = new PIDController(0.01, 0, 0.01, 0.67);
+
+	private ColorSensor bucketColor;
+	private int blue, red, green;
+	private static final int[] block = new int[] {204, 126, 8},
+			ball = new int[] {255, 255, 255}, duck = new int[] {224, 183, 31};
+	private static  final int range = 25;
+
+	private RevBlinkinLedDriver liftLed;
+	private RevBlinkinLedDriver bucketLed;
+
 	public Lift(HardwareMap hardwareMap, LinearOpMode opMode, boolean errors) {
 		mode = opMode;
 		usingEncoders = true;
@@ -38,23 +59,33 @@ public class Lift {
 		slide = new MotorController(hardwareMap, "Slider", mode, errors);
 		slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		slide.setDirection(DcMotorSimple.Direction.REVERSE);
+		slide.setPositionPIDFCoefficients(10);
 
 		bucketWall = new ServoController(hardwareMap, "bucket", mode, errors);
 		bucketWall.setPosition(1);
 
-		limitSwitch = new MagneticLimitSwitch(hardwareMap, "liftLimit");
+		limitSwitch = hardwareMap.get(ModernRoboticsTouchSensor.class, "liftLimit");
 
 		zeroSlider();
+
+		liftLed = hardwareMap.get(RevBlinkinLedDriver.class, "lift led");
+		liftLed.setPattern(downColor);
+		bucketLed = hardwareMap.get(RevBlinkinLedDriver.class, "bucket led");
+		bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+
+		bucketColor = hardwareMap.get(ColorSensor.class, "bucketColor");
 	}
 
 	public void zeroSlider(){
+		mode.telemetry.addData("Status", "Zeroing slider");
+		mode.telemetry.update();
 		braking = false;
 		slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-		if(!limitSwitch.getState()){//lift is lower
+		if(limitSwitch.isPressed()){//lift is lower
 			slide.setPower(1);
 
-			while (mode.opModeIsActive() && !limitSwitch.getState());
+			while (mode.opModeIsActive() && limitSwitch.isPressed());
 
 			slide.setPower(0);
 			mode.sleep(100);
@@ -62,9 +93,11 @@ public class Lift {
 
 		slide.setPower(-0.1);//lift is higher
 
-		while (mode.opModeIsActive() && limitSwitch.getState());
+		while (mode.opModeIsActive() && !limitSwitch.isPressed());
 
 		slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		mode.telemetry.addData("Status", "Initializing");
+		mode.telemetry.update();
 	}
 
 	public void rawMove(int height) {
@@ -72,6 +105,11 @@ public class Lift {
 		usingEncoders = true;
 		slide.setTargetPosition(height);
 		slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		if (height < 100) {
+			slide.setVelocity(750);
+		} else {
+			slide.setVelocity(10000);
+		}
 	}
 
 	public boolean isMoving() {
@@ -85,16 +123,34 @@ public class Lift {
 		}
 	}
 
+	public void upAnalog(double power) {
+		if (getTick() < POSITIONS[2]) {
+			braking = false;
+			modeCheck();
+			slide.setPower(power);
+		}
+	}
+
 	public void up() {
-		braking = false;
-		modeCheck();
-		slide.setPower(0.5);
+		if (getTick() < POSITIONS[2]) {
+			braking = false;
+			modeCheck();
+			slide.setPower(0.5);
+		}
+	}
+
+	public void downAnalog(double power) {
+		if (!limitSwitch.isPressed()) {
+			braking = false;
+			modeCheck();
+			slide.setPower(-power / 5.0);
+		}
 	}
 
 	public void down() {
-		braking = false;
-		modeCheck();
-		if (limitSwitch.getState()) {
+		if (!limitSwitch.isPressed()) {
+			braking = false;
+			modeCheck();
 			slide.setPower(-0.1);
 		}
 	}
@@ -131,17 +187,51 @@ public class Lift {
 
 	public void dropFreight() {
 		bucketWall.setPosition(1 - bucketWall.getPosition());
+
+		bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+	}
+
+	private boolean detectColor() {
+		red = bucketColor.red();
+		green = bucketColor.green();
+		blue = bucketColor.blue();
+
+		int[] color = new int[] {red,green,blue};
+
+		boolean blockBo = colorChecker(block, color);
+		boolean ballBo = colorChecker(ball, color);
+		boolean duckBo = colorChecker(duck, color);
+
+		return ballBo || blockBo || duckBo;
+	}
+
+	private boolean colorChecker(int[] colorA, int[] colorB) {
+		return Math.abs(colorA[0] - colorB[0]) <= range && Math.abs(colorA[1] - colorB[1]) <= range
+				&& Math.abs(colorA[2] - colorB[2]) <= range;
 	}
 
 	public void update() {
-		if (!limitSwitch.getState() && slide.getPower() < 0) {
-			modeCheck();
-			slide.setPower(0);
-			slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		if (limitSwitch.isPressed() && slide.getPower() < 0) {
+			brake();
 		}
-//		if (getCurrentHeight() >= 23 && slide.getPower() > 0) {
-//			modeCheck();
-//			slide.setPower(0);
-//		}
+		if (getTick() > POSITIONS[2] + 50 && slide.getPower() > 0) {
+			brake();
+		}
+
+		if (limitSwitch.isPressed()) {
+			liftLed.setPattern(downColor);
+		} else if (slide.getCurrentPosition() > POSITIONS[2] - 50) {
+			liftLed.setPattern(upColor);
+		} else {
+			liftLed.setPattern(midColor);
+		}
+
+		if (limitSwitch.isPressed()){
+			if (detectColor()) {
+				bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
+			} else {
+				bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+			}
+		}
 	}
 }

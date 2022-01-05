@@ -37,7 +37,7 @@ public class CameraPipeline extends OpenCvPipeline {
 
 	@Override
 	public Mat processFrame(Mat input) {
-		Core.rotate(input, image, Core.ROTATE_90_CLOCKWISE);
+		Core.rotate(input, image, Core.ROTATE_90_COUNTERCLOCKWISE);
 		points = new Mat();
 		data = detector.detectAndDecode(image, points);
 

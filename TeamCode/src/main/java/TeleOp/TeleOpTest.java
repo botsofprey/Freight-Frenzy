@@ -25,7 +25,7 @@ public class TeleOpTest extends LinearOpMode {
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		try {
+		//try {
 			lift = new Lift(hardwareMap, this, throwErrors);
 			intake = new Intake(hardwareMap, this, throwErrors);
 			carousel = new Carousel(hardwareMap, this, throwErrors);
@@ -40,6 +40,7 @@ public class TeleOpTest extends LinearOpMode {
 
 			//lift.zeroSlider();
 			drive.update();
+			telemetry.addData("Location", drive::getCurrentLocation);
 
 			while (opModeIsActive()) {
 				controller1.update();
@@ -49,10 +50,10 @@ public class TeleOpTest extends LinearOpMode {
 						-controller1.rightStick.x);
 
 				if (controller2.rightTriggerHeld && !controller2.leftTriggerHeld) {
-					lift.up();
+					lift.upAnalog(controller2.rightTrigger);
 				}
 				else if (controller2.leftTriggerHeld && !controller2.rightTriggerHeld) {
-					lift.down();
+					lift.downAnalog(controller2.leftTrigger);
 				}
 				else {
 					lift.brake();
@@ -95,16 +96,14 @@ public class TeleOpTest extends LinearOpMode {
 
 				lift.update();
 				drive.update();
-				telemetry.addData("Location", drive.getCurrentLocation());
-				telemetry.addData("Height", lift.getTick());
 
 				telemetry.update();
 			}
-		} finally {
-			drive.moveRobot(0, 0, 0);
-			lift.brake();
-			carousel.stop();
-			intake.brake();
-		}
+		//} finally {
+			//drive.moveRobot(0, 0, 0);
+			//lift.brake();
+			//carousel.stop();
+			//intake.brake();
+		//}
 	}
 }
