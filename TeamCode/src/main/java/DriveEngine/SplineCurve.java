@@ -152,7 +152,7 @@ public class SplineCurve {
 			y += i * pow * coefficients[1][i];
 			h += i * pow * coefficients[2][i];
 		}
-		return Math.sqrt(x * x + y * y + h * h / 100.0);
+		return Math.sqrt(x * x + y * y + h * h / 10.0);
 	}
 	
 	public double getIntervalLength(double a, double b) {//uses gaussian quadrature

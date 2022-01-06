@@ -132,7 +132,7 @@ public class Lift {
 	}
 
 	public void up() {
-		if (getTick() < POSITIONS[2]) {
+		if (getTick() < POSITIONS[2]|| true) {
 			braking = false;
 			modeCheck();
 			slide.setPower(0.5);
@@ -214,9 +214,9 @@ public class Lift {
 		if (limitSwitch.isPressed() && slide.getPower() < 0) {
 			brake();
 		}
-		if (getTick() > POSITIONS[2] + 50 && slide.getPower() > 0) {
-			brake();
-		}
+//		if (getTick() > POSITIONS[2] + 50 && slide.getPower() > 0) {
+//			brake();
+//		}
 
 		if (limitSwitch.isPressed()) {
 			liftLed.setPattern(downColor);

@@ -10,10 +10,14 @@ import java.util.Objects;
 
 public class MotorController {
 	private DcMotorEx motor;
-	private MagneticLimitSwitch start = null;
-	private MagneticLimitSwitch end = null;
+	private LimitSwitch start = null;
+	private LimitSwitch end = null;
 
 	public MotorController(HardwareMap hw, String motorName, LinearOpMode m, boolean errors) {
+		motor = hw.get(DcMotorEx.class, motorName);
+	}
+
+	public MotorController(HardwareMap hw, String motorName) {
 		motor = hw.get(DcMotorEx.class, motorName);
 	}
 
@@ -28,6 +32,19 @@ public class MotorController {
 	public void setSwitches(HardwareMap hw, String startName, String endName) {
 		start = new MagneticLimitSwitch(hw, startName);
 		end = new MagneticLimitSwitch(hw, endName);
+	}
+
+	public void setStartSwitch(LimitSwitch s) {
+		start = s;
+	}
+
+	public void setEndSwitch(LimitSwitch e) {
+		end = e;
+	}
+
+	public void setSwitches(LimitSwitch s, LimitSwitch e) {
+		start = s;
+		end = e;
 	}
 
 	public void setMode(DcMotor.RunMode runMode) {

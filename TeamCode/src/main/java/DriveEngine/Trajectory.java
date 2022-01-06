@@ -146,4 +146,8 @@ public class Trajectory {
 		double t1 = Math.abs(trajectory[point].t - t);
 		return t0 > t1 ? trajectory[point] : trajectory[point - 1];
 	}
+
+	public double getDuration() {
+		return trajectory[trajectory.length - 1].t;
+	}
 }

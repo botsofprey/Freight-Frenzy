@@ -39,8 +39,7 @@ public class Localizer {
 
 	
 	
-	public Localizer(HardwareMap hw, String fileName, Location startLocation, boolean north,
-	                 LinearOpMode m, boolean errors) {
+	public Localizer(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m) {
 		initFromConfig(hw, fileName, m);
 		
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -122,9 +121,9 @@ public class Localizer {
 		Matrix PoseExponential = new Matrix(3, 3);
 		if (rotation != 0) {
 			PoseExponential = new Matrix(new double[][]{
-					{Math.sin(rotation) / rotation, (Math.cos(rotation) - 1) / rotation, 0},
-					{(1 - Math.cos(rotation)) / rotation, Math.sin(rotation) / rotation, 0},
-					{0, 0, 1}
+					{	Math.sin(rotation) / rotation,			(Math.cos(rotation) - 1) / rotation,	0},
+					{	(1 - Math.cos(rotation)) / rotation,	Math.sin(rotation) / rotation,			0},
+					{	0,										0,										1}
 			});
 		}
 		Matrix rotationMatrix = new Matrix(new double[][] {

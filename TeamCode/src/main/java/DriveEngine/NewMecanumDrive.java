@@ -8,11 +8,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.Func;
+
 import java.util.List;
 
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
+import UtilityClasses.Matrix;
 import UtilityClasses.PIDController;
 
 /**
@@ -63,6 +66,8 @@ public class NewMecanumDrive {
 		
 		slowMode = false;
 		fastMode = false;
+
+		localizer = new Localizer(hw, fileName, startLocation, mode);
 		
 		currentlyMoving = false;
 		currentLocation = startLocation;
@@ -102,11 +107,28 @@ public class NewMecanumDrive {
 	}
 	
 	public void move(double x, double y, double h) {
-	
+		x *= 1;
+		y *= 1;
+		h *= 1;
+		double[] powers = new double[]{
+				x + y - h,
+				-x + y - h,
+				x - y + h,
+				-x - y + h
+		};
 	}
 	
 	public void moveTrueNorth(double x, double y, double h) {
-	
+		Matrix vec = new Matrix(new double[][]{ { x }, { y } });
+		double heading = -Math.toRadians(currentLocation.getHeading());
+		double sin = Math.sin(heading);
+		double cos = Math.cos(heading);
+		Matrix rotation = new Matrix(new double[][]{
+				{ cos, -sin },
+				{ sin,  cos }
+		});
+		double[] result = rotation.mul(vec).transpose().getData()[0];
+		move(result[0], result[1], h);
 	}
 	
 	private void calculateMovement() {
@@ -121,12 +143,32 @@ public class NewMecanumDrive {
 		double h = hController.calculateAdjustment(currentLocation.getHeading());
 		
 		moveTrueNorth(point.vx + x, point.vy + y, point.vh + h);
+		if (time > currentTrajectory.getDuration()) {
+			currentlyMoving = false;
+		}
 	}
 	
 	public void update() {
 		updateLocation();
 		if (currentlyMoving) {
 			calculateMovement();
+		} else {
+			move(0, 0, 0);
 		}
+	}
+
+	public void waitForMovement() {
+		waitForMovement(()->{});
+	}
+
+	public void waitForMovement(Runnable updateFunctions) {
+		while (mode.opModeIsActive() && currentlyMoving) {
+			update();
+			updateFunctions.run();
+		}
+	}
+
+	public boolean isMoving() {
+		return currentlyMoving;
 	}
 }

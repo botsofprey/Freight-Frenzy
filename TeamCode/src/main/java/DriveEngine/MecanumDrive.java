@@ -49,6 +49,7 @@ public class MecanumDrive {
 	private double buffer = 0.8;
 	
 	private volatile Location currentLocation;
+	private volatile Location currentVelocity;
 	
 	private double[] motorSpeeds;//  rad/s
 	private double[] motorRPMs;
@@ -204,6 +205,8 @@ public class MecanumDrive {
 				currentRotation - currentLocation.getHeading());
 		
 		currentLocation.add(deltaLocation);
+		currentVelocity = deltaLocation.scale(1.0 / timeDiff);
+		currentVelocity.setHeading(currentVelocity.getHeading() * 0.1);
 	}
 
 	private double[] getPowerRange(double currentRPM) {
@@ -297,6 +300,8 @@ public class MecanumDrive {
 	public Location getCurrentLocation() {
 		return currentLocation;
 	}
+
+	public Location getCurrentVelocity() { return currentVelocity; }
 
 	public boolean isMoving() {
 		return isMoving;

@@ -58,6 +58,13 @@ public class Location {
 		y -= location.y;
 		return this;
 	}
+	public Location scale(double s) {
+		x *= s;
+		y *= s;
+		heading *= s;
+		normalizeHeading();
+		return this;
+	}
 	
 	public double distanceToLocation(Location location) {
 		return Math.hypot(x - location.x, y - location.y);
