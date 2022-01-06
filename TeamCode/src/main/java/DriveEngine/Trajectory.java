@@ -6,6 +6,7 @@ import UtilityClasses.Location;
 
 public class Trajectory {
 	private TrajectoryPoint[] trajectory;
+	private int previousMotion;
 	
 	public Trajectory(ArrayList<Location> waypoints,
 	                  ArrayList<Location> tangents, DriveConstraints constraints) {
@@ -46,6 +47,8 @@ public class Trajectory {
 		}
 		
 		calculateMotionControlledTrajectory(points, constraints);
+		
+		previousMotion = 0;
 	}
 	
 	private void calculateMotionControlledTrajectory(Location[] points,
@@ -129,5 +132,18 @@ public class Trajectory {
 					(trajectory[i].vh + trajectory[i - 1].vh);
 			trajectory[i].t = trajectory[i - 1].t + Math.max(moveTime, turnTime);
 		}
+	}
+	
+	public TrajectoryPoint getMotion(double t) {
+		int point = trajectory.length - 1;
+		for (int i = previousMotion; i < trajectory.length; i++) {
+			if (t - trajectory[i].t < 0) {
+				point = i;
+				break;
+			}
+		}
+		double t0 = Math.abs(trajectory[point - 1].t - t);
+		double t1 = Math.abs(trajectory[point].t - t);
+		return t0 > t1 ? trajectory[point] : trajectory[point - 1];
 	}
 }
