@@ -40,8 +40,6 @@ public class Lift {
 	private boolean usingEncoders;
 	private boolean braking;
 
-	private PIDController heightController = new PIDController(0.01, 0, 0.01, 0.67);
-
 	private ColorSensor bucketColor;
 	private int blue, red, green;
 	private static final int[] block = new int[] {204, 126, 8},
@@ -51,29 +49,35 @@ public class Lift {
 	private RevBlinkinLedDriver liftLed;
 	private RevBlinkinLedDriver bucketLed;
 
+	private long dropTime;
+	private boolean freightDropped;
+
 	public Lift(HardwareMap hardwareMap, LinearOpMode opMode, boolean errors) {
 		mode = opMode;
 		usingEncoders = true;
 		braking = false;
 
-		slide = new MotorController(hardwareMap, "Slider", mode, errors);
+		slide = new MotorController(hardwareMap, "liftMotor", mode, errors);
 		slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		slide.setDirection(DcMotorSimple.Direction.REVERSE);
 		slide.setPositionPIDFCoefficients(10);
 
-		bucketWall = new ServoController(hardwareMap, "bucket", mode, errors);
+		bucketWall = new ServoController(hardwareMap, "bucketServo", mode, errors);
 		bucketWall.setPosition(1);
 
 		limitSwitch = hardwareMap.get(ModernRoboticsTouchSensor.class, "liftLimit");
 
 		zeroSlider();
 
-		liftLed = hardwareMap.get(RevBlinkinLedDriver.class, "lift led");
+		liftLed = hardwareMap.get(RevBlinkinLedDriver.class, "liftLED");
 		liftLed.setPattern(downColor);
-		bucketLed = hardwareMap.get(RevBlinkinLedDriver.class, "bucket led");
+		bucketLed = hardwareMap.get(RevBlinkinLedDriver.class, "bucketLED");
 		bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 
 		bucketColor = hardwareMap.get(ColorSensor.class, "bucketColor");
+
+		dropTime = System.currentTimeMillis();
+		freightDropped = false;
 	}
 
 	public void zeroSlider(){
@@ -124,19 +128,16 @@ public class Lift {
 	}
 
 	public void upAnalog(double power) {
-		if (getTick() < POSITIONS[2]) {
-			braking = false;
-			modeCheck();
-			slide.setPower(power);
-		}
+		braking = false;
+		modeCheck();
+		slide.setPower(power);
 	}
 
 	public void up() {
-		if (getTick() < POSITIONS[2]|| true) {
-			braking = false;
-			modeCheck();
-			slide.setPower(0.5);
-		}
+		getTick();
+		braking = false;
+		modeCheck();
+		slide.setPower(0.5);
 	}
 
 	public void downAnalog(double power) {
@@ -191,6 +192,13 @@ public class Lift {
 		bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 	}
 
+	public void autoDrop() {
+		bucketWall.setPosition(0);
+		bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+		dropTime = System.currentTimeMillis();
+		freightDropped = true;
+	}
+
 	private boolean detectColor() {
 		red = bucketColor.red();
 		green = bucketColor.green();
@@ -214,9 +222,6 @@ public class Lift {
 		if (limitSwitch.isPressed() && slide.getPower() < 0) {
 			brake();
 		}
-//		if (getTick() > POSITIONS[2] + 50 && slide.getPower() > 0) {
-//			brake();
-//		}
 
 		if (limitSwitch.isPressed()) {
 			liftLed.setPattern(downColor);
@@ -233,5 +238,12 @@ public class Lift {
 				bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 			}
 		}
+
+		if (freightDropped && System.currentTimeMillis() >= 2000 + dropTime) {
+			freightDropped = false;
+			bucketWall.setPosition(1);
+		}
+
+		mode.telemetry.addData("Switch", limitSwitch.isPressed());
 	}
 }

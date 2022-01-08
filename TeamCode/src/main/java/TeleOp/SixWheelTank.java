@@ -7,9 +7,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.Func;
+
 import Subsystems.BucketArm;
 import UtilityClasses.Controller;
 import UtilityClasses.HardwareWrappers.CRServoController;
+import UtilityClasses.HardwareWrappers.RevTouchSensor;
 
 @TeleOp(name="6 Wheel Tank", group="Tank")
 public class SixWheelTank extends LinearOpMode {
@@ -38,7 +41,6 @@ public class SixWheelTank extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		controller = new Controller(gamepad1);
-
 		bucketArm = new BucketArm(hardwareMap);
 
 		servoLeft = new CRServoController(hardwareMap, "leftWheel");
@@ -49,6 +51,7 @@ public class SixWheelTank extends LinearOpMode {
 			motors[i].setDirection(directions[i]);
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		}
+
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 		waitForStart();
@@ -76,17 +79,30 @@ public class SixWheelTank extends LinearOpMode {
 			motors[2].setPower(controller.rightStick.y);
 			motors[3].setPower(controller.rightStick.y);
 
-			if(controller.aHeld){
-				bucketArm.setPower(0.5);
+			if(controller.rightTriggerReleased || controller.leftTriggerReleased){
+				bucketArm.noDrop();
 			}
-			if(controller.bHeld){
-				bucketArm.setPower(0.5);
+
+			if(controller.rightTrigger != 0){
+				bucketArm.setPower(-controller.rightTrigger);
+				bucketArm.motorMode();
+			} else if(controller.leftTrigger != 0){
+				bucketArm.setPower(controller.leftTrigger);
+				bucketArm.motorMode();
 			}
+
 			if(controller.xPressed){
 				bucketArm.dropFreight();
 			}
-			servoLeft.setPower(controller.leftTrigger > 0 ? 1 : 0);
-			servoRight.setPower(controller.rightTrigger > 0 ? 1 : 0);
+
+			if(controller.yHeld){
+				servoLeft.setPower(-1);
+				servoRight.setPower(1);
+			}else{
+
+				servoLeft.setPower(0);
+				servoRight.setPower(0);
+			}
 
 			//			double forward = -gamepad1.left_stick_y;
 //			double turn = gamepad1.right_stick_x;
@@ -106,6 +122,10 @@ public class SixWheelTank extends LinearOpMode {
 //			for (int i = 0; i < 4; i++) {
 //				motors[i].setPower(powers[i]);
 //			}
+
+			telemetry.addData("Bucket Position", bucketArm.getDoorPosition());
+
+			bucketArm.update();
 			telemetry.update();
 		}
 	}

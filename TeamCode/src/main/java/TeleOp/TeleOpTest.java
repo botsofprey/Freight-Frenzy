@@ -78,7 +78,7 @@ public class TeleOpTest extends LinearOpMode {
 				}
 
 				if (controller1.yPressed) {
-					lift.dropFreight();
+					lift.autoDrop();
 				}
 
 				if (controller2.xHeld) {

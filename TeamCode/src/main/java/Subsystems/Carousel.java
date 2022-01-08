@@ -7,25 +7,25 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import UtilityClasses.HardwareWrappers.CRServoController;
 
 public class Carousel {
-	private CRServoController carousel;
-	private CRServoController carousel1;
+	private CRServoController lCarousel;
+	private CRServoController rCarousel;
 	private LinearOpMode mode;
 
 	public Carousel(HardwareMap hardwareMap, LinearOpMode m, boolean errors){
 		mode = m;
-		carousel = new CRServoController(hardwareMap,
-				"carousel_servo");
-		carousel1 = new CRServoController(hardwareMap,
-				"carousel1");
+		lCarousel = new CRServoController(hardwareMap,
+				"leftDuckSpinner");
+		rCarousel = new CRServoController(hardwareMap,
+				"rightDuckSpinner");
 	}
 
 	public void rotate() {
-		carousel.setPower(-0.4);
-		carousel1.setPower(0.4);
+		lCarousel.setPower(-0.4);
+		rCarousel.setPower(0.4);
 	}
 
 	public void stop() {
-		carousel.setPower(0);
-		carousel1.setPower(0);
+		lCarousel.setPower(0);
+		rCarousel.setPower(0);
 	}
 }

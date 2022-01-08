@@ -105,17 +105,31 @@ public class NewMecanumDrive {
 		localizer.updateLocation();
 		currentLocation = localizer.getCurrentLocation();
 	}
-	
-	public void move(double x, double y, double h) {
-		x *= 1;
-		y *= 1;
-		h *= 1;
+
+	public void rawMove(double x, double y, double h) {
 		double[] powers = new double[]{
 				x + y - h,
 				-x + y - h,
 				x - y + h,
 				-x - y + h
 		};
+		double max = 1;
+		for (double power : powers) {
+			max = Math.max(max, Math.abs(power));
+		}
+		for (int i = 0; i < 4; i++) {
+			powers[i] /= max;
+		}
+		for (int i = 0; i < 4; i++) {
+			motors[i].setPower(powers[i]);
+		}
+	}
+	
+	public void move(double x, double y, double h) {
+		x /= 43.0;
+		y /= 17.0;
+		h /= 14.0;
+		rawMove(x, y, h);
 	}
 	
 	public void moveTrueNorth(double x, double y, double h) {

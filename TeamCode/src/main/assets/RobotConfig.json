@@ -1,8 +1,8 @@
 {
-  "frontLeftDriveMotorName": "front_left_drive_motor",
-  "frontRightDriveMotorName": "front_right_drive_motor",
-  "backRightDriveMotorName": "back_right_drive_motor",
-  "backLeftDriveMotorName": "back_left_drive_motor",
+  "frontLeftDriveMotorName": "flMotor",
+  "frontRightDriveMotorName": "frMotor",
+  "backRightDriveMotorName": "brMotor",
+  "backLeftDriveMotorName": "blMotor",
   "frontLeftDriveMotorDirection": "reverse",
   "frontRightDriveMotorDirection": "forward",
   "backRightDriveMotorDirection": "forward",

@@ -1,7 +1,5 @@
 package Subsystems;
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -42,7 +40,7 @@ public class Intake {
 		mode = m;
 
 		intakeMotor = new MotorController(hw, "intakeMotor", mode, errors);
-		intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+		intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 		state = BRAKE;
 
 		//colorSensor = hw.get(ColorSensor.class, "color Intake");
