@@ -167,7 +167,7 @@ public class NewMecanumDrive {
 		if (currentlyMoving) {
 			calculateMovement();
 		} else {
-			move(0, 0, 0);
+			rawMove(0, 0, 0);
 		}
 	}
 

@@ -19,11 +19,11 @@ public class Trajectory {
 			switch ((startTangent == null ? 0 : 1) | (endTangent == null ? 0 : 2)) {
 				case 0:
 					splines.add(new SplineCurve(start, end));
-					tangents.set(i, splines.get(i).getEndTangent());
+					tangents.set(i, splines.get(i - 1).getEndTangent());
 					break;
 				case 1:
 					splines.add(new SplineCurve(start, end, startTangent, SplineCurve.FIRST_POINT));
-					tangents.set(i, splines.get(i).getEndTangent());
+					tangents.set(i, splines.get(i - 1).getEndTangent());
 					break;
 				case 2:
 					splines.add(new SplineCurve(start, end, endTangent, SplineCurve.SECOND_POINT));
@@ -33,20 +33,22 @@ public class Trajectory {
 					break;
 			}
 		}
+
 		int numPoints = 0;
-		double spacing = 0.1;
+		double spacing = 10;
 		for (int i = 0; i < splines.size(); i++) {
 			numPoints += (int)(splines.get(i).getLength() / spacing);
 		}
 		Location[] points = new Location[numPoints];
 		int index = 0;
 		for (int i = 0; i < splines.size(); i++) {
-			Location[] temp = splines.get(i).getEvenlySpacedPoints(spacing, 0.005);
+			//Location[] temp = splines.get(i).getEvenlySpacedPoints(spacing, 1);
+			Location[] temp = {};
 			System.arraycopy(temp, 0, points, index, temp.length);
 			index += temp.length;
 		}
 		
-		calculateMotionControlledTrajectory(points, constraints);
+		//calculateMotionControlledTrajectory(points, constraints);
 		
 		previousMotion = 0;
 	}

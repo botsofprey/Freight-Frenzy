@@ -1,6 +1,7 @@
 package DriveEngine;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -50,11 +52,15 @@ public class MecanumDrive {
 	
 	private volatile Location currentLocation;
 	private volatile Location currentVelocity;
+	private volatile double prePreviousAngle;
+	private volatile double previousAngle;
 	
 	private double[] motorSpeeds;//  rad/s
 	private double[] motorRPMs;
 	private long[] previousPositions;//  ticks
 	private long previousTime;//  nanos
+	private long prePreviousTime;
+	private long prePrePreviousTime;
 	
 	private double encoderCPR;
 	private double wheelDiameter;
@@ -67,7 +73,7 @@ public class MecanumDrive {
 
 	private LinearOpMode mode;
 
-	private BNO055IMU imu;
+	public BNO055IMU imu;
 
 	private PIDCoefficients coefficients = new PIDCoefficients(0.1, 0.025, 0.05);
 	private PIDCoefficients headingCoefficients =
@@ -95,7 +101,10 @@ public class MecanumDrive {
 		parameters.mode                = BNO055IMU.SensorMode.IMU;
 		parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
 		parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+		parameters.calibrationDataFile = "AdafruitIMUCalibration.json";
 		parameters.loggingEnabled      = false;
+		parameters.accelerationIntegrationAlgorithm
+										= new JustLoggingAccelerationIntegrator();
 
 		// Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
 		// on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
@@ -112,7 +121,9 @@ public class MecanumDrive {
 		slowMode = false;
 		fastMode = false;
 		trueNorth = north;
-		
+
+		previousAngle = 0;
+		prePreviousAngle = 0;
 		currentLocation = startLocation;
 		previousPositions = new long[] { 0, 0, 0, 0 };
 		motorSpeeds = new double[] { 0, 0, 0, 0 };
@@ -157,6 +168,8 @@ public class MecanumDrive {
 		long currentTime = System.nanoTime();
 
 		long deltaTime = currentTime - previousTime;
+		prePrePreviousTime = prePreviousTime;
+		prePreviousTime = previousTime;
 		previousTime = currentTime;
 		double timeDiff = deltaTime / 1_000_000_000.0;//convert nanoseconds to seconds
 		double[] rotationAngles = new double[4];
@@ -203,7 +216,8 @@ public class MecanumDrive {
 		double[] movementVectors = vector.getData()[0];
 		Location deltaLocation = new Location(movementVectors[0], movementVectors[1],
 				currentRotation - currentLocation.getHeading());
-		
+		prePreviousAngle = previousAngle;
+		previousAngle = currentLocation.getHeading();
 		currentLocation.add(deltaLocation);
 		currentVelocity = deltaLocation.scale(1.0 / timeDiff);
 		currentVelocity.setHeading(currentVelocity.getHeading() * 0.1);

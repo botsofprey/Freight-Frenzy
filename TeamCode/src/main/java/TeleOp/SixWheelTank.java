@@ -81,14 +81,14 @@ public class SixWheelTank extends LinearOpMode {
 
 			if(controller.rightTriggerReleased || controller.leftTriggerReleased){
 				bucketArm.noDrop();
+			}else if(controller.rightTriggerPressed || controller.leftTriggerReleased){
+				bucketArm.motorMode();
 			}
 
 			if(controller.rightTrigger != 0){
 				bucketArm.setPower(-controller.rightTrigger);
-				bucketArm.motorMode();
 			} else if(controller.leftTrigger != 0){
 				bucketArm.setPower(controller.leftTrigger);
-				bucketArm.motorMode();
 			}
 
 			if(controller.xPressed){
@@ -122,8 +122,6 @@ public class SixWheelTank extends LinearOpMode {
 //			for (int i = 0; i < 4; i++) {
 //				motors[i].setPower(powers[i]);
 //			}
-
-			telemetry.addData("Bucket Position", bucketArm.getDoorPosition());
 
 			bucketArm.update();
 			telemetry.update();

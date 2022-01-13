@@ -7,7 +7,11 @@ import org.checkerframework.checker.units.qual.C;
 
 import java.util.Arrays;
 
+import DriveEngine.DriveConstraints;
 import DriveEngine.MecanumDrive;
+import DriveEngine.NewMecanumDrive;
+import DriveEngine.Trajectory;
+import DriveEngine.TrajectoryBuilder;
 import Subsystems.CameraPipeline;
 import Subsystems.Carousel;
 import Subsystems.Lift;
@@ -16,7 +20,7 @@ import UtilityClasses.Location;
 
 @Autonomous(name="mecanum drive test", group="Autonomous")
 public class MovementTest extends LinearOpMode {
-	private MecanumDrive drive;
+	private NewMecanumDrive drive;
 	private Carousel carousel;
 	private Lift lift;
 
@@ -26,65 +30,26 @@ public class MovementTest extends LinearOpMode {
 	
 	@Override
 	public void runOpMode() throws InterruptedException {//test
-		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(0, 0, 0), true, this, throwErrors);
-		carousel = new Carousel(hardwareMap, this, throwErrors);
-		lift = new Lift(hardwareMap, this, throwErrors);
-		
-		CameraPipeline pipeline = new CameraPipeline(this);
-		Camera camera = new Camera(hardwareMap, "Webcam 1", pipeline, this);
-
-		while (!isStarted()) {
-			blockLocation = pipeline.getShippingElementLocation();
-			telemetry.addData("Location", blockLocation);
-			telemetry.update();
-		}
-
-		telemetry.addData("Status", "Running");
+		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
+				new Location(0, 0, 0), this);
+		DriveConstraints constraints = new DriveConstraints();
+		constraints.maxAngularAcceleration = 720;
+		constraints.maxAngularVelocity = 280;
+		constraints.maxAcceleration = 200;
+		constraints.maxVelocity = 30;
+		TrajectoryBuilder trajBuild = new TrajectoryBuilder(new Location(0, 0, 0), constraints)
+				.splineToLocation(new Location(24, 24, 0));
+		Trajectory traj = trajBuild.build();
+		telemetry.addData("Status", "Initialized");
 		telemetry.update();
+		waitForStart();
 
-		drive.moveToLocation(new Location(-21.75, -9, 0));
-
-		carousel.rotate();
-		sleep(5000);
-		carousel.stop();
-
-		drive.moveToLocation(new Location(32, -9, 0));
-		sleep(200);
-		drive.moveToLocation(new Location(32, -21, 0));
-		lift.up();
-		sleep(100);
-		lift.brake();
-		if (blockLocation == 1) {
-			lift.positionDown();
-		}
-		else if (blockLocation == 2) {
-			lift.positionMiddle();
-		}
-		else if (blockLocation == 3) {
-			lift.positionUp();
-		}
-		long time = System.nanoTime();
-		while (opModeIsActive() && lift.isMoving() && System.nanoTime() < time + 2_000_000_000L)
-			lift.update();
-		sleep(2000);
-		lift.dropFreight();
-		sleep(1000);
-		lift.dropFreight();
-		sleep(1000);
-		lift.positionDown();
-
-		drive.moveToLocation(new Location(60, -20, -90));
-		sleep(1000);
-		drive.fastMode();
-		drive.coast();
-		drive.moveRobot(1, 0, 0);
-		sleep(1200);
-		drive.moveRobot(0, 0, 0);
-		drive.noFastMode();
-		sleep(1000);
-		drive.brake();
-
+		telemetry.addData("Status", "Moving");
+		telemetry.update();
+		drive.followTrajectory(traj);
+		drive.waitForMovement();
+		telemetry.addData("Status", "Stopped");
+		telemetry.update();
 		while (opModeIsActive()) {
 
 		}

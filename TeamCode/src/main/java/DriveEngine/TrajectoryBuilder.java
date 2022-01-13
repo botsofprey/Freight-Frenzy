@@ -22,23 +22,27 @@ public class TrajectoryBuilder {
 				tangentMagnitude * Math.sin(tangentAngle)));
 	}
 	
-	public void splineToLocation(Location location) {
+	public TrajectoryBuilder splineToLocation(Location location) {
 		waypoints.add(location);
 		tangents.add(null);
+		return this;
 	}
 	
-	public void splineToLocation(Location location, double tangentAngle, double tangentMagnitude) {
+	public TrajectoryBuilder splineToLocation(Location location,
+											  double tangentAngle, double tangentMagnitude) {
 		waypoints.add(location);
 		tangents.add(new Location(tangentMagnitude * Math.cos(tangentAngle),
 				tangentMagnitude * Math.sin(tangentAngle)));
+		return this;
 	}
 	
-	public void lineToLocation(Location location) {
+	public TrajectoryBuilder lineToLocation(Location location) {
 		double xDiff = location.getX() - waypoints.get(waypoints.size() - 1).getX();
 		double yDiff = location.getY() - waypoints.get(waypoints.size() - 1).getY();
 		tangents.set(tangents.size(), new Location(xDiff, yDiff));
 		waypoints.add(location);
 		tangents.add(null);
+		return this;
 	}
 	
 	public Trajectory build() {
