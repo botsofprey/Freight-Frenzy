@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Func;
 
@@ -46,11 +47,27 @@ public class SixWheelTank extends LinearOpMode {
 		servoLeft = new CRServoController(hardwareMap, "leftWheel");
 		servoRight = new CRServoController(hardwareMap, "rightWheel");
 
+		bucketArm.liftMoveTowards(2, 0.5);
+		while(bucketArm.liftIsBusy()){}
+
+		bucketArm.liftMoveTowards(-2, .25);
+		while (bucketArm.liftIsBusy() && !bucketArm.startPosSet){
+			if(bucketArm.limitSwitch()){
+				bucketArm.resetLiftEncoder();
+				bucketArm.startPosSet = true;
+			}
+		}
+
+		double xValue, yValue, leftPower, rightPower;
+
 		for (int i = 0; i < 4; i++) {
 			motors[i] = hardwareMap.get(DcMotor.class, names[i]);
 			motors[i].setDirection(directions[i]);
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		}
+
+		telemetry.addData("Start set", bucketArm.startPosSet);
+		telemetry.addData("Magnet sensor pressed", bucketArm.limitSwitch());
 
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
@@ -74,32 +91,66 @@ public class SixWheelTank extends LinearOpMode {
 //				motors[2].setPower(0);
 //				motors[3].setPower(0);
 //			}
-			motors[0].setPower(controller.leftStick.y);
-			motors[1].setPower(controller.leftStick.y);
-			motors[2].setPower(controller.rightStick.y);
-			motors[3].setPower(controller.rightStick.y);
+//			motors[0].setPower(controller.leftStick.y);
+//			motors[1].setPower(controller.leftStick.y);
+//			motors[2].setPower(controller.rightStick.y);
+//			motors[3].setPower(controller.rightStick.y);
 
-			if(controller.rightTriggerReleased || controller.leftTriggerReleased){
-				bucketArm.noDrop();
-			}else if(controller.rightTriggerPressed || controller.leftTriggerReleased){
-				bucketArm.motorMode();
+			yValue = controller.leftStick.y;
+			xValue = controller.rightStick.x * -1;
+
+			leftPower =  yValue - xValue;
+			rightPower = yValue + xValue;
+
+			motors[0].setPower(Range.clip(leftPower, -1.0, 1.0));
+			motors[1].setPower(Range.clip(leftPower, -1.0, 1.0));
+			motors[2].setPower(Range.clip(rightPower, -1.0, 1.0));
+			motors[3].setPower(Range.clip(rightPower, -1.0, 1.0));
+
+			telemetry.addData("Mode", "running");
+			telemetry.addData("stick", "  y=" + yValue + "  x=" + xValue);
+			telemetry.addData("power", "  left=" + leftPower + "  right=" + rightPower);
+			telemetry.update();
+
+			//Stop lift from dropping
+//			if(controller.rightTriggerReleased || controller.leftTriggerReleased){
+//				bucketArm.noDrop();
+//			}else if(controller.rightTriggerPressed || controller.leftTriggerReleased){
+//				bucketArm.motorMode();
+//			}
+
+			//Lift Control
+			if (controller.leftTrigger == 0) {
+				// only set the lift power from the right trigger if the left trigger is not pressed
+				if(bucketArm.getLiftPos() < BucketArm.MAX) {
+					bucketArm.setLiftPower(controller.rightTrigger);
+				}
+				telemetry.addData("Right trigger", controller.rightTrigger);
+			}
+			if (controller.rightTrigger == 0) {
+				// only set the lift power from the left trigger if the right trigger is not pressed
+				if(!bucketArm.limitSwitch()){
+				bucketArm.setLiftPower(-controller.leftTrigger);
+				}else{
+					bucketArm.setLiftPower(0);
+				}
+				telemetry.addData("Left trigger", controller.leftTrigger);
 			}
 
-			if(controller.rightTrigger != 0){
-				bucketArm.setPower(-controller.rightTrigger);
-			} else if(controller.leftTrigger != 0){
-				bucketArm.setPower(controller.leftTrigger);
+			//Bucket Control
+			if(controller.leftBumperHeld){
+				bucketArm.setBucketPower(BucketArm.OUTTAKE);
+			}else if(controller.rightBumperHeld) {
+				bucketArm.setBucketPower(BucketArm.INTAKE);
+			} else {
+				bucketArm.setBucketPower(0);
 			}
 
-			if(controller.xPressed){
-				bucketArm.dropFreight();
-			}
-
-			if(controller.yHeld){
+			//Carasoul
+			if(controller.bHeld){
 				servoLeft.setPower(-1);
 				servoRight.setPower(1);
 			}else{
-
 				servoLeft.setPower(0);
 				servoRight.setPower(0);
 			}
@@ -122,6 +173,10 @@ public class SixWheelTank extends LinearOpMode {
 //			for (int i = 0; i < 4; i++) {
 //				motors[i].setPower(powers[i]);
 //			}
+
+			telemetry.addData("Lift Position", bucketArm.getLiftPos());
+			telemetry.addData("Magnet Switch Pressed", bucketArm.limitSwitch());
+			telemetry.addData("Lift Power", bucketArm.getLiftPower());
 
 			bucketArm.update();
 			telemetry.update();
