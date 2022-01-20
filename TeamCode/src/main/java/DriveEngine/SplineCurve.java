@@ -141,6 +141,12 @@ public class SplineCurve {
 		}
 		return new Location(x, y, Location.normalizeHeading(h));
 	}
+
+	public Location getPoint(double dist, double precision) {
+		Location[] point = new Location[1];
+		findPoint(dist, point, 0, precision, 0, 1);
+		return point[0];
+	}
 	
 	private double getIntegrand(double t) {//@see https://medium.com/@all2one/how-to-compute-the-length-of-a-spline-e44f5f04c40
 		double x = 0;

@@ -145,14 +145,15 @@ public class BucketArm {
 		return liftMotor.getPower();
 	}
 
-	public void liftMoveTowards(int inches, double power){
-		liftMotor.setTargetPosition(inches * (int)TICKS_PER_INCH);
+	public void liftMoveTowards(double inches, double power){
+		liftMotor.setTargetPosition((int)(inches * TICKS_PER_INCH));
 		liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		liftMotor.setPower(power);
 	}
 
 	public void resetLiftEncoder(){
 		liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 	}
 
 	public void update(){

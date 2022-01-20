@@ -32,8 +32,6 @@ public class NewMecanumDrive {
 			"backRightDriveMotor",
 			"frontRightDriveMotor"
 	};
-	
-	private MotorController[] driveMotors = new MotorController[4];
 	private long previousTime;
 	
 	private LinearOpMode mode;
@@ -50,6 +48,8 @@ public class NewMecanumDrive {
 	private Trajectory currentTrajectory;
 	private boolean currentlyMoving;
 	private long startTime;
+	private double maxSpeed;
+	private SplineCurve path;
 	
 	private PIDCoefficients coefficients = new PIDCoefficients(0.1, 0.025, 0.05);
 	private PIDCoefficients headingCoefficients =
@@ -78,14 +78,14 @@ public class NewMecanumDrive {
 		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");
-			driveMotors[i] = new MotorController(hw, motorName, mode, true);
-			driveMotors[i].setDirection(
+			motors[i] = new MotorController(hw, motorName, mode, true);
+			motors[i].setDirection(
 					reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
 							DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE
 			);
-			driveMotors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-			driveMotors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-			driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+			motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		}
 		
 		JSONReader motorReader = new JSONReader(hw, reader.getString("driveMotorFile"));
@@ -95,9 +95,14 @@ public class NewMecanumDrive {
 		Kv = motorReader.getDouble("max_rpm") /
 				(12 - motorReader.getDouble("no_load_current") * R);
 	}
-	
+
 	public void followTrajectory(Trajectory trajectory) {
 		currentTrajectory = trajectory;
+		currentlyMoving = true;
+	}
+
+	public void followPath(SplineCurve path) {
+		this.path = path;
 		currentlyMoving = true;
 	}
 	
@@ -161,6 +166,28 @@ public class NewMecanumDrive {
 			currentlyMoving = false;
 		}
 	}
+
+	private void altMovement() {
+		double time = (System.nanoTime() - previousTime) / 1_000_000_000.0;
+		double inches = time * maxSpeed;
+		Location point = path.getPoint(inches, 0.1);
+
+		xController.setTargetPoint(point.getX());
+		yController.setTargetPoint(point.getY());
+		hController.setTargetPoint(point.getHeading());
+		double x = xController.calculateAdjustment(currentLocation.getX());
+		double y = yController.calculateAdjustment(currentLocation.getY());
+		double h = hController.calculateAdjustment(currentLocation.getHeading());
+
+		if (inches + maxSpeed * 0.5 >= path.getLength() ||
+				currentLocation.distanceToLocation(path.getPoint(1)) <= 0.5) {
+			currentlyMoving = false;
+			rawMove(0, 0, 0);
+		}
+		else {
+			moveTrueNorth(x, y, h);
+		}
+	}
 	
 	public void update() {
 		updateLocation();
@@ -184,5 +211,9 @@ public class NewMecanumDrive {
 
 	public boolean isMoving() {
 		return currentlyMoving;
+	}
+
+	public Location getCurrentLocation() {
+		return currentLocation;
 	}
 }

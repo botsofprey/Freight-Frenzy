@@ -47,7 +47,18 @@ public class MovementTest extends LinearOpMode {
 		telemetry.addData("Status", "Moving");
 		telemetry.update();
 		drive.followTrajectory(traj);
-		drive.waitForMovement();
+		drive.waitForMovement(new Runnable() {
+			long time = System.nanoTime();
+			@Override
+			public void run() {
+				long currentTime = System.nanoTime();
+				if (currentTime - time > 500_000_000) {
+					time = currentTime;
+					telemetry.addData("Location", drive.getCurrentLocation());
+					telemetry.update();
+				}
+			}
+		});
 		telemetry.addData("Status", "Stopped");
 		telemetry.update();
 		while (opModeIsActive()) {

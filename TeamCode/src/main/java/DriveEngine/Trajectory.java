@@ -35,20 +35,19 @@ public class Trajectory {
 		}
 
 		int numPoints = 0;
-		double spacing = 10;
+		double spacing = 0.25;
 		for (int i = 0; i < splines.size(); i++) {
 			numPoints += (int)(splines.get(i).getLength() / spacing);
 		}
 		Location[] points = new Location[numPoints];
 		int index = 0;
 		for (int i = 0; i < splines.size(); i++) {
-			//Location[] temp = splines.get(i).getEvenlySpacedPoints(spacing, 1);
-			Location[] temp = {};
+			Location[] temp = splines.get(i).getEvenlySpacedPoints(spacing, 0.01);
 			System.arraycopy(temp, 0, points, index, temp.length);
 			index += temp.length;
 		}
 		
-		//calculateMotionControlledTrajectory(points, constraints);
+		calculateMotionControlledTrajectory(points, constraints);
 		
 		previousMotion = 0;
 	}
