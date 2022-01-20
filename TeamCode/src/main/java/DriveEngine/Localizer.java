@@ -29,9 +29,9 @@ public class Localizer {
 	private BNO055IMU imu;
 	private long previousTime;
 	private long[] positions = new long[]{ 0, 0, 0, 0 };
-	private long[] previousPositions = new long[]{ 0, 0, 0, 0 };
-	private double[] motorSpeeds = new double[]{ 0, 0, 0, 0 };
-	private double[] motorRPMs = new double[]{ 0, 0, 0, 0 };
+	private long[] previousPositions;
+	private double[] motorSpeeds;
+	private double[] motorRPMs;
 	private double encoderCPR;
 	private double wheelDiameter;
 

@@ -1,5 +1,7 @@
 package DriveEngine;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -48,7 +50,7 @@ public class NewMecanumDrive {
 	private Trajectory currentTrajectory;
 	private boolean currentlyMoving;
 	private long startTime;
-	private double maxSpeed;
+	private double maxSpeed = 30;
 	private SplineCurve path;
 	
 	private PIDCoefficients coefficients = new PIDCoefficients(0.1, 0.025, 0.05);
@@ -104,6 +106,7 @@ public class NewMecanumDrive {
 	public void followPath(SplineCurve path) {
 		this.path = path;
 		currentlyMoving = true;
+		previousTime = System.nanoTime();
 	}
 	
 	private void updateLocation() {
@@ -115,8 +118,8 @@ public class NewMecanumDrive {
 		double[] powers = new double[]{
 				x + y - h,
 				-x + y - h,
-				x - y + h,
-				-x - y + h
+				x + y + h,
+				-x + y + h
 		};
 		double max = 1;
 		for (double power : powers) {
@@ -151,7 +154,9 @@ public class NewMecanumDrive {
 	}
 	
 	private void calculateMovement() {
-		double time = (System.nanoTime() - previousTime) / 1_000_000_000.0;
+		long currentTime = System.nanoTime();
+		double time = (currentTime - previousTime) / 1_000_000_000.0;
+		previousTime = currentTime;
 		TrajectoryPoint point = currentTrajectory.getMotion(time);
 		
 		xController.setTargetPoint(point.x);
@@ -168,7 +173,8 @@ public class NewMecanumDrive {
 	}
 
 	private void altMovement() {
-		double time = (System.nanoTime() - previousTime) / 1_000_000_000.0;
+		long currentTime = System.nanoTime();
+		double time = (currentTime - previousTime) / 1_000_000_000.0;
 		double inches = time * maxSpeed;
 		Location point = path.getPoint(inches, 0.1);
 
@@ -179,8 +185,12 @@ public class NewMecanumDrive {
 		double y = yController.calculateAdjustment(currentLocation.getY());
 		double h = hController.calculateAdjustment(currentLocation.getHeading());
 
-		if (inches + maxSpeed * 0.5 >= path.getLength() ||
-				currentLocation.distanceToLocation(path.getPoint(1)) <= 0.5) {
+		double distanceToEnd = currentLocation.distanceToLocation(path.getPoint(1));
+		System.out.println("Distance to end point: " + distanceToEnd);
+		System.out.println("Theoretical distance to end point: " + (path.getLength() - inches));
+
+		if ((inches - maxSpeed * 0.5 >= path.getLength()) ||
+				distanceToEnd <= 0.5) {
 			currentlyMoving = false;
 			rawMove(0, 0, 0);
 		}
@@ -192,7 +202,7 @@ public class NewMecanumDrive {
 	public void update() {
 		updateLocation();
 		if (currentlyMoving) {
-			calculateMovement();
+			altMovement();
 		} else {
 			rawMove(0, 0, 0);
 		}
@@ -203,6 +213,7 @@ public class NewMecanumDrive {
 	}
 
 	public void waitForMovement(Runnable updateFunctions) {
+		previousTime = System.nanoTime();
 		while (mode.opModeIsActive() && currentlyMoving) {
 			update();
 			updateFunctions.run();

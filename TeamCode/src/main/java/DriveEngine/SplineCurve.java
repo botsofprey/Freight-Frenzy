@@ -129,7 +129,7 @@ public class SplineCurve {
 	}
 	
 	public Location getPoint(double t) {
-		t = Math.max(-1, Math.min(1, t));
+		t = Math.max(0, Math.min(1, t));
 		double x = 0;
 		double y = 0;
 		double h = 0;
@@ -143,6 +143,8 @@ public class SplineCurve {
 	}
 
 	public Location getPoint(double dist, double precision) {
+		if (dist <= 0) return getPoint(0);
+		if (dist >= length) return getPoint(1);
 		Location[] point = new Location[1];
 		findPoint(dist, point, 0, precision, 0, 1);
 		return point[0];
