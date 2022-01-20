@@ -215,7 +215,7 @@ public class SplineCurve {
 		}
 		double mid = (lower + upper) / 2.0;
 		double midDistance = getIntervalLength(0, mid);
-		int c = (int)(midDistance / spacing);
+		int c = (int)(midDistance / spacing + 1);
 		findPoints(distances, points, spacing, precision, a, c, lower, mid);
 		findPoints(distances, points, spacing, precision, c, b, mid, upper);
 	}
