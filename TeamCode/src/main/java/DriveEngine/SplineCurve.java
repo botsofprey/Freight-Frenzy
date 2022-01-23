@@ -44,7 +44,7 @@ public class SplineCurve {
 		Matrix xVector = new Matrix(new double[][]{
 				{   x0,     x1,     xPrime0,    xPrime1 }
 		});
-		coefficients[0] = xVector.transpose().mul(solution).transpose().getData()[0];
+		coefficients[0] = solution.clone().mul(xVector.transpose()).transpose().getData()[0];
 		double y0 = start.getY();
 		double y1 = end.getY();
 		double yPrime0 = startTangent.getX();
@@ -52,7 +52,7 @@ public class SplineCurve {
 		Matrix yVector = new Matrix(new double[][]{
 				{   y0,     y1,     yPrime0,    yPrime1 }
 		});
-		coefficients[1] = yVector.transpose().mul(solution).transpose().getData()[0];
+		coefficients[1] = solution.clone().mul(yVector.transpose()).transpose().getData()[0];
 		double h0 = start.getHeading();
 		double hPrime0 = startTangent.getHeading();
 		double hPrime1 = endTangent.getHeading();
@@ -60,7 +60,7 @@ public class SplineCurve {
 		Matrix hVector = new Matrix(new double[][]{
 				{   h0,     h1,     hPrime0,    hPrime1 }
 		});
-		coefficients[2] = hVector.transpose().mul(solution).transpose().getData()[0];
+		coefficients[2] = solution.clone().mul(hVector.transpose()).transpose().getData()[0];
 		length = getIntervalLength(0, 1);
 	}
 	

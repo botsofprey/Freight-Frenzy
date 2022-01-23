@@ -50,14 +50,15 @@ public class NewMecanumDrive {
 	private Trajectory currentTrajectory;
 	private boolean currentlyMoving;
 	private long startTime;
-	private double maxSpeed = 30;
+	private double maxSpeed = 24;
 	private SplineCurve path;
 	
-	private PIDCoefficients coefficients = new PIDCoefficients(0.1, 0.025, 0.05);
+	private PIDCoefficients xCoefficients = new PIDCoefficients(2, 0.8, 0.15);
+	private PIDCoefficients yCoefficients = new PIDCoefficients(0.8, 0.15, 0.05);
 	private PIDCoefficients headingCoefficients =
-			new PIDCoefficients(0.01, 0.005, 0.005);
-	private PIDController xController = new PIDController(coefficients);
-	private PIDController yController = new PIDController(coefficients);
+			new PIDCoefficients(0.4, 0.1, 0.0125);
+	private PIDController xController = new PIDController(xCoefficients);
+	private PIDController yController = new PIDController(yCoefficients);
 	private PIDController hController = new PIDController(headingCoefficients);
 
 	public NewMecanumDrive(HardwareMap hw, String fileName,
@@ -106,6 +107,9 @@ public class NewMecanumDrive {
 	public void followPath(SplineCurve path) {
 		this.path = path;
 		currentlyMoving = true;
+		xController.reset();
+		yController.reset();
+		hController.reset();
 		previousTime = System.nanoTime();
 	}
 	
@@ -175,7 +179,7 @@ public class NewMecanumDrive {
 	private void altMovement() {
 		long currentTime = System.nanoTime();
 		double time = (currentTime - previousTime) / 1_000_000_000.0;
-		double inches = time * maxSpeed;
+		double inches = Math.min(time * maxSpeed, path.getLength());
 		Location point = path.getPoint(inches, 0.1);
 
 		xController.setTargetPoint(point.getX());
@@ -185,12 +189,13 @@ public class NewMecanumDrive {
 		double y = yController.calculateAdjustment(currentLocation.getY());
 		double h = hController.calculateAdjustment(currentLocation.getHeading());
 
-		double distanceToEnd = currentLocation.distanceToLocation(path.getPoint(1));
-		System.out.println("Distance to end point: " + distanceToEnd);
-		System.out.println("Theoretical distance to end point: " + (path.getLength() - inches));
+		double distanceToEnd = Math.max(currentLocation.headingDifference(path.getPoint(1)),
+				currentLocation.distanceToLocation(path.getPoint(1)));
+		double theoDistanceToEnd = point.headingDifference(path.getPoint(1));
+		System.out.println("Movement data: " + time + " " +
+				theoDistanceToEnd + " " + distanceToEnd);
 
-		if ((inches - maxSpeed * 0.5 >= path.getLength()) ||
-				distanceToEnd <= 0.5) {
+		if (time - 1 >= path.getLength() / maxSpeed || distanceToEnd <= 0.5) {
 			currentlyMoving = false;
 			rawMove(0, 0, 0);
 		}
