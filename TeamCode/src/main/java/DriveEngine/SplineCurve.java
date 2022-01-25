@@ -149,6 +149,10 @@ public class SplineCurve {
 		findPoint(dist, point, 0, precision, 0, 1);
 		return point[0];
 	}
+
+	public Location getEnd() {
+		return getPoint(1);
+	}
 	
 	private double getIntegrand(double t) {//@see https://medium.com/@all2one/how-to-compute-the-length-of-a-spline-e44f5f04c40
 		double x = 0;

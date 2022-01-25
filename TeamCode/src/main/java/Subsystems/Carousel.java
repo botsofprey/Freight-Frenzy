@@ -11,7 +11,7 @@ public class Carousel {
 	private CRServoController rCarousel;
 	private LinearOpMode mode;
 
-	public Carousel(HardwareMap hardwareMap, LinearOpMode m, boolean errors){
+	public Carousel(HardwareMap hardwareMap, LinearOpMode m, boolean errors) {
 		mode = m;
 		lCarousel = new CRServoController(hardwareMap,
 				"leftDuckSpinner");
@@ -20,8 +20,8 @@ public class Carousel {
 	}
 
 	public void rotate() {
-		lCarousel.setPower(-0.4);
-		rCarousel.setPower(0.4);
+		lCarousel.setPower(1);
+		rCarousel.setPower(-1);
 	}
 
 	public void stop() {
