@@ -5,13 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.QRCodeDetector;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class CameraPipeline extends OpenCvPipeline {
+public class CameraPipelineRed extends OpenCvPipeline {
 	private boolean init = true;
 
 	private static final Point[] LOCATIONS = {
@@ -32,7 +29,7 @@ public class CameraPipeline extends OpenCvPipeline {
 
 	public volatile int xPos;
 
-	public CameraPipeline(LinearOpMode m) {
+	public CameraPipelineRed(LinearOpMode m) {
 		mode = m;
 	}
 
@@ -53,15 +50,15 @@ public class CameraPipeline extends OpenCvPipeline {
 			xPos = x;
 			y = (int)(point.y / 4.0);
 
-			Imgproc.rectangle(image, new Point(x - 50, y - 50),
-					new Point(x + 50, y + 50), new Scalar(0, 0, 255), 3);
+//			Imgproc.rectangle(image, new Point(x - 50, y - 50),
+//					new Point(x + 50, y + 50), new Scalar(0, 0, 255), 3);
 
 			double[] distances = new double[2];
 			for (int i = 0; i < 2; i++) {
 				distances[i] = Math.abs(x - LOCATIONS[i].x);
 			}
 
-			if (distances[0] > distances[1]) {
+			if (Math.abs(point.x - LOCATIONS[0].x) > Math.abs(point.x - LOCATIONS[1].x)) {
 				location = 1;
 			}
 			else {

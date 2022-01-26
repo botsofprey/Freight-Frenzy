@@ -36,6 +36,7 @@ public class Localizer {
 	private double wheelDiameter;
 
 	private Location currentLocation;
+	private double initHeading;
 
 	
 	
@@ -62,6 +63,7 @@ public class Localizer {
 		}
 		
 		currentLocation = startLocation;
+		initHeading = startLocation.getHeading();
 		previousPositions = new long[] { 0, 0, 0, 0 };
 		motorSpeeds = new double[] { 0, 0, 0, 0 };
 		motorRPMs = new double[] { 0, 0, 0, 0 };
@@ -103,7 +105,7 @@ public class Localizer {
 			motorRPMs[i] = rotationAngles[i] * 2 * Math.PI;
 		}
 		double currentRotation = imu.getAngularOrientation(AxesReference.INTRINSIC,
-				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle + initHeading;
 		double rotation = Math.toRadians(currentLocation.getHeading() - currentRotation);
 		double xMovement =
 				(motorDistances[0] + motorDistances[1] +//1.266 is a manually tuned constant

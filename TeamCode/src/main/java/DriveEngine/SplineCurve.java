@@ -105,9 +105,9 @@ public class SplineCurve {
 				{   h0, h1, hPrime  }
 		});
 		coefficients = new double[][]{
-				xVector.transpose().mul(solution).transpose().getData()[0],
-				yVector.transpose().mul(solution).transpose().getData()[0],
-				hVector.transpose().mul(solution).transpose().getData()[0]
+				solution.clone().mul(xVector.transpose()).transpose().getData()[0],
+				solution.clone().mul(yVector.transpose()).transpose().getData()[0],
+				solution.clone().mul(hVector.transpose()).transpose().getData()[0]
 		};
 		length = getIntervalLength(0, 1);
 	}
