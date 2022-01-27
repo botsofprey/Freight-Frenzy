@@ -153,6 +153,33 @@ public class SplineCurve {
 	public Location getEnd() {
 		return getPoint(1);
 	}
+
+	public Location getTangent(double t) {
+		t = Math.max(0, Math.min(1, t));
+		double x = 0;
+		double y = 0;
+		double h = 0;
+		for (int i = 1; i < coefficients[0].length; i++) {
+			double pow = Math.pow(t, i - 1);
+			x += i * pow * coefficients[0][i];
+			y += i * pow * coefficients[1][i];
+			h += i * pow * coefficients[2][i];
+		}
+		return new Location(x, y, h);
+	}
+
+	public Location getVelocity(double t, double maxVelocity, double maxAngular) {
+		Location tangent = getTangent(t);
+		double velocity = tangent.distanceToLocation(new Location(0, 0, 0));
+		double angular = tangent.getHeading();
+		double scale = Math.min(maxVelocity / velocity, maxAngular / angular);
+		return new Location(tangent.getX() * scale,
+				tangent.getY() * scale, tangent.getHeading() * scale);
+	}
+
+	public Location getAccelControlVelocity(double t, double maxVelocity, double maxAngular) {
+		return getVelocity((1 - Math.cos(t * Math.PI)) / 2.0, maxVelocity, maxAngular);
+	}
 	
 	private double getIntegrand(double t) {//@see https://medium.com/@all2one/how-to-compute-the-length-of-a-spline-e44f5f04c40
 		double x = 0;
