@@ -47,13 +47,16 @@ public class NewMecanumDrive {
 	
 	private Localizer localizer;
 	private Location currentLocation;
+	public Location targetLocation;
 	private Trajectory currentTrajectory;
 	private boolean currentlyMoving;
 	private long startTime;
-	private double maxSpeed = 24;
+	public static final double MAX_SPEED = 24;
+	public static final double MAX_ANGULAR = 90;
+	private double speed = 24;
 	private SplineCurve path;
 	
-	private PIDCoefficients xCoefficients = new PIDCoefficients(2, 0.8, 0.15);
+	private PIDCoefficients xCoefficients = new PIDCoefficients(3.5, 1.2, 0.15);
 	private PIDCoefficients yCoefficients = new PIDCoefficients(0.8, 0.15, 0.05);
 	private PIDCoefficients headingCoefficients =
 			new PIDCoefficients(0.4, 0.1, 0.0125);
@@ -111,6 +114,10 @@ public class NewMecanumDrive {
 		yController.reset();
 		hController.reset();
 		previousTime = System.nanoTime();
+	}
+
+	public void setSpeed(double speed) {
+		this.speed = speed;
 	}
 	
 	private void updateLocation() {
@@ -179,8 +186,13 @@ public class NewMecanumDrive {
 	private void altMovement() {
 		long currentTime = System.nanoTime();
 		double time = (currentTime - previousTime) / 1_000_000_000.0;
-		double inches = Math.min(time * maxSpeed, path.getLength());
+		double inches = Math.min(time * speed, path.getLength());
 		Location point = path.getPoint(inches, 0.1);
+		targetLocation = point;
+
+		Location baseSpeeds =
+				path.getVelocity(inches / path.getLength(), MAX_SPEED, MAX_ANGULAR);
+		baseSpeeds.scale(1 / 3.0);
 
 		xController.setTargetPoint(point.getX());
 		yController.setTargetPoint(point.getY());
@@ -195,12 +207,13 @@ public class NewMecanumDrive {
 		System.out.println("Movement data: " + time + " " +
 				theoDistanceToEnd + " " + distanceToEnd);
 
-		if (time - 1 >= path.getLength() / maxSpeed || distanceToEnd <= 0.5) {
+		if (time - 1 >= path.getLength() / speed || distanceToEnd <= 0.5) {
 			currentlyMoving = false;
 			rawMove(0, 0, 0);
 		}
 		else {
-			moveTrueNorth(x, y, h);
+			moveTrueNorth(x + baseSpeeds.getX(),
+					y + baseSpeeds.getY(), h + baseSpeeds.getHeading());
 		}
 	}
 	

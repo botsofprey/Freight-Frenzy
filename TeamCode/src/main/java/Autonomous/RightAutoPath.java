@@ -17,32 +17,42 @@ public class RightAutoPath extends LinearOpMode {
 	private Carousel carousel;
 	private Lift lift;
 
-	private SplineCurve toCarousel = new SplineCurve(new Location(-61, -41, -90),
-			new Location(-58, -56, -90));
+	private SplineCurve toCarousel = new SplineCurve(new Location(-61, -41, 90),
+			new Location(-58, -56, 90));
 	private SplineCurve toShippingHub = new SplineCurve(toCarousel.getEnd(),
-			new Location(-24, -29, -180),
+			new Location(-24, -29, 180),
 			new Location(0, 300, 0), SplineCurve.SECOND_POINT);
 	private SplineCurve toDepot = new SplineCurve(toShippingHub.getEnd(),
-			new Location(-36, -60, -180));
+			new Location(-36, -60, 180));
 
 	@Override
 	public void runOpMode() throws InterruptedException {
 		CameraPipeline cameraPipeline = new CameraPipeline(this);
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(-61, -41, -90), this);
+				new Location(-61, -41, 90), this);
 		carousel = new Carousel(hardwareMap, this, true);
 		lift = new Lift(hardwareMap, this, true);
 
-		telemetry.addData("Status", "Initialized");
-		telemetry.update();
-		waitForStart();
+		while (!isStarted() && !isStopRequested()) {
+			drive.update();
+			telemetry.addData("Location", drive.getCurrentLocation());
+			telemetry.addData("QR Code", cameraPipeline.getShippingElementLocation());
+			telemetry.update();
+		}
 
 		telemetry.addData("Status", "Moving to carousel");
 		telemetry.update();
 		drive.followPath(toCarousel);
-		drive.waitForMovement();
+		drive.setSpeed(6);
+		drive.waitForMovement(()->{
+			telemetry.addData("Location", drive.getCurrentLocation());
+			telemetry.addData("Target", drive.targetLocation);
+			telemetry.update();
+		});
 
+		while (opModeIsActive());
+/*
 		telemetry.addData("Status", "Spinning carousel");
 		telemetry.update();
 		carousel.rotate();
@@ -53,10 +63,10 @@ public class RightAutoPath extends LinearOpMode {
 		telemetry.update();
 		int level = cameraPipeline.getShippingElementLocation();
 		switch (level) {
-			case 2:
+			case 1:
 				lift.positionMiddle();
 				break;
-			case 3:
+			case 2:
 				lift.positionUp();
 				break;
 			default:
@@ -79,6 +89,6 @@ public class RightAutoPath extends LinearOpMode {
 
 		telemetry.addData("Status", "Parked");
 		telemetry.update();
-		while(opModeIsActive());
+		while(opModeIsActive());*/
 	}
 }
