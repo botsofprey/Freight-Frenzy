@@ -177,6 +177,13 @@ public class SplineCurve {
 				tangent.getY() * scale, tangent.getHeading() * scale);
 	}
 
+	public Location getPowers(double t, double maxVelocity, double maxAngular) {
+		Location toNormalize = getVelocity(t, maxVelocity, maxAngular);
+		double scale = Math.max(1, Math.max(Math.abs(toNormalize.getX()),
+				Math.max(Math.abs(toNormalize.getY()), Math.abs(toNormalize.getHeading()))));
+		return toNormalize.scale(1.0 / scale);
+	}
+
 	public Location getAccelControlVelocity(double t, double maxVelocity, double maxAngular) {
 		return getVelocity((1 - Math.cos(t * Math.PI)) / 2.0, maxVelocity, maxAngular);
 	}

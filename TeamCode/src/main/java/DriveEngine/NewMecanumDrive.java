@@ -52,6 +52,7 @@ public class NewMecanumDrive {
 	private boolean currentlyMoving;
 	private long startTime;
 	public static final double MAX_SPEED = 24;
+	public static final double MAX_ANGULAR = 90;
 	private double speed = 24;
 	private SplineCurve path;
 	
@@ -189,6 +190,10 @@ public class NewMecanumDrive {
 		Location point = path.getPoint(inches, 0.1);
 		targetLocation = point;
 
+		Location baseSpeeds =
+				path.getVelocity(inches / path.getLength(), MAX_SPEED, MAX_ANGULAR);
+		baseSpeeds.scale(1 / 3.0);
+
 		xController.setTargetPoint(point.getX());
 		yController.setTargetPoint(point.getY());
 		hController.setTargetPoint(point.getHeading());
@@ -207,7 +212,8 @@ public class NewMecanumDrive {
 			rawMove(0, 0, 0);
 		}
 		else {
-			moveTrueNorth(x, y, h);
+			moveTrueNorth(x + baseSpeeds.getX(),
+					y + baseSpeeds.getY(), h + baseSpeeds.getHeading());
 		}
 	}
 	
