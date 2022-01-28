@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -32,7 +33,7 @@ public class SixDrive {
 	private double globalAngle;
 	public String RIGHT = "right", LEFT = "left";
 
-	private double TICKS_PER_INCH = 537.6 / (3 * Math.PI);
+	private double TICKS_PER_INCH = 537.6 / (3 * Math.PI), movementPower;
 	public double targetAngle;
 
 	public SixDrive(HardwareMap hardwareMap){
@@ -65,7 +66,8 @@ public class SixDrive {
 	}
 
 	boolean rotating;
-	public void rotate(double angle, double power){
+	double rotationRange;
+	public void rotate(double angle, double motorPower, double range){
 		targetAngle = angle + getAngle();
 		if (targetAngle < -180)
 			targetAngle += 360;
@@ -77,6 +79,7 @@ public class SixDrive {
 		}
 
 		String direction = (targetAngle > getAngle() ? RIGHT : LEFT);
+		double power = motorPower/2;
 
 		if(direction == RIGHT){
 			motors[0].setPower(power);
@@ -91,6 +94,31 @@ public class SixDrive {
 		}
 
 		rotating = true;
+		movementPower = motorPower;
+		rotationRange = range;
+	}
+	public void correctRotation(double motorPower){
+		for(int i = 0; i < motors.length; i++){
+			motors[i].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		}
+
+		String direction = (targetAngle > getAngle() ? RIGHT : LEFT);
+
+		motors[0].setPower(motorPower);
+		motors[1].setPower(motorPower);
+		motors[2].setPower(-motorPower);
+		motors[3].setPower(-motorPower);
+//		if(direction == RIGHT){
+//			motors[0].setPower(motorPower);
+//			motors[1].setPower(motorPower);
+//			motors[2].setPower(-motorPower);
+//			motors[3].setPower(-motorPower);
+//		}else{
+//			motors[0].setPower(-motorPower);
+//			motors[1].setPower(-motorPower);
+//			motors[2].setPower(motorPower);
+//			motors[3].setPower(motorPower);
+//		}
 	}
 
 	public boolean rotating(){
@@ -141,12 +169,19 @@ public class SixDrive {
 		else if (globalAngle > 180)
 			globalAngle -= 360;
 
-		return globalAngle;
+		return -globalAngle;
+	}
+
+	public double getMovementPower(){
+		return motors[0].getPower();
 	}
 
 	public void update(){
 		if(rotating){
-			if(compareAngles(targetAngle, getAngle(), 15)){
+			double power = Math.min((movementPower/45)*(Math.abs(targetAngle - getAngle())),
+					movementPower);
+			correctRotation(power);
+			if(compareAngles(targetAngle, getAngle(), rotationRange)){
 				rotating = false;
 			}
 		}

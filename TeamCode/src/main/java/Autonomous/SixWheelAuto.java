@@ -45,12 +45,14 @@ public class SixWheelAuto extends LinearOpMode {
 				telemetry.addData("Lift Position", bucketArm.getLiftPos());
 				telemetry.update();
 			}
+			bucketArm.setLiftPower(-.3);
 			sleep(1000);
 			bucketArm.setLiftPower(0);
 			bucketArm.resetLiftEncoder();
 		}
 
 		telemetry.addData("Lift Position", bucketArm.getLiftPos());
+		telemetry.addData("Current angle", sixDrive.getAngle());
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 
@@ -61,21 +63,34 @@ public class SixWheelAuto extends LinearOpMode {
 		//Go to warehouse
 		{
 			//Rotate towards warehouse
-			sixDrive.rotate(90, .01);
+			sixDrive.rotate(90, .06, 2);
 			while (opModeIsActive() && sixDrive.rotating()) {
-				telemetry.addData("Target", sixDrive.targetAngle);
-				telemetry.addData("Current Angle", sixDrive.getAngle());
-				telemetry.update();
 				sixDrive.update();
+				telemetry.addData("Current angle", sixDrive.getAngle());
+				telemetry.addData("Motor power", sixDrive.getMovementPower());
+				System.out.println("Motor power: " + sixDrive.getMovementPower());
+				telemetry.update();
 			}
-			stop();
-			sleep(1000);
+//			sixDrive.correctRotation(.06, 2);
+//			while (opModeIsActive() && sixDrive.rotating()) {
+//				sixDrive.update();
+//			}
+			double stoppedAngle = sixDrive.getAngle();
+			sixDrive.stop();
 
-			//Move to warehouse
-			sixDrive.move(distanceFromWarehouse - 1, 1);
-			while (sixDrive.isBusy() && opModeIsActive()) {
+			while(opModeIsActive()){
+				telemetry.addData("Stopped angle", stoppedAngle);
+				telemetry.addData("Current angle", sixDrive.getAngle());
+				telemetry.update();
 			}
-			sleep(1000);
+
+//			//Move to warehouse
+//			sixDrive.move(distanceFromWarehouse - 5, 1);
+//			while (sixDrive.isBusy() && opModeIsActive()) {
+//				telemetry.addData("Current angle", sixDrive.getAngle());
+//				telemetry.update();
+//			}
+//			sleep(1000);
 		}
 //
 //    //Drop freight in shipping hub
