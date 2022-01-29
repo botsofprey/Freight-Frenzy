@@ -187,10 +187,10 @@ public class MecanumDrive {
 		double rotation = Math.toRadians(currentLocation.getHeading() - currentRotation);
 		double xMovement =
 				(motorDistances[0] + motorDistances[1] +//1.6 is a manually tuned constant
-						motorDistances[2] + motorDistances[3]) * 0.25 / 1.6;
+						motorDistances[2] + motorDistances[3]) * 0.25 / 0.8;
 		double yMovement =
 				(motorDistances[1] - motorDistances[0] +//2.13 is a manually tuned constant
-						motorDistances[3] - motorDistances[2]) * 0.25 / 2.13;
+						motorDistances[3] - motorDistances[2]) * 0.25 / 1.07;
 		double currentHeading = -Math.toRadians(currentLocation.getHeading() + 90);
 		
 		Matrix vector = new Matrix(new double[][] {
@@ -201,18 +201,18 @@ public class MecanumDrive {
 		Matrix PoseExponential = new Matrix(3, 3);
 		if (rotation != 0) {
 			PoseExponential = new Matrix(new double[][]{
-					{Math.sin(rotation) / rotation, (Math.cos(rotation) - 1) / rotation, 0},
-					{(1 - Math.cos(rotation)) / rotation, Math.sin(rotation) / rotation, 0},
-					{0, 0, 1}
+					{	Math.sin(rotation) / rotation,			(Math.cos(rotation) - 1) / rotation,	0 },
+					{	(1 - Math.cos(rotation)) / rotation,	Math.sin(rotation) / rotation,			0 },
+					{	0,										0,										1 }
 			});
 		}
-		Matrix rotationMatrix = new Matrix(new double[][] {
+		Matrix rotationMatrix = new Matrix(new double[][]{
 				{ Math.cos(currentHeading), -Math.sin(currentHeading),  0 },
 				{ Math.sin(currentHeading), Math.cos(currentHeading),   0 },
-				{ 0,                        0,                          1}
+				{ 0,                        0,                          1 }
 		});
-		vector.mul(PoseExponential);
-		vector.mul(rotationMatrix);
+		vector.mul(PoseExponential.transpose());
+		vector.mul(rotationMatrix.transpose());
 		double[] movementVectors = vector.getData()[0];
 		Location deltaLocation = new Location(movementVectors[0], movementVectors[1],
 				currentRotation - currentLocation.getHeading());
@@ -291,8 +291,8 @@ public class MecanumDrive {
 	
 	public void update() {
 		updateLocation();
-		//mode.telemetry.addData("Location", currentLocation);
-		//mode.telemetry.update();
+		mode.telemetry.addData("Location", currentLocation);
+		mode.telemetry.update();
 		if (isMoving) {
 			correctTrajectory();
 		}
@@ -307,9 +307,7 @@ public class MecanumDrive {
 				/ 1_000_000_000.0;
 		while (mode.opModeIsActive() && isMoving()) {
 			if (System.nanoTime() - previousTime > 10_000_000) {
-				mode.telemetry.addData("Status", "Moving");
 				update();
-				mode.telemetry.update();
 			}
 		}
 	}

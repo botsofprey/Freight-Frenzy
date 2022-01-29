@@ -58,7 +58,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 		waitForStart();
 
-		sixDrive.move
+//		sixDrive.move
 	}
 //	}
 

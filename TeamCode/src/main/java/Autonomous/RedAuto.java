@@ -39,7 +39,7 @@ public class RedAuto extends LinearOpMode {
 		telemetry.addData("Status", "Running");
 		telemetry.update();
 
-		drive.moveToLocation(new Location(-35.5, -7.5, 0));
+		drive.moveToLocation(new Location(-24, -24, 0));
 
 		while(opModeIsActive());
 		carousel.rotate();
