@@ -97,29 +97,36 @@ public class SixDrive {
 		movementPower = motorPower;
 		rotationRange = range;
 	}
-	public void correctRotation(double motorPower){
+	public void rotateRight(double motorPower, double angle){
 		for(int i = 0; i < motors.length; i++){
-			motors[i].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		}
-
-		String direction = (targetAngle > getAngle() ? RIGHT : LEFT);
 
 		motors[0].setPower(motorPower);
 		motors[1].setPower(motorPower);
-		motors[2].setPower(-motorPower);
-		motors[3].setPower(-motorPower);
-//		if(direction == RIGHT){
-//			motors[0].setPower(motorPower);
-//			motors[1].setPower(motorPower);
-//			motors[2].setPower(-motorPower);
-//			motors[3].setPower(-motorPower);
-//		}else{
-//			motors[0].setPower(-motorPower);
-//			motors[1].setPower(-motorPower);
-//			motors[2].setPower(motorPower);
-//			motors[3].setPower(motorPower);
-//		}
+
+		targetAngle = angle-4;
+		movementPower = motorPower;
+		rotating = true;
 	}
+	public void rotateLeft(double motorPower, double angle){
+		for(int i = 0; i < motors.length; i++){
+			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		}
+
+		motors[2].setPower(motorPower);
+		motors[3].setPower(motorPower);
+
+		targetAngle = angle-4;
+		movementPower = motorPower;
+		rotating = true;
+	}
+
+	public void setMotors(double power){
+	motors[0].setPower(power);
+	motors[1].setPower(power);
+	}
+
 
 	public boolean rotating(){
 		return rotating;
@@ -178,11 +185,13 @@ public class SixDrive {
 
 	public void update(){
 		if(rotating){
-			double power = Math.min((movementPower/45)*(Math.abs(targetAngle - getAngle())),
-					movementPower);
-			correctRotation(power);
-			if(compareAngles(targetAngle, getAngle(), rotationRange)){
+//			double power = Math.min((movementPower/45)*(Math.abs(targetAngle - getAngle())),
+//					movementPower);
+//			setMotors(power);
+//			System.out.println("power: " + power);
+			if(compareAngles(targetAngle, getAngle(), 2)){
 				rotating = false;
+				stop();
 			}
 		}
 	}
