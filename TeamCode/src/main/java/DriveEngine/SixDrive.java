@@ -33,7 +33,7 @@ public class SixDrive {
 	private double globalAngle;
 	public String RIGHT = "right", LEFT = "left";
 
-	private double TICKS_PER_INCH = 537.6 / (3 * Math.PI), movementPower;
+	private double TICKS_PER_INCH = 312 / (4 * Math.PI), movementPower = .5;
 	public double targetAngle;
 
 	public SixDrive(HardwareMap hardwareMap){
@@ -63,6 +63,15 @@ public class SixDrive {
 			motors[i].setMode(DcMotor.RunMode.RUN_TO_POSITION);
 			motors[i].setPower(power);
 		}
+
+		movementPower = power;
+	}
+
+	public void setMotorPower(double leftPower, double rightPower){
+		motors[0].setPower(leftPower);
+		motors[1].setPower(leftPower);
+		motors[2].setPower(rightPower);
+		motors[3].setPower(rightPower);
 	}
 
 	boolean rotating;
@@ -122,12 +131,6 @@ public class SixDrive {
 		rotating = true;
 	}
 
-	public void setMotors(double power){
-	motors[0].setPower(power);
-	motors[1].setPower(power);
-	}
-
-
 	public boolean rotating(){
 		return rotating;
 	}
@@ -179,8 +182,11 @@ public class SixDrive {
 		return -globalAngle;
 	}
 
-	public double getMovementPower(){
+	public double getLeftPower(){
 		return motors[0].getPower();
+	}
+	public double getRightPower(){
+		return motors[2].getPower();
 	}
 
 	public void update(){
@@ -193,7 +199,12 @@ public class SixDrive {
 				rotating = false;
 				stop();
 			}
-		}
+		} else if(motors[0].isBusy()){
+			}
+
+		double angleError = getAngle() - targetAngle;
+		double newPower = movementPower * (angleError / 360);
+		setMotorPower(movementPower - newPower, movementPower + newPower);
 	}
 
 	private boolean compareAngles(double a, double b, double range){

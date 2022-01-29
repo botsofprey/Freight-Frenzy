@@ -56,6 +56,14 @@ public class SixWheelAuto extends LinearOpMode {
 
 		waitForStart();
 
+		sixDrive.setMotorPower(0.5, 0.5);
+
+		while(opModeIsActive()){
+			telemetry.addData("Left Power", sixDrive.getLeftPower());
+			telemetry.addData("Right Power", sixDrive.getRightPower());
+			telemetry.update();
+		}
+
 		sixDrive.move(30, 1);
 		while (sixDrive.isBusy()){}
 
