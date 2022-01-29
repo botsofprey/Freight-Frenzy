@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import DriveEngine.MecanumDrive;
-import DriveEngine.TeleOpMotorDriver;
 import Subsystems.Carousel;
 import Subsystems.Intake;
 import Subsystems.Lift;
@@ -38,9 +37,12 @@ public class TeleOpTest extends LinearOpMode {
 			telemetry.update();
 			waitForStart();
 
-			//lift.zeroSlider();
 			drive.update();
 			telemetry.addData("Location", drive::getCurrentLocation);
+
+			double[] cycleTimes = new double[32];
+			int cycle = 0;
+			long previousTime = System.currentTimeMillis();
 
 			while (opModeIsActive()) {
 				controller1.update();
@@ -79,6 +81,7 @@ public class TeleOpTest extends LinearOpMode {
 
 				if (controller1.yPressed) {
 					lift.autoDrop();
+					intake.resetLEDs();
 				}
 
 				if (controller2.xHeld) {
@@ -95,7 +98,21 @@ public class TeleOpTest extends LinearOpMode {
 				}
 
 				lift.update();
+				intake.update();
 				drive.update();
+
+				long time = System.currentTimeMillis();
+				cycleTimes[cycle] = 1000.0 / (time - previousTime);
+				previousTime = time;
+				cycle++;
+				cycle %= cycleTimes.length;
+				double acc = 0;
+				for (double elem : cycleTimes) {
+					acc += elem;
+				}
+				acc /= cycleTimes.length;
+				telemetry.addData("Cycles per second", (int)acc);
+
 
 				telemetry.update();
 			}

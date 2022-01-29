@@ -115,16 +115,17 @@ public class Path {
 		double newB = location.getY() - newM * location.getX();
 
 		double x = (b - newB) / (newM - m);
-		return (start.getX() - x) / (start.getX() - end.getX());
+		return (start.getX() - x) / (start.getX() - end.getX()); // TODO handle case of / by 0
 	}
 
 	public Location getTargetLocation(Location location, double distance) {
 		double t = reverse_interpolate(location);
 		double e = location.distanceToLocation(interpolateLocation(t));
 		double distForward = Math.sqrt(distance * distance - e * e);
-		Location targetLocation = interpolateLocation(Math.min(t + distForward / pathLength, 1));
-		double r = location.distanceToLocation(end) /
-				Math.toRadians(Location.normalizeHeading(end.getHeading() - start.getHeading()));
+		t = Math.min(t + distForward / pathLength, 1);
+		Location targetLocation = interpolateLocation(t);
+		double r = Location.normalizeHeading(start.getHeading()
+				+ t * (end.getHeading() - start.getHeading()));
 		targetLocation.setHeading(r);
 		return targetLocation;
 	}

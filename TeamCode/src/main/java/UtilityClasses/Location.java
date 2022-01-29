@@ -3,6 +3,8 @@ package UtilityClasses;
 import java.util.Objects;
 
 public class Location {
+	public static final Location ORIGIN = new Location(0, 0, 0);
+
 	private double x;
 	private double y;
 	private double heading;//range [-180, 180)

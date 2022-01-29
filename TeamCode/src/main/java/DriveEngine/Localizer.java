@@ -31,7 +31,7 @@ public class Localizer {
 	private long[] positions = new long[]{ 0, 0, 0, 0 };
 	private long[] previousPositions;
 	private double[] motorSpeeds;
-	private double[] motorRPMs;
+	public double[] motorRPMs;
 	private double encoderCPR;
 	private double wheelDiameter;
 

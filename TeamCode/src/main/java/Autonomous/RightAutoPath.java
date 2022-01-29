@@ -44,7 +44,6 @@ public class RightAutoPath extends LinearOpMode {
 		telemetry.addData("Status", "Moving to carousel");
 		telemetry.update();
 		drive.followPath(toCarousel);
-		drive.setSpeed(6);
 		drive.waitForMovement(()->{
 			telemetry.addData("Location", drive.getCurrentLocation());
 			telemetry.addData("Target", drive.targetLocation);

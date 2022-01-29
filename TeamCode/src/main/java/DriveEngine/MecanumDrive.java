@@ -77,7 +77,7 @@ public class MecanumDrive {
 
 	private PIDCoefficients coefficients = new PIDCoefficients(0.1, 0.025, 0.05);
 	private PIDCoefficients headingCoefficients =
-			new PIDCoefficients(0.01, 0.005, 0.005);
+			new PIDCoefficients(0.1, 0.05, 0.05);
 	private PIDController xController = new PIDController(coefficients);
 	private PIDController yController = new PIDController(coefficients);
 	private PIDController hController = new PIDController(headingCoefficients);
@@ -186,11 +186,11 @@ public class MecanumDrive {
 				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 		double rotation = Math.toRadians(currentLocation.getHeading() - currentRotation);
 		double xMovement =
-				(motorDistances[0] + motorDistances[1] +//1.266 is a manually tuned constant
-						motorDistances[2] + motorDistances[3]) * 0.25 * 1.266;
+				(motorDistances[0] + motorDistances[1] +//1.6 is a manually tuned constant
+						motorDistances[2] + motorDistances[3]) * 0.25 / 1.6;
 		double yMovement =
-				(motorDistances[1] - motorDistances[0] +//0.833 is a manually tuned constant
-						motorDistances[3] - motorDistances[2]) * 0.25 * 0.833;
+				(motorDistances[1] - motorDistances[0] +//2.13 is a manually tuned constant
+						motorDistances[3] - motorDistances[2]) * 0.25 / 2.13;
 		double currentHeading = -Math.toRadians(currentLocation.getHeading() + 90);
 		
 		Matrix vector = new Matrix(new double[][] {
@@ -275,8 +275,9 @@ public class MecanumDrive {
 			hController.reset();
 		}
 
-		double location = Math.min((previousTime - moveStart) * pointCoefficient, 1);
-		Location target = path.interpolateLocation(location);
+//		double location = Math.min((previousTime - moveStart) * pointCoefficient, 1);
+		Location target = path.getTargetLocation(currentLocation, 3);//look three inches down the path
+//		Location target = path.interpolateLocation(location);
 		mode.telemetry.addData("target", target.toString());
 		mode.telemetry.addData("position", currentLocation.toString());
 		xController.setTargetPoint(target.getX());
@@ -290,6 +291,8 @@ public class MecanumDrive {
 	
 	public void update() {
 		updateLocation();
+		//mode.telemetry.addData("Location", currentLocation);
+		//mode.telemetry.update();
 		if (isMoving) {
 			correctTrajectory();
 		}

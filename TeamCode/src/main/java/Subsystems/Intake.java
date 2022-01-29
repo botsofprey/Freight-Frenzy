@@ -1,5 +1,6 @@
 package Subsystems;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -25,15 +26,20 @@ public class Intake {
 
 	private MotorController intakeMotor;
 
+	private RevBlinkinLedDriver intakeLEDs;
+
 	private LinearOpMode mode;
 
-	private ColorSensor colorSensor;
+	private ColorSensor colorSensorA;
+	private ColorSensor colorSensorB;
+	private static final int RED_THRESHOLD = 72;
 	private int blue, red, green;
 	private static final int[] block = new int[] {204, 126, 8},
 			ball = new int[] {255, 255, 255}, duck = new int[] {224, 183, 31};
 	private static  final int range = 25;
 
 	private long mil = 0;
+	private long freezeTime = 0;
 	private boolean driverControl = true;
 
 	public Intake(HardwareMap hw, LinearOpMode m, boolean errors) {
@@ -43,7 +49,15 @@ public class Intake {
 		intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 		state = BRAKE;
 
-		//colorSensor = hw.get(ColorSensor.class, "color Intake");
+		colorSensorA = hw.get(ColorSensor.class, "intakeSensorA");
+		colorSensorB = hw.get(ColorSensor.class, "intakeSensorB");
+
+		intakeLEDs = hw.get(RevBlinkinLedDriver.class, "intakeLED");
+		intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+	}
+
+	private boolean detectColor() {
+		return Math.max(colorSensorA.red(), colorSensorB.red()) > RED_THRESHOLD;
 	}
 
 	public void intake() {
@@ -73,50 +87,23 @@ public class Intake {
 		return state == OUTTAKE ? -MOTOR_POWER : (state * MOTOR_POWER);
 	}
 
-	private boolean detectColor() {
-		red = colorSensor.red();
-		green = colorSensor.green();
-		blue = colorSensor.blue();
-
-		int[] color = new int[] {red,green,blue};
-
-		boolean blockBo = colorChecker(block, color);
-		boolean ballBo = colorChecker(ball, color);
-		boolean duckBo = colorChecker(duck, color);
-
-		return ballBo || blockBo || duckBo;
-	}
-
-	private boolean colorChecker(int[] colorA, int[] colorB) {
-		return Math.abs(colorA[0] - colorB[0]) <= range && Math.abs(colorA[1] - colorB[1]) <= range
-				&& Math.abs(colorA[2] - colorB[2]) <= range;
+	public void resetLEDs() {
+		intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 	}
 
 	public void update() {
-		//if (state == INTAKE && detectColor() && System.currentTimeMillis() - mil >= 1000) {
-		//	brake();
-		//}
-	}
+		boolean color = detectColor();
+		mode.telemetry.addData("Intake sensor", color);
+		if (state == INTAKE && detectColor() && System.currentTimeMillis() - mil >= 1000) {
+			intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+			brake();
+			freezeTime = System.currentTimeMillis();
+		}
 
-	private double[] RGBToHSV(int r, int g, int b) {
-		if (r == g && r == b) {
-			return new double[] { 0, 0, 1 };
+		if (freezeTime != 0 && freezeTime + 500 <= System.currentTimeMillis()) {
+			intake();
+			freezeTime = 0;
+			resetLEDs();
 		}
-		double scale = Math.max(r, Math.max(g, b));
-		double[] color = new double[] { r / scale, g / scale, b / scale };
-		double h = 0;
-		double max = 1.0;
-		double min = Math.min(color[0], Math.min(color[1], color[2]));
-		double diff = max - min;
-		if (scale == r) {
-			h = (60 * (color[1] - color[2]) / diff + 360) % 360;
-		}
-		if (scale == g) {
-			h = (60 * (color[2] - color[0]) / diff + 120) % 360;
-		}
-		if (scale == b) {
-			h = (60 * (color[0] - color[1]) / diff + 240) % 360;
-		}
-		return new double[] { h, diff, max };
 	}
 }
