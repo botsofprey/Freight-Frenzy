@@ -39,6 +39,7 @@ public class Lift {
 
 	private boolean usingEncoders;
 	private boolean braking;
+	private boolean switchPressed = true;
 
 	private ColorSensor bucketColor;
 	private int blue, red, green;
@@ -47,7 +48,6 @@ public class Lift {
 	private static  final int range = 25;
 
 	private RevBlinkinLedDriver liftLed;
-	private RevBlinkinLedDriver bucketLed;
 
 	private long dropTime;
 	private boolean freightDropped;
@@ -71,8 +71,6 @@ public class Lift {
 
 		liftLed = hardwareMap.get(RevBlinkinLedDriver.class, "liftLED");
 		liftLed.setPattern(downColor);
-		bucketLed = hardwareMap.get(RevBlinkinLedDriver.class, "bucketLED");
-		bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 
 		bucketColor = hardwareMap.get(ColorSensor.class, "bucketColor");
 
@@ -188,13 +186,10 @@ public class Lift {
 
 	public void dropFreight() {
 		bucketWall.setPosition(1 - bucketWall.getPosition());
-
-		bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 	}
 
 	public void autoDrop() {
 		bucketWall.setPosition(0);
-		bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 		dropTime = System.currentTimeMillis();
 		freightDropped = true;
 	}
@@ -219,11 +214,17 @@ public class Lift {
 	}
 
 	public void update() {
-		if (limitSwitch.isPressed() && slide.getPower() < 0) {
+		boolean pressed = limitSwitch.isPressed();
+		if (pressed && !switchPressed) {
+			slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		}
+		switchPressed = pressed;
+
+		if (pressed && slide.getPower() < 0) {
 			brake();
 		}
 
-		if (limitSwitch.isPressed()) {
+		if (pressed) {
 			liftLed.setPattern(downColor);
 		} else if (slide.getCurrentPosition() > POSITIONS[2] - 50) {
 			liftLed.setPattern(upColor);
@@ -231,19 +232,11 @@ public class Lift {
 			liftLed.setPattern(midColor);
 		}
 
-		if (limitSwitch.isPressed()){
-			if (detectColor()) {
-				bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
-			} else {
-				bucketLed.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
-			}
-		}
-
 		if (freightDropped && System.currentTimeMillis() >= 2000 + dropTime) {
 			freightDropped = false;
 			bucketWall.setPosition(1);
 		}
 
-		mode.telemetry.addData("Switch", limitSwitch.isPressed());
+		mode.telemetry.addData("Switch", pressed);
 	}
 }

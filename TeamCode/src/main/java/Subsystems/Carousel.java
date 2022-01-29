@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import UtilityClasses.HardwareWrappers.CRServoController;
 
-public class Carousel {
+public class  Carousel {
 	private CRServoController lCarousel;
 	private CRServoController rCarousel;
 	private LinearOpMode mode;

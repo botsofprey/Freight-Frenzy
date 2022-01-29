@@ -50,18 +50,16 @@ public class NewMecanumDrive {
 	public Location targetLocation;
 	private Trajectory currentTrajectory;
 	private boolean currentlyMoving;
-	private long startTime;
+	private static final double buffer = 0.1;
+	private static final double maxTorque = 1;
 	public static final double MAX_SPEED = 24;
 	public static final double MAX_ANGULAR = 90;
-	private double speed = 24;
 	private SplineCurve path;
-	
-	private PIDCoefficients xCoefficients = new PIDCoefficients(3.5, 1.2, 0.15);
-	private PIDCoefficients yCoefficients = new PIDCoefficients(0.8, 0.15, 0.05);
+
+	private PIDCoefficients translationCoefficients = new PIDCoefficients(0.8, 0.15, 0.05);
 	private PIDCoefficients headingCoefficients =
 			new PIDCoefficients(0.4, 0.1, 0.0125);
-	private PIDController xController = new PIDController(xCoefficients);
-	private PIDController yController = new PIDController(yCoefficients);
+	private PIDController translationController = new PIDController(translationCoefficients);
 	private PIDController hController = new PIDController(headingCoefficients);
 
 	public NewMecanumDrive(HardwareMap hw, String fileName,
@@ -74,6 +72,8 @@ public class NewMecanumDrive {
 		fastMode = false;
 
 		localizer = new Localizer(hw, fileName, startLocation, mode);
+
+		translationController.setTargetPoint(0);
 		
 		currentlyMoving = false;
 		currentLocation = startLocation;
@@ -110,19 +110,46 @@ public class NewMecanumDrive {
 	public void followPath(SplineCurve path) {
 		this.path = path;
 		currentlyMoving = true;
-		xController.reset();
-		yController.reset();
+		translationController.reset();
 		hController.reset();
 		previousTime = System.nanoTime();
-	}
-
-	public void setSpeed(double speed) {
-		this.speed = speed;
 	}
 	
 	private void updateLocation() {
 		localizer.updateLocation();
 		currentLocation = localizer.getCurrentLocation();
+	}
+
+	private double[] getPowerRange(double currentRPM) {
+		double lower = (currentRPM / Kv - buffer * maxTorque * R / Kt) / 12.0;
+		double upper = (currentRPM / Kv + buffer * maxTorque * R / Kt) / 12.0;
+		return new double[]{ lower, upper };
+	}
+
+	private void adjustWheelPowers(double[] wheelPowers) {
+		double[][] wheelRanges = {
+				getPowerRange(localizer.motorRPMs[0]),
+				getPowerRange(localizer.motorRPMs[1]),
+				getPowerRange(localizer.motorRPMs[2]),
+				getPowerRange(localizer.motorRPMs[3])
+		};
+		double[] scaleFactors = new double[4];
+		for (int i = 0; i < 4; i++) {
+			double clampedValue =
+					Math.min(wheelRanges[i][1], Math.max(wheelRanges[i][0], wheelPowers[i]));
+			scaleFactors[i] = clampedValue / wheelPowers[i];
+		}
+		double maxDiff = 0;
+		int index = 0;
+		for (int i = 0; i < 4; i++) {
+			if (Math.abs(scaleFactors[i] - 1) > maxDiff) {
+				maxDiff = Math.abs(scaleFactors[i] - 1);
+				index = i;
+			}
+		}
+		for (int i = 0; i < 4; i++) {
+			wheelPowers[i] /= scaleFactors[index];
+		}
 	}
 
 	public void rawMove(double x, double y, double h) {
@@ -170,14 +197,14 @@ public class NewMecanumDrive {
 		previousTime = currentTime;
 		TrajectoryPoint point = currentTrajectory.getMotion(time);
 		
-		xController.setTargetPoint(point.x);
-		yController.setTargetPoint(point.y);
+//		xController.setTargetPoint(point.x);
+//		yController.setTargetPoint(point.y);
 		hController.setTargetPoint(point.h);
-		double x = xController.calculateAdjustment(currentLocation.getX());
-		double y = yController.calculateAdjustment(currentLocation.getY());
+//		double x = xController.calculateAdjustment(currentLocation.getX());
+//		double y = yController.calculateAdjustment(currentLocation.getY());
 		double h = hController.calculateAdjustment(currentLocation.getHeading());
 		
-		moveTrueNorth(point.vx + x, point.vy + y, point.vh + h);
+//		moveTrueNorth(point.vx + x, point.vy + y, point.vh + h);
 		if (time > currentTrajectory.getDuration()) {
 			currentlyMoving = false;
 		}
@@ -186,20 +213,20 @@ public class NewMecanumDrive {
 	private void altMovement() {
 		long currentTime = System.nanoTime();
 		double time = (currentTime - previousTime) / 1_000_000_000.0;
-		double inches = Math.min(time * speed, path.getLength());
+		double inches = Math.min(time * MAX_SPEED, path.getLength());
 		Location point = path.getPoint(inches, 0.1);
+		double extraPower = path.getLength() - inches;
 		targetLocation = point;
 
-		Location baseSpeeds =
-				path.getVelocity(inches / path.getLength(), MAX_SPEED, MAX_ANGULAR);
-		baseSpeeds.scale(1 / 3.0);
+		point.subXY(currentLocation);
+		double speed = point.distanceToLocation(Location.ORIGIN);
+		extraPower += speed;
 
-		xController.setTargetPoint(point.getX());
-		yController.setTargetPoint(point.getY());
 		hController.setTargetPoint(point.getHeading());
-		double x = xController.calculateAdjustment(currentLocation.getX());
-		double y = yController.calculateAdjustment(currentLocation.getY());
+		double t = translationController.calculateAdjustment(-extraPower);
 		double h = hController.calculateAdjustment(currentLocation.getHeading());
+
+		point.scale(t / speed);
 
 		double distanceToEnd = Math.max(currentLocation.headingDifference(path.getPoint(1)),
 				currentLocation.distanceToLocation(path.getPoint(1)));
@@ -207,13 +234,12 @@ public class NewMecanumDrive {
 		System.out.println("Movement data: " + time + " " +
 				theoDistanceToEnd + " " + distanceToEnd);
 
-		if (time - 1 >= path.getLength() / speed || distanceToEnd <= 0.5) {
+		if (time - 1 >= path.getLength() / MAX_SPEED || distanceToEnd <= 0.5) {
 			currentlyMoving = false;
 			rawMove(0, 0, 0);
 		}
 		else {
-			moveTrueNorth(x + baseSpeeds.getX(),
-					y + baseSpeeds.getY(), h + baseSpeeds.getHeading());
+			moveTrueNorth(point.getX() * 2, point.getY(), h);
 		}
 	}
 	
