@@ -97,7 +97,7 @@ public class SixDrive {
 		movementPower = motorPower;
 		rotationRange = range;
 	}
-	public void rotateRight(double motorPower, double angle){
+	public void rotateRight(double angle, double motorPower){
 		for(int i = 0; i < motors.length; i++){
 			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		}
@@ -105,11 +105,11 @@ public class SixDrive {
 		motors[0].setPower(motorPower);
 		motors[1].setPower(motorPower);
 
-		targetAngle = angle-4;
+		targetAngle = getAngle() + (angle-4);
 		movementPower = motorPower;
 		rotating = true;
 	}
-	public void rotateLeft(double motorPower, double angle){
+	public void rotateLeft(double angle, double motorPower){
 		for(int i = 0; i < motors.length; i++){
 			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		}
@@ -117,7 +117,7 @@ public class SixDrive {
 		motors[2].setPower(motorPower);
 		motors[3].setPower(motorPower);
 
-		targetAngle = angle-4;
+		targetAngle =getAngle() - (angle-4);
 		movementPower = motorPower;
 		rotating = true;
 	}
