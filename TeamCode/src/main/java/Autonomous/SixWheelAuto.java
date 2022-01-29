@@ -45,8 +45,6 @@ public class SixWheelAuto extends LinearOpMode {
 				telemetry.addData("Lift Position", bucketArm.getLiftPos());
 				telemetry.update();
 			}
-			bucketArm.setLiftPower(-.3);
-			sleep(1000);
 			bucketArm.setLiftPower(0);
 			bucketArm.resetLiftEncoder();
 		}
@@ -58,7 +56,65 @@ public class SixWheelAuto extends LinearOpMode {
 
 		waitForStart();
 
-//		sixDrive.move
+		sixDrive.setMotorPower(0.5, 0.5);
+
+		while(opModeIsActive()){
+			telemetry.addData("Left Power", sixDrive.getLeftPower());
+			telemetry.addData("Right Power", sixDrive.getRightPower());
+			telemetry.update();
+		}
+
+		sixDrive.move(30, 1);
+		while (sixDrive.isBusy()){}
+
+		double distanceFromHub = leftSensor.getDistance(DistanceUnit.INCH);
+
+		sixDrive.rotateRight(.5, 90);
+		while(sixDrive.rotating()){}
+		sleep(500);
+
+		sixDrive.move(distanceFromHub - 3, .25);
+		while (sixDrive.isBusy()){}
+		sleep(500);
+
+		bucketArm.liftMoveTowards(BucketArm.TOP/BucketArm.TICKS_PER_INCH, .5);
+		while (bucketArm.liftIsBusy()){}
+		sleep(500);
+
+		bucketArm.setBucketPower(BucketArm.OUTTAKE);
+		sleep(2500);
+		bucketArm.setBucketPower(0);
+
+		bucketArm.liftMoveTowards(0, .5);
+		while (bucketArm.liftIsBusy()){}
+		sleep(500);
+
+		sixDrive.rotateRight(90, 0.5);
+		while(sixDrive.rotating()){}
+		sleep(1000);
+
+		double distanceFromWall = rightSensor.getDistance(DistanceUnit.INCH);
+
+		sixDrive.rotateRight(90, 0.5);
+		while(sixDrive.rotating()){}
+		sleep(500);
+
+		sixDrive.move(distanceFromWall - 2, .75);
+		while(sixDrive.isBusy()){}
+		sleep(500);
+
+		double distanceFromCaro = rightSensor.getDistance(DistanceUnit.INCH);
+
+		sixDrive.rotateLeft(90, 0.5);
+		while (sixDrive.rotating()){}
+		sleep(500);
+
+		servoLeft.setPower(1);
+
+		sixDrive.move(distanceFromCaro - 3, .85);
+		while(sixDrive.isBusy()){}
+
+		sleep(10000);
 	}
 //	}
 

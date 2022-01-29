@@ -50,13 +50,11 @@ public class SixWheelTank extends LinearOpMode {
 		bucketArm.liftMoveTowards(2, 0.5);
 		while(bucketArm.liftIsBusy()){}
 
-		bucketArm.liftMoveTowards(-2, .25);
-		while (bucketArm.liftIsBusy() && !bucketArm.startPosSet){
-			if(bucketArm.limitSwitch()){
-				bucketArm.resetLiftEncoder();
-				bucketArm.startPosSet = true;
-			}
+		bucketArm.setLiftPower(-.25);
+		while (bucketArm.liftIsBusy() && !bucketArm.limitSwitch()){
 		}
+		bucketArm.setLiftPower(0);
+		bucketArm.resetLiftEncoder();
 
 		double xValue, yValue, leftPower, rightPower;
 
@@ -111,13 +109,6 @@ public class SixWheelTank extends LinearOpMode {
 			telemetry.addData("stick", "  y=" + yValue + "  x=" + xValue);
 			telemetry.addData("power", "  left=" + leftPower + "  right=" + rightPower);
 			telemetry.update();
-
-			//Stop lift from dropping
-//			if(controller.rightTriggerReleased || controller.leftTriggerReleased){
-//				bucketArm.noDrop();
-//			}else if(controller.rightTriggerPressed || controller.leftTriggerReleased){
-//				bucketArm.motorMode();
-//			}
 
 			//Lift Control
 			if (controller.leftTrigger == 0) {

@@ -29,28 +29,13 @@ public class BucketArm {
 
 	public static final double INTAKE = 0.5, OUTTAKE = -0.5;
 	public static final int TOP = 2640, MIDDLE = 1390, BOTTOM = 727, MAX = 3120;
-	public static final double TICKS_PER_INCH = 537.7 / 1.5;
+	public static final double TICKS_PER_INCH = 537.6 / 1.5;
 
 	public boolean startPosSet = false;
 
 	public BucketArm(HardwareMap hardwareMap){
-//    RevTouchSensor start = new RevTouchSensor(hardwareMap, "start");
-//    RevTouchSensor end = new RevTouchSensor(hardwareMap, "end");
-		//motorControllerLeft = new MotorController(hardwareMap, "leftArm");
-		//motorControllerLeft.setSwitches(start, end);
-		//motorControllerLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//    motorControllerRight = new MotorController(hardwareMap, "rightArm");
-//    motorControllerRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//    motorControllerRight.setSwitches(start, end);
-//
-//    motorControllerRight.setDirection(DcMotorSimple.Direction.REVERSE);
-//    motorControllerLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-//    motorControllerLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 		liftMotor = hardwareMap.get(DcMotor.class, "lift");
-//    liftMotor.setTargetPosition(liftMotor.getCurrentPosition() + 2000);
-//    liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 		magLiftSensor = hardwareMap.get(TouchSensor.class, "liftSensor");
 		leftBucketMotor = hardwareMap.get(DcMotor.class, "leftBucketMotor");
@@ -62,12 +47,6 @@ public class BucketArm {
 		led = hardwareMap.get(RevBlinkinLedDriver.class, "Led Indicate");
 		led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
 
-		//bucketDoor = hardwareMap.get(Servo.class, "bucketDoor");
-		//bucketSensor = hardwareMap.get(DistanceSensor.class, "bucketSensor");
-
-		//bucketDoor.setPosition(doorStartPos);
-		//distanceInBucket = bucketSensor.getDistance(DistanceUnit.CM);
-
 		liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 	}
 
@@ -76,27 +55,13 @@ public class BucketArm {
 	}
 
 	public void setLiftPower(double power){
-//    motorControllerLeft.setPower(power);
-//    motorControllerRight.setPower(power);
 		liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 		liftMotor.setPower(power);
 	}
 
 	public void setBucketPower(double power){
-//    motorControllerLeft.setPower(power);
-//    motorControllerRight.setPower(power);
-
 		rightBucketMotor.setPower(power);
 		leftBucketMotor.setPower(power);
-	}
-
-	public void dropFreight(){
-//    if(bucketDoor.getPosition() == doorStartPos){
-//    bucketDoor.setPosition(doorClosePos);
-//    } else{
-//       bucketDoor.setPosition(doorStartPos);
-//    }
-
 	}
 
 	public double getLiftPos(){
@@ -104,34 +69,17 @@ public class BucketArm {
 	}
 
 	public void noDrop(){
-//    motorControllerLeft.setTargetPosition(motorControllerLeft.getCurrentPosition());
-//    motorControllerRight.setTargetPosition(motorControllerRight.getCurrentPosition());
-//    motorControllerRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//    motorControllerRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
 		leftBucketMotor.setTargetPosition(leftBucketMotor.getCurrentPosition());
 		rightBucketMotor.setTargetPosition(rightBucketMotor.getCurrentPosition());
 		rightBucketMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		leftBucketMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 	}
 	public void motorMode(){
-//    motorControllerLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//    motorControllerRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
 		leftBucketMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 		rightBucketMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 	}
 
-  /*public double currentDistance(){
-     //return bucketSensor.getDistance(DistanceUnit.CM);
-  }
-
-  public double initDistance(){
-     //return distanceInBucket;
-  }*/
-
 	public double getPower(){
-		//return motorControllerLeft.getPower();
 		return leftBucketMotor.getPower();
 	}
 
