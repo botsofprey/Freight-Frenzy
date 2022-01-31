@@ -109,10 +109,10 @@ public class Localizer {
 		double rotation = Math.toRadians(currentLocation.getHeading() - currentRotation);
 		double xMovement =
 				(motorDistances[0] + motorDistances[1] +//1.266 is a manually tuned constant
-						motorDistances[2] + motorDistances[3]) * 0.25;
+						motorDistances[2] + motorDistances[3]) * 0.25 * 0.497;
 		double yMovement =
 				(motorDistances[1] - motorDistances[0] +//0.833 is a manually tuned constant
-						motorDistances[3] - motorDistances[2]) * 0.25;
+						motorDistances[3] - motorDistances[2]) * 0.25 * 0.554;
 		double currentHeading = -Math.toRadians(currentLocation.getHeading() + 90);
 		
 		Matrix vector = new Matrix(new double[][] {
@@ -133,11 +133,11 @@ public class Localizer {
 				{ Math.sin(currentHeading), Math.cos(currentHeading),   0 },
 				{ 0,                        0,                          1}
 		});
-		vector.mul(PoseExponential);
-		vector.mul(rotationMatrix);
+		vector.mul(PoseExponential.transpose());
+		vector.mul(rotationMatrix.transpose());
 		double[] movementVectors = vector.getData()[0];
-		Location deltaLocation = new Location(movementVectors[0] * 1.5, movementVectors[1] * 2,
-				currentRotation - currentLocation.getHeading());
+		Location deltaLocation = new Location(movementVectors[0] * -1.5,
+				movementVectors[1] * 2, currentRotation - currentLocation.getHeading());
 		currentLocation.add(deltaLocation);
 	}
 	

@@ -1,5 +1,9 @@
 package DriveEngine;
 
+import com.qualcomm.robotcore.util.Range;
+
+import java.awt.font.NumericShaper;
+
 import UtilityClasses.Location;
 import UtilityClasses.Matrix;
 
@@ -185,7 +189,8 @@ public class SplineCurve {
 	}
 
 	public Location getAccelControlVelocity(double t, double maxVelocity, double maxAngular) {
-		return getVelocity((1 - Math.cos(t * Math.PI)) / 2.0, maxVelocity, maxAngular);
+		return getVelocity((1 - Math.cos(Range.clip(t, 0, 1) * Math.PI)) / 2.0,
+				maxVelocity, maxAngular);
 	}
 	
 	private double getIntegrand(double t) {//@see https://medium.com/@all2one/how-to-compute-the-length-of-a-spline-e44f5f04c40

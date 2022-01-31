@@ -55,11 +55,13 @@ public class NewMecanumDrive {
 	public static final double MAX_SPEED = 24;
 	public static final double MAX_ANGULAR = 90;
 	private SplineCurve path;
-
-	private PIDCoefficients translationCoefficients = new PIDCoefficients(0.8, 0.15, 0.05);
+	
+	private PIDCoefficients xCoefficients = new PIDCoefficients(0.08, 0.0, 0.01);
+	private PIDCoefficients yCoefficients = new PIDCoefficients(0.08, 0.0, 0.01);
 	private PIDCoefficients headingCoefficients =
-			new PIDCoefficients(0.4, 0.1, 0.0125);
-	private PIDController translationController = new PIDController(translationCoefficients);
+			new PIDCoefficients(0.04, 0.01, 0.00125);
+	private PIDController xController = new PIDController(xCoefficients);
+	private PIDController yController = new PIDController(yCoefficients);
 	private PIDController hController = new PIDController(headingCoefficients);
 
 	public NewMecanumDrive(HardwareMap hw, String fileName,
@@ -72,8 +74,6 @@ public class NewMecanumDrive {
 		fastMode = false;
 
 		localizer = new Localizer(hw, fileName, startLocation, mode);
-
-		translationController.setTargetPoint(0);
 		
 		currentlyMoving = false;
 		currentLocation = startLocation;
@@ -110,7 +110,8 @@ public class NewMecanumDrive {
 	public void followPath(SplineCurve path) {
 		this.path = path;
 		currentlyMoving = true;
-		translationController.reset();
+		xController.reset();
+		yController.reset();
 		hController.reset();
 		previousTime = System.nanoTime();
 	}
@@ -172,9 +173,6 @@ public class NewMecanumDrive {
 	}
 	
 	public void move(double x, double y, double h) {
-		x /= 43.0;
-		y /= 17.0;
-		h /= 14.0;
 		rawMove(x, y, h);
 	}
 	
@@ -214,32 +212,61 @@ public class NewMecanumDrive {
 		long currentTime = System.nanoTime();
 		double time = (currentTime - previousTime) / 1_000_000_000.0;
 		double inches = Math.min(time * MAX_SPEED, path.getLength());
-		Location point = path.getPoint(inches, 0.1);
-		double extraPower = path.getLength() - inches;
-		targetLocation = point;
-
-		point.subXY(currentLocation);
-		double speed = point.distanceToLocation(Location.ORIGIN);
-		extraPower += speed;
-
-		hController.setTargetPoint(point.getHeading());
-		double t = translationController.calculateAdjustment(-extraPower);
+		targetLocation = path.getPoint(inches, 0.1);
+		targetLocation = new Location(0, 1, 0);
+		Location base =
+				path.getAccelControlVelocity(inches / path.getLength(), MAX_SPEED, MAX_ANGULAR);
+		
+		xController.setTargetPoint(targetLocation.getX());
+		yController.setTargetPoint(targetLocation.getY());
+		hController.setTargetPoint(targetLocation.getHeading());
+		double x = xController.calculateAdjustment(currentLocation.getX());
+		double y = yController.calculateAdjustment(currentLocation.getY());
 		double h = hController.calculateAdjustment(currentLocation.getHeading());
-
-		point.scale(t / speed);
-
-		double distanceToEnd = Math.max(currentLocation.headingDifference(path.getPoint(1)),
-				currentLocation.distanceToLocation(path.getPoint(1)));
-		double theoDistanceToEnd = point.headingDifference(path.getPoint(1));
-		System.out.println("Movement data: " + time + " " +
-				theoDistanceToEnd + " " + distanceToEnd);
-
-		if (time - 1 >= path.getLength() / MAX_SPEED || distanceToEnd <= 0.5) {
+		mode.telemetry.addData("X:", x);
+		mode.telemetry.addData("Y:", y);
+		mode.telemetry.addData("H:", h);
+		
+		double distanceToEnd = currentLocation.distanceToLocation(path.getEnd());
+		if (time - 1 >= path.getLength() / MAX_SPEED && false || distanceToEnd <= 0.5) {
 			currentlyMoving = false;
 			rawMove(0, 0, 0);
 		}
 		else {
-			moveTrueNorth(point.getX() * 2, point.getY(), h);
+			//moveTrueNorth(x + base.getX(), y + base.getY(), h + base.getHeading());
+			moveTrueNorth(x, y, h);
+		}
+	}
+	
+	public void moveToLocation(Location targetLocation) {
+		xController.reset();
+		yController.reset();
+		hController.reset();
+		xController.setTargetPoint(targetLocation.getX());
+		yController.setTargetPoint(targetLocation.getY());
+		hController.setTargetPoint(targetLocation.getHeading());
+		long startTime = System.currentTimeMillis();
+		long endTime = 1000 + startTime + (long)(1000 *
+				Math.hypot(currentLocation.distanceToLocation(targetLocation) / MAX_SPEED,
+						currentLocation.headingDifference(targetLocation) / MAX_ANGULAR));
+		while (mode.opModeIsActive()) {
+			updateLocation();
+			mode.telemetry.addData("Status", "Moving");
+			mode.telemetry.addData("Location", currentLocation);
+			mode.telemetry.addData("Target", targetLocation);
+			mode.telemetry.addData("Angle",
+					currentLocation.headingDifference(targetLocation));
+			mode.telemetry.update();
+			double x = xController.calculateAdjustment(currentLocation.getX());
+			double y = -yController.calculateAdjustment(currentLocation.getY());
+			double h = hController.calculateAdjustment(currentLocation.getHeading());
+			if (currentLocation.distanceToLocation(targetLocation) < 0.5
+					&& currentLocation.headingDifference(targetLocation) < 2
+					|| endTime <= System.currentTimeMillis() && false) {
+				rawMove(0, 0, 0);
+				break;
+			}
+			moveTrueNorth(x, y, h);
 		}
 	}
 	

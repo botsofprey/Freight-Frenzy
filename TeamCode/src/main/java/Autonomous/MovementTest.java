@@ -32,9 +32,7 @@ public class MovementTest extends LinearOpMode {
 		constraints.maxAcceleration = 200;
 		constraints.maxVelocity = 30;
 		SplineCurve splineCurve = new SplineCurve(new Location(0, 0, 0),
-				new Location(48, 48, 0),
-				new Location(0, 100, 0),
-				new Location(0, 100, 0));
+				new Location(48, 48, 0));
 		SplineCurve a = new SplineCurve(new Location(-12, -12, 0),
 				new Location(-12, 12, 0));
 		SplineCurve b = new SplineCurve(new Location(-12, 12, 0),
@@ -44,36 +42,25 @@ public class MovementTest extends LinearOpMode {
 		SplineCurve d = new SplineCurve(new Location(12, -12, 0),
 				new Location(-12, -12, 0));
 		
-		TrajectoryBuilder trajBuild =
-				new TrajectoryBuilder(new Location(0, 0, 0), constraints)
-				.splineToLocation(new Location(24, 24, 0));
-		Trajectory traj = trajBuild.build();
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 		waitForStart();
 
 		telemetry.addData("Status", "Moving");
 		telemetry.update();
-		//drive.followTrajectory(traj);
-		drive.followPath(splineCurve);
-		drive.waitForMovement();
-//		while (opModeIsActive() && drive.isMoving()) {
+		
+//		drive.followPath(splineCurve);
+//		drive.waitForMovement(()->{
 //			telemetry.addData("Location", drive.getCurrentLocation());
-//			telemetry.addData("Time", System.nanoTime());
+//			telemetry.addData("Target", drive.targetLocation);
 //			telemetry.update();
-//			drive.update();
-//		}
-//		telemetry.addData("Status", "Stopped");
-//		telemetry.update();
-//		while (opModeIsActive()) {
-//			drive.followPath(a);
-//			drive.waitForMovement();
-//			drive.followPath(b);
-//			drive.waitForMovement();
-//			drive.followPath(c);
-//			drive.waitForMovement();
-//			drive.followPath(d);
-//			drive.waitForMovement();
-//		}
+//		});
+		drive.moveToLocation(new Location(0, 0, 90));
+		while (opModeIsActive()) {
+			drive.update();
+			//telemetry.addData("Location", drive.getCurrentLocation());
+			//telemetry.addData("Target", drive.targetLocation);
+			//telemetry.update();
+		}
 	}
 }
