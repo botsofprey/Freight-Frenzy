@@ -152,6 +152,14 @@ public class NewMecanumDrive {
 		}
 	}
 
+	public void ram() {
+		rawMove(0, 1, 0);
+	}
+
+	public void brake() {
+		rawMove(0, 0, 0);
+	}
+
 	public void rawMove(double x, double y, double h) {
 		double[] powers = new double[]{
 				x + y - h,
@@ -181,8 +189,8 @@ public class NewMecanumDrive {
 		double sin = Math.sin(heading);
 		double cos = Math.cos(heading);
 		Matrix rotation = new Matrix(new double[][]{
-				{ cos, -sin },
-				{ sin,  cos }
+				{ cos, sin },
+				{ -sin,  cos }
 		});
 		double[] result = rotation.mul(vec).transpose().getData()[0];
 		move(result[0], result[1], h);
@@ -254,14 +262,14 @@ public class NewMecanumDrive {
 						currentLocation.headingDifference(targetLocation) / MAX_ANGULAR));
 		while (mode.opModeIsActive()) {
 			updateLocation();
-			mode.telemetry.addData("Status", "Moving");
-			mode.telemetry.addData("Location", currentLocation);
-			mode.telemetry.addData("Target", targetLocation);
-			mode.telemetry.addData("Angle",
-					currentLocation.headingDifference(targetLocation));
-			mode.telemetry.addData("Time left",
-					(endTime - System.currentTimeMillis()) / 1000.0);
-			mode.telemetry.update();
+//			mode.telemetry.addData("Status", "Moving");
+//			mode.telemetry.addData("Location", currentLocation);
+//			mode.telemetry.addData("Target", targetLocation);
+//			mode.telemetry.addData("Angle",
+//					currentLocation.headingDifference(targetLocation));
+//			mode.telemetry.addData("Time left",
+//					(endTime - System.currentTimeMillis()) / 1000.0);
+//			mode.telemetry.update();
 			double x = xController.calculateAdjustment(currentLocation.getX());
 			double y = -yController.calculateAdjustment(currentLocation.getY());
 			double h = hController.calculateAdjustment(currentLocation.getHeading());
@@ -283,11 +291,11 @@ public class NewMecanumDrive {
 						currentLocation.headingDifference(angle) / MAX_ANGULAR);
 		while (mode.opModeIsActive()) {
 			updateLocation();
-			mode.telemetry.addData("Angle",
-					currentLocation.headingDifference(angle));
-			mode.telemetry.addData("Time left",
-					(endTime - System.currentTimeMillis()) / 1000.0);
-			mode.telemetry.update();
+//			mode.telemetry.addData("Angle",
+//					currentLocation.headingDifference(angle));
+//			mode.telemetry.addData("Time left",
+//					(endTime - System.currentTimeMillis()) / 1000.0);
+//			mode.telemetry.update();
 			double h = hController.calculateAdjustment(currentLocation.getHeading());
 			if (currentLocation.headingDifference(angle) < 2
 					|| endTime <= System.currentTimeMillis()) {

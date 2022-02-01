@@ -17,51 +17,42 @@ public class RightAutoPath extends LinearOpMode {
 	private Carousel carousel;
 	private Lift lift;
 
-	private SplineCurve toCarousel = new SplineCurve(new Location(-61, -41, 90),
-			new Location(-58, -56, 90));
-	private SplineCurve toShippingHub = new SplineCurve(toCarousel.getEnd(),
-			new Location(-24, -29, 180),
-			new Location(0, 300, 0), SplineCurve.SECOND_POINT);
-	private SplineCurve toDepot = new SplineCurve(toShippingHub.getEnd(),
-			new Location(-36, -60, 180));
+	private Location carouselLocation = new Location(-18, -4, 0);
+	private Location corner1 = new Location(-18, -40, 0);
+	private Location shippingHub = new Location(7, -38, 90);
+	private Location corner2 = new Location(-18, -36, 90);
+	private Location corner3 = new Location(-18, -12, 90);
+	private Location ramPause = new Location(54, -12, -90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
 		CameraPipeline cameraPipeline = new CameraPipeline(this);
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(-61, -41, 90), this);
+				new Location(0, 0, 0), this);
 		carousel = new Carousel(hardwareMap, this, true);
 		lift = new Lift(hardwareMap, this, true);
 
 		while (!isStarted() && !isStopRequested()) {
 			drive.update();
-			telemetry.addData("Location", drive.getCurrentLocation());
 			telemetry.addData("QR Code", cameraPipeline.getShippingElementLocation());
 			telemetry.update();
 		}
-
-		telemetry.addData("Status", "Moving to carousel");
+		int pos = cameraPipeline.getShippingElementLocation();
+		telemetry.addData("Pos", pos);
 		telemetry.update();
-		drive.followPath(toCarousel);
-		drive.waitForMovement(()->{
-			telemetry.addData("Location", drive.getCurrentLocation());
-			telemetry.addData("Target", drive.targetLocation);
-			telemetry.update();
-		});
 
-		while (opModeIsActive());
-/*
-		telemetry.addData("Status", "Spinning carousel");
-		telemetry.update();
-		carousel.rotate();
-		sleep(1500);
+		drive.moveToLocation(carouselLocation);
+		sleep(500);
+		carousel.autoRotate();
+		sleep(6000);
 		carousel.stop();
-
-		telemetry.addData("Status", "Moving to shipping hub");
-		telemetry.update();
-		int level = cameraPipeline.getShippingElementLocation();
-		switch (level) {
+		sleep(200);
+		drive.moveToLocation(corner1);
+		sleep(200);
+		drive.rotate(90);
+		sleep(200);
+		switch (pos) {
 			case 1:
 				lift.positionMiddle();
 				break;
@@ -72,22 +63,26 @@ public class RightAutoPath extends LinearOpMode {
 				lift.positionDown();
 				break;
 		}
-		drive.followPath(toShippingHub);
-		drive.waitForMovement();
-
-		telemetry.addData("Status", "Dropping freight");
-		telemetry.update();
+		while (opModeIsActive() && lift.isMoving()) sleep(100);
+		sleep(200);
+		drive.moveToLocation(shippingHub);
+		sleep(200);
 		lift.dropFreight();
-		sleep(1000);
+		sleep(3000);
 		lift.dropFreight();
-
-		telemetry.addData("Status", "Moving to depot");
-		telemetry.update();
-		drive.followPath(toDepot);
-		drive.waitForMovement();
-
-		telemetry.addData("Status", "Parked");
-		telemetry.update();
-		while(opModeIsActive());*/
+		sleep(200);
+		drive.moveToLocation(corner2);
+		lift.positionDown();
+		sleep(200);
+		drive.moveToLocation(corner3);
+		sleep(200);
+		drive.rotate(-90);
+		sleep(200);
+		drive.moveToLocation(ramPause);
+		sleep(500);
+		drive.ram();
+		sleep(2000);
+		drive.brake();
+		while (opModeIsActive());
 	}
 }

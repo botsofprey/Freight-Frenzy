@@ -18,9 +18,14 @@ public class  Carousel {
 				"rightDuckSpinner");
 	}
 
+	public void autoRotate() {
+		lCarousel.setPower(-1.0 / 4);
+		rCarousel.setPower(1.0 / 4);
+	}
+
 	public void rotate() {
-		lCarousel.setPower(1);
-		rCarousel.setPower(-1);
+		lCarousel.setPower(-1);
+		rCarousel.setPower(1);
 	}
 
 	public void stop() {

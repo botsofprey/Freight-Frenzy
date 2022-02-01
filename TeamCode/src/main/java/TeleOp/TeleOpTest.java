@@ -48,7 +48,7 @@ public class TeleOpTest extends LinearOpMode {
 				controller1.update();
 				controller2.update();
 
-				drive.moveRobot(controller1.leftStick.x, controller1.leftStick.y,
+				drive.moveRobot(controller1.leftStick.x, -controller1.leftStick.y,
 						-controller1.rightStick.x);
 
 				if (controller2.rightTriggerHeld && !controller2.leftTriggerHeld) {
