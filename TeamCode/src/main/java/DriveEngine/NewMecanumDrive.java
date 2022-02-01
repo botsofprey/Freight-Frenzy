@@ -56,10 +56,9 @@ public class NewMecanumDrive {
 	public static final double MAX_ANGULAR = 90;
 	private SplineCurve path;
 	
-	private PIDCoefficients xCoefficients = new PIDCoefficients(0.08, 0.0, 0.01);
-	private PIDCoefficients yCoefficients = new PIDCoefficients(0.08, 0.0, 0.01);
-	private PIDCoefficients headingCoefficients =
-			new PIDCoefficients(0.04, 0.01, 0.00125);
+	private PIDCoefficients xCoefficients = new PIDCoefficients(0.08, 0.01, 0.02);
+	private PIDCoefficients yCoefficients = new PIDCoefficients(0.08, 0.01, 0.02);
+	private PIDCoefficients headingCoefficients = new PIDCoefficients(0.02, 0.006, 0.005);
 	private PIDController xController = new PIDController(xCoefficients);
 	private PIDController yController = new PIDController(yCoefficients);
 	private PIDController hController = new PIDController(headingCoefficients);
@@ -238,6 +237,10 @@ public class NewMecanumDrive {
 		}
 	}
 	
+	public void moveToLocation(double x, double y, double h) {
+		moveToLocation(new Location(x, y, h));
+	}
+	
 	public void moveToLocation(Location targetLocation) {
 		xController.reset();
 		yController.reset();
@@ -256,17 +259,42 @@ public class NewMecanumDrive {
 			mode.telemetry.addData("Target", targetLocation);
 			mode.telemetry.addData("Angle",
 					currentLocation.headingDifference(targetLocation));
+			mode.telemetry.addData("Time left",
+					(endTime - System.currentTimeMillis()) / 1000.0);
 			mode.telemetry.update();
 			double x = xController.calculateAdjustment(currentLocation.getX());
 			double y = -yController.calculateAdjustment(currentLocation.getY());
 			double h = hController.calculateAdjustment(currentLocation.getHeading());
-			if (currentLocation.distanceToLocation(targetLocation) < 0.5
-					&& currentLocation.headingDifference(targetLocation) < 2
-					|| endTime <= System.currentTimeMillis() && false) {
+			if (currentLocation.distanceToLocation(targetLocation) < 1
+					&& currentLocation.headingDifference(targetLocation) < 5
+					|| endTime <= System.currentTimeMillis()) {
 				rawMove(0, 0, 0);
 				break;
 			}
 			moveTrueNorth(x, y, h);
+		}
+	}
+	
+	public void rotate(double angle) {
+		hController.reset();
+		hController.setTargetPoint(angle);
+		long startTime = System.currentTimeMillis();
+		long endTime = 1000 + startTime + (long)Math.abs(1000 *
+						currentLocation.headingDifference(angle) / MAX_ANGULAR);
+		while (mode.opModeIsActive()) {
+			updateLocation();
+			mode.telemetry.addData("Angle",
+					currentLocation.headingDifference(angle));
+			mode.telemetry.addData("Time left",
+					(endTime - System.currentTimeMillis()) / 1000.0);
+			mode.telemetry.update();
+			double h = hController.calculateAdjustment(currentLocation.getHeading());
+			if (currentLocation.headingDifference(angle) < 2
+					|| endTime <= System.currentTimeMillis()) {
+				rawMove(0, 0, 0);
+				break;
+			}
+			moveTrueNorth(0, 0, h);
 		}
 	}
 	

@@ -76,6 +76,10 @@ public class Location {
 		return normalizeHeading(location.heading - heading);
 	}
 	
+	public double headingDifference(double h) {
+		return normalizeHeading(h - heading);
+	}
+	
 	public double headingToLocation(Location location) {
 		return Math.toDegrees(Math.atan2(-x, y));
 	}
