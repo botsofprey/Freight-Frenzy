@@ -297,7 +297,7 @@ public class NewMecanumDrive {
 //					(endTime - System.currentTimeMillis()) / 1000.0);
 //			mode.telemetry.update();
 			double h = hController.calculateAdjustment(currentLocation.getHeading());
-			if (currentLocation.headingDifference(angle) < 2
+			if (Math.abs(currentLocation.headingDifference(angle)) < 2
 					|| endTime <= System.currentTimeMillis()) {
 				rawMove(0, 0, 0);
 				break;
