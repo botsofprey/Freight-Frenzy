@@ -21,7 +21,7 @@ public class Lift {
 
 	private static final int[] POSITIONS = {
 			0,
-			350,
+			300,
 			600
 	};
 	private static final RevBlinkinLedDriver.BlinkinPattern

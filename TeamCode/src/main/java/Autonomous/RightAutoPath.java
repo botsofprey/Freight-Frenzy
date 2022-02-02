@@ -25,11 +25,14 @@ public class RightAutoPath extends LinearOpMode {
 	private Location carouselLocation = new Location(-18, -4, 0);
 	private Location corner1 = new Location(-18, -40, 0);
 	private Location shippingHub = new Location(7, -40, 90);
-	private Location corner2 = new Location(-18, -36, 90);
-	private Location corner3 = new Location(-18, -12, 90);
+	private Location corner2 = new Location(-18, -40, 90);
+	private Location corner3 = new Location(-18, -6, 90);
 	private Location ramPause = new Location(44, -12, -90);
-	private Location warehouseEntrance = new Location(54, 12, -90);
-	private Location warehouse = new Location(60, 12, -90);
+	private Location warehouseEntrance = new Location(38, 8, -90);
+	private Location warehouse = new Location(50, 8, -90);
+	private Location corner4 = new Location(20, -23, -90);
+	private Location duckDrive = new Location(36, -27, -100);
+	private Location dropPoint2 = new Location(34, -30, -90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
@@ -51,15 +54,14 @@ public class RightAutoPath extends LinearOpMode {
 		telemetry.update();
 
 		drive.moveToLocation(carouselLocation);
-		sleep(500);
+		sleep(100);
 		carousel.autoRotate();
-		sleep(6000);
+		sleep(4000);
 		carousel.stop();
-		sleep(200);
+		sleep(100);
 		drive.moveToLocation(corner1);
 		sleep(200);
 		drive.rotate(90);
-		sleep(200);
 		switch (pos) {
 			case 1:
 				lift.positionMiddle();
@@ -72,11 +74,10 @@ public class RightAutoPath extends LinearOpMode {
 				break;
 		}
 		while (opModeIsActive() && lift.isMoving()) sleep(100);
-		sleep(200);
 		drive.moveToLocation(shippingHub);
 		sleep(200);
 		lift.dropFreight();
-		sleep(3000);
+		sleep(1000);
 		lift.dropFreight();
 		sleep(200);
 		drive.moveToLocation(corner2);
@@ -86,7 +87,27 @@ public class RightAutoPath extends LinearOpMode {
 		sleep(200);
 		drive.rotate(-90);
 		sleep(200);
+		intake.intake();
+		sleep(200);
+		drive.moveToLocation(corner4);
+		sleep(200);
+		drive.rotate(-100);
+		sleep(200);
+		drive.moveToLocation(duckDrive);
+		sleep(200);
+		drive.rotate(-90);
+		sleep(1000);
+		intake.brake();
+		lift.positionUp();
+		while (opModeIsActive() && lift.isMoving()) sleep(100);
+		drive.moveToLocation(dropPoint2);
+		sleep(200);
+		lift.dropFreight();
+		sleep(1000);
+		lift.dropFreight();
+		sleep(200);
 		drive.moveToLocation(warehouseEntrance);
+		lift.positionDown();
 		sleep(200);
 		drive.moveToLocation(warehouse);
 
