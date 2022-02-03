@@ -1,6 +1,7 @@
 package Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.MecanumDrive;
@@ -10,6 +11,7 @@ import Subsystems.Lift;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
+@Disabled
 @Autonomous(name="Red Auto", group="Autonomous")
 public class RedAuto extends LinearOpMode {
 	private MecanumDrive drive;

@@ -29,6 +29,7 @@ public class CameraPipeline extends OpenCvPipeline {
 	public volatile int x;
 	public volatile int y;
 	public volatile String data;
+	public volatile int numChecks = 0;
 
 	public volatile int xPos;
 
@@ -65,12 +66,14 @@ public class CameraPipeline extends OpenCvPipeline {
 				location = 1;
 			}
 			else {
-				location = 2;
+				location = 0;
 			}
 		}
 		else {
-			location = 0;
+			location = 2;
 		}
+		int temp = numChecks;
+		numChecks = temp + 1;
 
 		return image;
 	}

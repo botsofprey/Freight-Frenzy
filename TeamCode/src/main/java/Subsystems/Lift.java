@@ -22,7 +22,7 @@ public class Lift {
 	private static final int[] POSITIONS = {
 			0,
 			350,
-			600
+			700
 	};
 	private static final RevBlinkinLedDriver.BlinkinPattern
 			downColor =  RevBlinkinLedDriver.BlinkinPattern.GREEN,

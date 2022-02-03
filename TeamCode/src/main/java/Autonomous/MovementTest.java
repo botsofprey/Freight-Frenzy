@@ -1,6 +1,7 @@
 package Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.DriveConstraints;
@@ -12,6 +13,7 @@ import Subsystems.Carousel;
 import Subsystems.Lift;
 import UtilityClasses.Location;
 
+@Disabled
 @Autonomous(name="mecanum drive test", group="Autonomous")
 public class MovementTest extends LinearOpMode {
 	private NewMecanumDrive drive;

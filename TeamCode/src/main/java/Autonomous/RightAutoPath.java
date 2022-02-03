@@ -2,12 +2,8 @@ package Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import DriveEngine.NewMecanumDrive;
-import DriveEngine.SplineCurve;
 import Subsystems.CameraPipeline;
 import Subsystems.Carousel;
 import Subsystems.Intake;
@@ -28,7 +24,7 @@ public class RightAutoPath extends LinearOpMode {
 	private Location corner2 = new Location(-18, -36, 90);
 	private Location corner3 = new Location(-18, -12, 90);
 	private Location ramPause = new Location(44, -12, -90);
-	private Location warehouseEntrance = new Location(54, 12, -90);
+	private Location warehouseEntrance = new Location(35, 11, -90);
 	private Location warehouse = new Location(60, 12, -90);
 
 	@Override
@@ -43,7 +39,8 @@ public class RightAutoPath extends LinearOpMode {
 
 		while (!isStarted() && !isStopRequested()) {
 			drive.update();
-			telemetry.addData("QR Code", cameraPipeline.getShippingElementLocation());
+			telemetry.addData("QR Code", cameraPipeline.getShippingElementLocation() + 1);
+			telemetry.addData("Checks", cameraPipeline.numChecks);
 			telemetry.update();
 		}
 		int pos = cameraPipeline.getShippingElementLocation();
@@ -53,7 +50,7 @@ public class RightAutoPath extends LinearOpMode {
 		drive.moveToLocation(carouselLocation);
 		sleep(500);
 		carousel.autoRotate();
-		sleep(6000);
+		sleep(4000);
 		carousel.stop();
 		sleep(200);
 		drive.moveToLocation(corner1);
@@ -76,7 +73,7 @@ public class RightAutoPath extends LinearOpMode {
 		drive.moveToLocation(shippingHub);
 		sleep(200);
 		lift.dropFreight();
-		sleep(3000);
+		sleep(1000);
 		lift.dropFreight();
 		sleep(200);
 		drive.moveToLocation(corner2);
