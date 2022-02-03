@@ -26,7 +26,7 @@ public class SixWheelTank extends LinearOpMode {
 	private DcMotorSimple.Direction[] directions = new DcMotorSimple.Direction[] {
 			DcMotorSimple.Direction.REVERSE,
 			DcMotorSimple.Direction.REVERSE,
-			DcMotorSimple.Direction.REVERSE,
+			DcMotorSimple.Direction.FORWARD,
 			DcMotorSimple.Direction.FORWARD
 	};
 
@@ -48,10 +48,11 @@ public class SixWheelTank extends LinearOpMode {
 		servoRight = new CRServoController(hardwareMap, "rightWheel");
 
 		bucketArm.liftMoveTowards(2, 0.5);
-		while(bucketArm.liftIsBusy()){}
+		while (bucketArm.liftIsBusy()) {
+		}
 
-		bucketArm.setLiftPower(-.25);
-		while (bucketArm.liftIsBusy() && !bucketArm.limitSwitch()){
+		bucketArm.setLiftPower(-.75);
+		while (!bucketArm.limitSwitch()) {
 		}
 		bucketArm.setLiftPower(0);
 		bucketArm.resetLiftEncoder();

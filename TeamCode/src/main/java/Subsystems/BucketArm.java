@@ -1,6 +1,7 @@
 package Subsystems;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -19,9 +20,9 @@ public class BucketArm {
 	private DcMotor liftMotor, leftBucketMotor, rightBucketMotor;
 	private TouchSensor magLiftSensor;
 
-	//private Servo bucketDoor;
-	//private DistanceSensor bucketSensor;
-	//private double distanceInBucket;
+	private ColorSensor bucketSensor, outsideSensor;
+	private static final int[] boxColor = {255, 190, 0}, ballColor = {241, 239, 223}, duckColor = {239, 206, 0};
+
 	private RevBlinkinLedDriver led;
 
 	//private double doorStartPos = 0, doorClosePos = 1;
@@ -44,6 +45,9 @@ public class BucketArm {
 		rightBucketMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+		bucketSensor = hardwareMap.get(ColorSensor.class, "bucketSensor");
+		outsideSensor = hardwareMap.get(ColorSensor.class, "outsideSensor");
+
 		led = hardwareMap.get(RevBlinkinLedDriver.class, "Led Indicate");
 		led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
 
@@ -60,6 +64,8 @@ public class BucketArm {
 	}
 
 	public void setBucketPower(double power){
+		if(compareNumbers(getLiftPos(), TOP, 500))
+			power = power * .5;
 		rightBucketMotor.setPower(power);
 		leftBucketMotor.setPower(power);
 	}
@@ -83,6 +89,28 @@ public class BucketArm {
 		return leftBucketMotor.getPower();
 	}
 
+	private int[] getColor(ColorSensor colorSensor){
+		int[] color = new int[3];
+
+		color[0] = colorSensor.red() / 255;
+		color[0] = colorSensor.green() /255;
+		color[0] = colorSensor.blue() / 255;
+
+		return color;
+	}
+	public boolean freightFound(ColorSensor colorSensor){
+		int[] curColor = getColor(colorSensor);
+		return compareNumbers(ballColor[0], curColor[0], 25) &&
+				compareNumbers(ballColor[1], curColor[1], 25) &&
+				compareNumbers(ballColor[2], curColor[2], 25) ||
+	compareNumbers(boxColor[0], curColor[0], 25) &&
+				compareNumbers(boxColor[1], curColor[1], 25) &&
+				compareNumbers(boxColor[2], curColor[2], 25) ||
+	compareNumbers(duckColor[0], curColor[0], 25) &&
+				compareNumbers(duckColor[1], curColor[1], 25) &&
+				compareNumbers(duckColor[2], curColor[2], 25);
+	}
+
 	private boolean compareNumbers(double a, double b, double range){
 		return Math.abs(a - b) < range;
 	}
@@ -102,14 +130,36 @@ public class BucketArm {
 
 	public void resetLiftEncoder(){
 		liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 	}
 
+	public boolean bucketFreight(){
+		return freightFound(bucketSensor);
+	}
+
+	public boolean outsideFreight(){
+		return freightFound(outsideSensor);
+	}
+
+	long millis;
+	boolean autoIntaking = false;
+
 	public void update(){
-		if(magLiftSensor.isPressed()){
-			led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-		}else{
+		if(freightFound(bucketSensor)){
 			led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+		}else{
+			led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+
+			if(freightFound(outsideSensor)){
+				setBucketPower(INTAKE);
+				millis = System.currentTimeMillis();
+				autoIntaking = true;
+			}
+		}
+		if(autoIntaking){
+			if(System.currentTimeMillis() - millis >= 1500){
+				setBucketPower(0);
+				autoIntaking = false;
+			}
 		}
 	}
 }

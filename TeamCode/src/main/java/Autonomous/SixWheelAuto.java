@@ -56,20 +56,25 @@ public class SixWheelAuto extends LinearOpMode {
 
 		waitForStart();
 
-		sixDrive.setMotorPower(0.5, 0.5);
-
 		while(opModeIsActive()){
-			telemetry.addData("Left Power", sixDrive.getLeftPower());
-			telemetry.addData("Right Power", sixDrive.getRightPower());
+			telemetry.addData("Bucket", bucketArm.bucketFreight());
+			telemetry.addData("Outside", bucketArm.outsideFreight());
 			telemetry.update();
+			bucketArm.update();
 		}
 
-		sixDrive.move(30, 1);
-		while (sixDrive.isBusy()){}
+		sixDrive.move(60, .5);
+		while (sixDrive.isBusy() && opModeIsActive()){
+			telemetry.addData("Left Power", sixDrive.getLeftPower());
+			telemetry.addData("Right Power", sixDrive.getRightPower());
+			sixDrive.update();
+		}
+
+		while(opModeIsActive());
 
 		double distanceFromHub = leftSensor.getDistance(DistanceUnit.INCH);
 
-		sixDrive.rotateRight(.5, 90);
+		sixDrive.rotateRight(90, .5);
 		while(sixDrive.rotating()){}
 		sleep(500);
 
@@ -120,6 +125,15 @@ public class SixWheelAuto extends LinearOpMode {
 
 	private boolean compare(double a, double b, double range){
 		return Math.abs(a - b) < range;
+	}
+
+	private char[] startLocation(){
+		char[] location = new char[2];
+		double left = leftSensor.getDistance(DistanceUnit.INCH),
+				right = rightSensor.getDistance(DistanceUnit.INCH);
+
+
+		return location;
 	}
 }
 

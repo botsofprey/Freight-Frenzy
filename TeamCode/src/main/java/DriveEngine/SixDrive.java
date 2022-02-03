@@ -23,18 +23,17 @@ public class SixDrive {
 	private DcMotorSimple.Direction[] directions = new DcMotorSimple.Direction[] {
 			DcMotorSimple.Direction.REVERSE,
 			DcMotorSimple.Direction.REVERSE,
-			DcMotorSimple.Direction.REVERSE,
+			DcMotorSimple.Direction.FORWARD,
 			DcMotorSimple.Direction.FORWARD
 	};
-
 
 	private BNO055IMU imu;
 	private Orientation lastAngles = new Orientation();
 	private double globalAngle;
 	public String RIGHT = "right", LEFT = "left";
 
-	private double TICKS_PER_INCH = 312 / (4 * Math.PI), movementPower = .5;
-	public double targetAngle;
+	private double TICKS_PER_INCH = 312 / (4 * Math.PI), movementPower;
+	public double targetAngle = 0;
 
 	public SixDrive(HardwareMap hardwareMap){
 		for (int i = 0; i < 4; i++) {
@@ -142,7 +141,7 @@ public class SixDrive {
 	}
 
 	public boolean isBusy(){
-		return  motors[0].isBusy();
+		return motors[0].isBusy() || motors[1].isBusy() || motors[2].isBusy() || motors[3].isBusy();
 	}
 
 	private void resetAngle()
@@ -199,12 +198,17 @@ public class SixDrive {
 				rotating = false;
 				stop();
 			}
-		} else if(motors[0].isBusy()){
-			}
+		} else if(isBusy()){
+			double angleError = getAngle() - targetAngle;
+			double newPower = movementPower * (angleError / 360);
+			double leftPower = movementPower - newPower, rightPower = movementPower + newPower;
 
-		double angleError = getAngle() - targetAngle;
-		double newPower = movementPower * (angleError / 360);
-		setMotorPower(movementPower - newPower, movementPower + newPower);
+			setMotorPower(leftPower, rightPower);
+
+			System.out.println("left: " + leftPower + " | right: " + rightPower);
+			System.out.println("angle error: " + angleError +
+					"OG movement power: " + movementPower + " | added power: " + newPower);
+			}
 	}
 
 	private boolean compareAngles(double a, double b, double range){
