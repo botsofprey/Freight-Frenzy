@@ -84,11 +84,15 @@ public class TeleOpTest extends LinearOpMode {
 					intake.resetLEDs();
 				}
 
-				if (controller2.xHeld) {
-					carousel.rotate();
-				} else {
-					carousel.stop();
+				if (controller2.xPressed) {
+					carousel.toggleEndgameRotate();
 				}
+
+//				if (controller2.xHeld) {
+//					carousel.rotate();
+//				} else {
+//					carousel.stop();
+//				}
 
 				if (controller1.leftTriggerPressed) {
 					drive.slowMode();
@@ -96,12 +100,13 @@ public class TeleOpTest extends LinearOpMode {
 				if (controller1.leftTriggerReleased) {
 					drive.noSlowMode();
 				}
+				long time = System.currentTimeMillis();
 
-				lift.update();
-				intake.update();
+				lift.update(time);
+				intake.update(time);
+				carousel.update(time);
 				drive.update();
 
-				long time = System.currentTimeMillis();
 				cycleTimes[cycle] = 1000.0 / (time - previousTime);
 				previousTime = time;
 				cycle++;

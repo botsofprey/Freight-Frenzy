@@ -65,7 +65,7 @@ public class RedAuto extends LinearOpMode {
 		}
 		long time = System.nanoTime();
 		while (opModeIsActive() && lift.isMoving() && System.nanoTime() < time + 2_000_000_000L)
-			lift.update();
+			lift.update(System.currentTimeMillis());
 		sleep(2000);
 		lift.dropFreight();
 		sleep(1000);

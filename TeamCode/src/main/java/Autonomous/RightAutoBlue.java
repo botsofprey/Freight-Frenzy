@@ -12,13 +12,13 @@ import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
 @Autonomous(name="RightAutoBlue", group="Competition Autos")
-public class RightAutoPath extends LinearOpMode {
+public class RightAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private Carousel carousel;
 	private Lift lift;
 	private Intake intake;
 
-	private Location carouselLocation = new Location(-18, -4, 0);
+	private Location carouselLocation = new Location(-20, -6, 0);
 	private Location corner1 = new Location(-18, -40, 0);
 	private Location shippingHub = new Location(7, -40, 90);
 	private Location corner2 = new Location(-18, -36, 90);
@@ -37,9 +37,11 @@ public class RightAutoPath extends LinearOpMode {
 		lift = new Lift(hardwareMap, this, true);
 		intake = new Intake(hardwareMap, this, true);
 
+		String[] positions = { "Right", "Center", "Left" };
+
 		while (!isStarted() && !isStopRequested()) {
 			drive.update();
-			telemetry.addData("QR Code", cameraPipeline.getShippingElementLocation() + 1);
+			telemetry.addData("QR Code", positions[cameraPipeline.getShippingElementLocation()]);
 			telemetry.addData("Checks", cameraPipeline.numChecks);
 			telemetry.update();
 		}
@@ -87,6 +89,11 @@ public class RightAutoPath extends LinearOpMode {
 		sleep(200);
 		drive.moveToLocation(warehouse);
 
-		while (opModeIsActive()) sleep(200);
+		telemetry.addData("Status", "Stopping");
+		telemetry.update();
+		camera.stop();
+		telemetry.addData("Status", "Stopped");
+		telemetry.update();
+		while (opModeIsActive()) sleep(100);
 	}
 }

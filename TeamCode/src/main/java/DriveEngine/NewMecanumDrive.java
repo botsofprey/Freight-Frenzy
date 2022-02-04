@@ -115,7 +115,7 @@ public class NewMecanumDrive {
 		previousTime = System.nanoTime();
 	}
 	
-	private void updateLocation() {
+	public void updateLocation() {
 		localizer.updateLocation();
 		currentLocation = localizer.getCurrentLocation();
 	}
