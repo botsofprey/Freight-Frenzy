@@ -1,6 +1,7 @@
 package Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.MecanumDrive;
@@ -10,6 +11,7 @@ import Subsystems.Lift;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
+@Disabled
 @Autonomous(name="Red Auto", group="Autonomous")
 public class RedAuto extends LinearOpMode {
 	private MecanumDrive drive;
@@ -63,7 +65,7 @@ public class RedAuto extends LinearOpMode {
 		}
 		long time = System.nanoTime();
 		while (opModeIsActive() && lift.isMoving() && System.nanoTime() < time + 2_000_000_000L)
-			lift.update();
+			lift.update(System.currentTimeMillis());
 		sleep(2000);
 		lift.dropFreight();
 		sleep(1000);

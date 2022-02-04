@@ -91,16 +91,18 @@ public class Intake {
 		intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 	}
 
-	public void update() {
+	public boolean moving() { return state != BRAKE; }
+
+	public void update(long millis) {
 		boolean color = detectColor();
 		mode.telemetry.addData("Intake sensor", color);
-		if (state == INTAKE && detectColor() && System.currentTimeMillis() - mil >= 1000) {
+		if (state == INTAKE && detectColor() && millis - mil >= 1000) {
 			intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
 			brake();
-			freezeTime = System.currentTimeMillis();
+			freezeTime = millis;
 		}
 
-		if (freezeTime != 0 && freezeTime + 500 <= System.currentTimeMillis()) {
+		if (freezeTime != 0 && freezeTime + 500 <= millis) {
 			intake();
 			freezeTime = 0;
 			resetLEDs();

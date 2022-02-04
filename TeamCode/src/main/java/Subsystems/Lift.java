@@ -22,7 +22,7 @@ public class Lift {
 	private static final int[] POSITIONS = {
 			0,
 			350,
-			600
+			700
 	};
 	private static final RevBlinkinLedDriver.BlinkinPattern
 			downColor =  RevBlinkinLedDriver.BlinkinPattern.GREEN,
@@ -213,7 +213,7 @@ public class Lift {
 				&& Math.abs(colorA[2] - colorB[2]) <= range;
 	}
 
-	public void update() {
+	public void update(long millis) {
 		boolean pressed = limitSwitch.isPressed();
 		if (pressed && !switchPressed) {
 			slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -232,7 +232,7 @@ public class Lift {
 			liftLed.setPattern(midColor);
 		}
 
-		if (freightDropped && System.currentTimeMillis() >= 2000 + dropTime) {
+		if (freightDropped && millis >= 2000 + dropTime) {
 			freightDropped = false;
 			bucketWall.setPosition(1);
 		}
