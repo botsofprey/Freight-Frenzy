@@ -18,7 +18,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 	private SixDrive sixDrive;
 
-	private DistanceSensor rightSensor, leftSensor;
+	private DistanceSensor rightSensor, leftSensor, frontSensor;
 
 	private CRServoController servoLeft, servoRight;
 
@@ -29,6 +29,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 		rightSensor = hardwareMap.get(DistanceSensor.class, "rightSensor");
 		leftSensor = hardwareMap.get(DistanceSensor.class, "leftSensor");
+		//frontSensor = hardwareMap.get(DistanceSensor.class, "frontSensor");
 
 		servoLeft = new CRServoController(hardwareMap, "leftWheel");
 		servoRight = new CRServoController(hardwareMap, "rightWheel");
@@ -56,30 +57,17 @@ public class SixWheelAuto extends LinearOpMode {
 
 		waitForStart();
 
-		while(opModeIsActive()){
-			telemetry.addData("Bucket", bucketArm.bucketFreight());
-			telemetry.addData("Outside", bucketArm.outsideFreight());
-			telemetry.update();
-			bucketArm.update();
-		}
-
 		sixDrive.move(60, .5);
 		while (sixDrive.isBusy() && opModeIsActive()){
-			telemetry.addData("Left Power", sixDrive.getLeftPower());
-			telemetry.addData("Right Power", sixDrive.getRightPower());
 			sixDrive.update();
 		}
 
-		while(opModeIsActive());
-
 		double distanceFromHub = leftSensor.getDistance(DistanceUnit.INCH);
 
-		sixDrive.rotateRight(90, .5);
-		while(sixDrive.rotating()){}
-		sleep(500);
-
-		sixDrive.move(distanceFromHub - 3, .25);
-		while (sixDrive.isBusy()){}
+		sixDrive.rotateRight(270, .5);
+		while(sixDrive.rotating()){
+			sixDrive.update();
+		}
 		sleep(500);
 
 		bucketArm.liftMoveTowards(BucketArm.TOP/BucketArm.TICKS_PER_INCH, .5);
@@ -90,34 +78,44 @@ public class SixWheelAuto extends LinearOpMode {
 		sleep(2500);
 		bucketArm.setBucketPower(0);
 
+		sixDrive.move(-distanceFromHub, .5);
+		while (sixDrive.isBusy()){
+			sixDrive.update();}
+		sleep(500);
+
 		bucketArm.liftMoveTowards(0, .5);
 		while (bucketArm.liftIsBusy()){}
 		sleep(500);
 
 		sixDrive.rotateRight(90, 0.5);
-		while(sixDrive.rotating()){}
+		while(sixDrive.rotating()){
+			sixDrive.update();}
 		sleep(1000);
 
 		double distanceFromWall = rightSensor.getDistance(DistanceUnit.INCH);
 
 		sixDrive.rotateRight(90, 0.5);
-		while(sixDrive.rotating()){}
+		while(sixDrive.rotating()){
+			sixDrive.update();}
 		sleep(500);
 
 		sixDrive.move(distanceFromWall - 2, .75);
-		while(sixDrive.isBusy()){}
+		while(sixDrive.isBusy()){
+			sixDrive.update();}
 		sleep(500);
 
 		double distanceFromCaro = rightSensor.getDistance(DistanceUnit.INCH);
 
 		sixDrive.rotateLeft(90, 0.5);
-		while (sixDrive.rotating()){}
+		while (sixDrive.rotating()){
+			sixDrive.update();}
 		sleep(500);
 
 		servoLeft.setPower(1);
 
 		sixDrive.move(distanceFromCaro - 3, .85);
-		while(sixDrive.isBusy()){}
+		while(sixDrive.isBusy()){
+			sixDrive.update();}
 
 		sleep(10000);
 	}

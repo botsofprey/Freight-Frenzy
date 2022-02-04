@@ -172,11 +172,11 @@ public class SixDrive {
 		globalAngle += deltaAngle;
 
 		lastAngles = angles;
-
-		if (globalAngle < -180)
-			globalAngle += 360;
-		else if (globalAngle > 180)
-			globalAngle -= 360;
+//
+//		if (globalAngle < -180)
+//			globalAngle += 360;
+//		else if (globalAngle > 180)
+//			globalAngle -= 360;
 
 		return -globalAngle;
 	}
@@ -190,13 +190,21 @@ public class SixDrive {
 
 	public void update(){
 		if(rotating){
-//			double power = Math.min((movementPower/45)*(Math.abs(targetAngle - getAngle())),
-//					movementPower);
-//			setMotors(power);
+			double power = Math.min((movementPower/45)*(Math.abs(targetAngle - getAngle())),
+					movementPower);
+				if(getLeftPower() > 0){
+					setMotorPower(power, 0);
+				}else{
+					setMotorPower(0, power);
+				}
 //			System.out.println("power: " + power);
-			if(compareAngles(targetAngle, getAngle(), 2)){
+			if(compareCurrentAngles()){
+				System.out.println("Close to angle: " + compareAngles(targetAngle, getAngle(), 2));
+				System.out.println("Current Angle: " + getAngle());
+				System.out.println("Target Angle: " + targetAngle);
+
 				rotating = false;
-				stop();
+				this.stop();
 			}
 		} else if(isBusy()){
 			double angleError = getAngle() - targetAngle;
@@ -217,6 +225,9 @@ public class SixDrive {
 		}else{
 			return b-a<=range;
 		}
+	}
+	private boolean compareCurrentAngles(){
+		return getAngle() - targetAngle <= 2;
 	}
 }
 
