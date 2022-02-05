@@ -7,6 +7,7 @@ import DriveEngine.MecanumDrive;
 import Subsystems.Carousel;
 import Subsystems.Intake;
 import Subsystems.Lift;
+import Subsystems.MotorCarousel;
 import UtilityClasses.Controller;
 import UtilityClasses.Location;
 
@@ -14,7 +15,7 @@ import UtilityClasses.Location;
 public class TeleOpTest extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
-	private Carousel carousel;
+	private MotorCarousel carousel;
 	private Controller controller1;
 	private Controller controller2;
 	private MecanumDrive drive;
@@ -27,7 +28,7 @@ public class TeleOpTest extends LinearOpMode {
 		//try {
 			lift = new Lift(hardwareMap, this, throwErrors);
 			intake = new Intake(hardwareMap, this, throwErrors);
-			carousel = new Carousel(hardwareMap, this, throwErrors);
+			carousel = new MotorCarousel(hardwareMap, this);
 			drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
 					new Location(0, 0, 0), false, this, throwErrors);
 			controller1 = new Controller(gamepad1);
@@ -85,14 +86,9 @@ public class TeleOpTest extends LinearOpMode {
 				}
 
 				if (controller2.xPressed) {
-					carousel.toggleEndgameRotate();
+					//carousel.blueEndgame();
+					carousel.blueSpin();
 				}
-
-//				if (controller2.xHeld) {
-//					carousel.rotate();
-//				} else {
-//					carousel.stop();
-//				}
 
 				if (controller1.leftTriggerPressed) {
 					drive.slowMode();
