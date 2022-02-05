@@ -11,6 +11,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import UtilityClasses.Location;
+import UtilityClasses.PIDController;
+
 public class SixDrive {
 
 	private DcMotor[] motors = new DcMotor[4];
@@ -35,12 +38,14 @@ public class SixDrive {
 	private double TICKS_PER_INCH = 312 / (4 * Math.PI), movementPower;
 	public double targetAngle = 0;
 
+	PIDController headingPid;
+
 	public SixDrive(HardwareMap hardwareMap){
 		for (int i = 0; i < 4; i++) {
 			motors[i] = hardwareMap.get(DcMotor.class, names[i]);
 			motors[i].setDirection(directions[i]);
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-			motors[i].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		}
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -52,6 +57,8 @@ public class SixDrive {
 		imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 		imu.initialize(parameters);
+
+		headingPid = new PIDController(.005,.002,0);
 
 		resetAngle();
 	}
@@ -75,6 +82,15 @@ public class SixDrive {
 
 	boolean rotating;
 	double rotationRange;
+	public void rotatePID(double angle){
+		for(int i = 0; i < motors.length; i++){
+			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		}
+		headingPid.reset();
+		headingPid.setTargetPoint(angle);
+		targetAngle = angle;
+		rotating = true;
+	}
 	public void rotate(double angle, double motorPower, double range){
 		targetAngle = angle + getAngle();
 		if (targetAngle < -180)
@@ -83,7 +99,7 @@ public class SixDrive {
 			targetAngle -= 360;
 
 		for(int i = 0; i < motors.length; i++){
-			motors[i].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		}
 
 		String direction = (targetAngle > getAngle() ? RIGHT : LEFT);
@@ -114,6 +130,7 @@ public class SixDrive {
 		motors[1].setPower(motorPower);
 
 		targetAngle = getAngle() + (angle-4);
+		targetAngle = Location.normalizeHeading(targetAngle);
 		movementPower = motorPower;
 		rotating = true;
 	}
@@ -125,7 +142,8 @@ public class SixDrive {
 		motors[2].setPower(motorPower);
 		motors[3].setPower(motorPower);
 
-		targetAngle =getAngle() - (angle-4);
+		targetAngle = getAngle() - (angle-4);
+		targetAngle = Location.normalizeHeading(targetAngle);
 		movementPower = motorPower;
 		rotating = true;
 	}
@@ -178,7 +196,7 @@ public class SixDrive {
 //		else if (globalAngle > 180)
 //			globalAngle -= 360;
 
-		return -globalAngle;
+		return -lastAngles.firstAngle;
 	}
 
 	public double getLeftPower(){
@@ -190,19 +208,19 @@ public class SixDrive {
 
 	public void update(){
 		if(rotating){
-			double power = Math.min((movementPower/45)*(Math.abs(targetAngle - getAngle())),
-					movementPower);
-				if(getLeftPower() > 0){
-					setMotorPower(power, 0);
-				}else{
-					setMotorPower(0, power);
-				}
-//			System.out.println("power: " + power);
-			if(compareCurrentAngles()){
-				System.out.println("Close to angle: " + compareAngles(targetAngle, getAngle(), 2));
-				System.out.println("Current Angle: " + getAngle());
-				System.out.println("Target Angle: " + targetAngle);
+		//	double power = Math.min((movementPower/45)*(Math.abs(targetAngle - getAngle())),
+		//			movementPower);
+			double power = headingPid.calculateAdjustment(getAngle());
+			System.out.println("Current Motor power: " + power + " Current angle: " + getAngle());
 
+			power = Range.clip(power, -1, 1);
+
+			motors[0].setPower(power);
+			motors[1].setPower(power);
+			motors[2].setPower(-power);
+			motors[3].setPower(-power);
+
+			if(compareCurrentAngles()){
 				rotating = false;
 				this.stop();
 			}
@@ -227,7 +245,7 @@ public class SixDrive {
 		}
 	}
 	private boolean compareCurrentAngles(){
-		return getAngle() - targetAngle <= 2;
+		return Math.abs(getAngle() - targetAngle) <= 1;
 	}
 }
 

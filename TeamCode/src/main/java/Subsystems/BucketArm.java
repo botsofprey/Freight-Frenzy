@@ -49,7 +49,6 @@ public class BucketArm {
 		bucketSensor = hardwareMap.get(ColorRangeSensor.class, "bucketSensor");
 
 		led = hardwareMap.get(RevBlinkinLedDriver.class, "Led Indicate");
-		led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
 
 		liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 	}
@@ -65,7 +64,7 @@ public class BucketArm {
 
 	public void setBucketPower(double power) {
 		if (compareNumbers(getLiftPos(), TOP, 500))
-			power = power * .5;
+			power = power * .75;
 		rightBucketMotor.setPower(power);
 		leftBucketMotor.setPower(power);
 	}

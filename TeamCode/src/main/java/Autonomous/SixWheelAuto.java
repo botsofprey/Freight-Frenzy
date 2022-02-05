@@ -1,8 +1,10 @@
 package Autonomous;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.sun.tools.javac.util.List;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -18,9 +20,13 @@ public class SixWheelAuto extends LinearOpMode {
 
 	private SixDrive sixDrive;
 
-	private DistanceSensor rightSensor, leftSensor, frontSensor;
+	private DistanceSensor rightSensor, leftSensor, backSensor;
+	private double backStartPos = 2, rightStartPos = 22;
+	private double rightDistances[] = new double[8], backDistances[] = new double[8];
 
 	private CRServoController servoLeft, servoRight;
+
+	private RevBlinkinLedDriver led;
 
 	@Override
 	public void runOpMode() throws InterruptedException {
@@ -29,10 +35,12 @@ public class SixWheelAuto extends LinearOpMode {
 
 		rightSensor = hardwareMap.get(DistanceSensor.class, "rightSensor");
 		leftSensor = hardwareMap.get(DistanceSensor.class, "leftSensor");
-		//frontSensor = hardwareMap.get(DistanceSensor.class, "frontSensor");
+		backSensor = hardwareMap.get(DistanceSensor.class, "backSensor");
 
 		servoLeft = new CRServoController(hardwareMap, "leftWheel");
 		servoRight = new CRServoController(hardwareMap, "rightWheel");
+
+		led = hardwareMap.get(RevBlinkinLedDriver.class, "Led Indicate");
 
 		//Zero Lift Position
 		{
@@ -50,34 +58,63 @@ public class SixWheelAuto extends LinearOpMode {
 			bucketArm.resetLiftEncoder();
 		}
 
-		telemetry.addData("Lift Position", bucketArm.getLiftPos());
-		telemetry.addData("Current angle", sixDrive.getAngle());
-		telemetry.addData("Status", "Initialized");
-		telemetry.update();
+		int index = 0;
 
-		waitForStart();
+		while(!isStarted()) {
+			rightDistances[index] = rightSensor.getDistance(DistanceUnit.INCH);
+			backDistances[index] = backSensor.getDistance(DistanceUnit.INCH);
+			index++;
+			if(index >= rightDistances.length) index = 0;
 
-		sixDrive.move(60, .5);
+			telemetry.addData("Current Distance From Carocel", averageValue(rightDistances));
+			telemetry.addData("At Start Distance On Right", compare(rightStartPos, averageValue(rightDistances), 1));
+			telemetry.addData("Current Distance From Wall", averageValue(backDistances));
+			telemetry.addData("At Start Distance Behind", compare(backStartPos, averageValue(backDistances), 1));
+			telemetry.update();
+
+			if(inPosition()){
+				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+				telemetry.addData("Status", "Initialized");
+			}else{
+				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+			}
+
+			telemetry.update();
+		}
+
+		//Move to Hub
+		sixDrive.move(120, .5);
 		while (sixDrive.isBusy() && opModeIsActive()){
 			sixDrive.update();
 		}
 
 		double distanceFromHub = leftSensor.getDistance(DistanceUnit.INCH);
 
-		sixDrive.rotateRight(270, .5);
+		sixDrive.rotatePID(-90);
 		while(sixDrive.rotating()){
 			sixDrive.update();
+			telemetry.addData("Power", sixDrive.getLeftPower());
+			telemetry.addData("Angle", sixDrive.getAngle());
+			telemetry.update();
 		}
 		sleep(500);
 
-		bucketArm.liftMoveTowards(BucketArm.TOP/BucketArm.TICKS_PER_INCH, .5);
+
+		//Drop freight
+		bucketArm.liftMoveTowards(BucketArm.TOP / BucketArm.TICKS_PER_INCH, .5);
 		while (bucketArm.liftIsBusy()){}
 		sleep(500);
+
+		sixDrive.move(5, .25);
+		while(sixDrive.isBusy()){
+			sixDrive.update();
+		}
 
 		bucketArm.setBucketPower(BucketArm.OUTTAKE);
 		sleep(2500);
 		bucketArm.setBucketPower(0);
 
+		//Move to wall
 		sixDrive.move(-distanceFromHub, .5);
 		while (sixDrive.isBusy()){
 			sixDrive.update();}
@@ -87,51 +124,60 @@ public class SixWheelAuto extends LinearOpMode {
 		while (bucketArm.liftIsBusy()){}
 		sleep(500);
 
-		sixDrive.rotateRight(90, 0.5);
-		while(sixDrive.rotating()){
-			sixDrive.update();}
-		sleep(1000);
+		double distanceFromWall = backSensor.getDistance(DistanceUnit.INCH);
 
-		double distanceFromWall = rightSensor.getDistance(DistanceUnit.INCH);
-
-		sixDrive.rotateRight(90, 0.5);
-		while(sixDrive.rotating()){
-			sixDrive.update();}
-		sleep(500);
-
-		sixDrive.move(distanceFromWall - 2, .75);
+		sixDrive.move(distanceFromWall, .5);
 		while(sixDrive.isBusy()){
 			sixDrive.update();}
 		sleep(500);
 
-		double distanceFromCaro = rightSensor.getDistance(DistanceUnit.INCH);
-
-		sixDrive.rotateLeft(90, 0.5);
+		//Move to carosel
+		sixDrive.rotatePID(0);
 		while (sixDrive.rotating()){
 			sixDrive.update();}
 		sleep(500);
 
+		double distanceFromCaro = backSensor.getDistance(DistanceUnit.INCH);
+
+			//Turn carosel
+		servoRight.setPower(-1);
 		servoLeft.setPower(1);
 
-		sixDrive.move(distanceFromCaro - 3, .85);
+		sixDrive.move(-distanceFromCaro + 6, .85);
 		while(sixDrive.isBusy()){
 			sixDrive.update();}
 
 		sleep(10000);
+		servoRight.setPower(0);
+		servoLeft.setPower(0);
+
+		//Park
+		sixDrive.move(18, .5);
+		while(sixDrive.isBusy()){
+			sixDrive.update();
+		}
+
+		while (opModeIsActive());
 	}
 //	}
 
-	private boolean compare(double a, double b, double range){
-		return Math.abs(a - b) < range;
+	private boolean inPosition(){
+		return compare(averageValue(rightDistances), rightStartPos, 1)
+				&& compare(averageValue(backDistances), backStartPos, 0.5);
 	}
 
-	private char[] startLocation(){
-		char[] location = new char[2];
-		double left = leftSensor.getDistance(DistanceUnit.INCH),
-				right = rightSensor.getDistance(DistanceUnit.INCH);
+	private double averageValue(double[] numbers){
+		double total = 0;
 
+		for(int i = 0; i < numbers.length; i++){
+			total += numbers[i];
+		}
 
-		return location;
+		return total/(double)numbers.length;
+	}
+
+	private boolean compare(double a, double b, double range){
+		return Math.abs(a - b) < range;
 	}
 }
 
