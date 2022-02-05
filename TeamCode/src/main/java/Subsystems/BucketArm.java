@@ -31,7 +31,7 @@ public class BucketArm {
 
 	public static final double INTAKE = 0.5, OUTTAKE = -0.5;
 	public static final int TOP = 2640, MIDDLE = 1390, BOTTOM = 727, MAX = 3120;
-	public static final double TICKS_PER_INCH = 537.6 / 1.5;
+	public static final double TICKS_PER_INCH = 537.6 / (1.5 * Math.PI);
 
 	public boolean startPosSet = false;
 

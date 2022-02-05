@@ -35,10 +35,10 @@ public class SixDrive {
 	private double globalAngle;
 	public String RIGHT = "right", LEFT = "left";
 
-	private double TICKS_PER_INCH = 312 / (4 * Math.PI), movementPower;
+	private double TICKS_PER_INCH = 537.7 / (4 * Math.PI), movementPower;
 	public double targetAngle = 0;
 
-	PIDController headingPid;
+	PIDController headingPid, driveHeadingPid;
 
 	public SixDrive(HardwareMap hardwareMap){
 		for (int i = 0; i < 4; i++) {
@@ -58,7 +58,8 @@ public class SixDrive {
 
 		imu.initialize(parameters);
 
-		headingPid = new PIDController(.005,.002,0);
+		headingPid = new PIDController(.005,.0025,0);
+		driveHeadingPid = new PIDController(.001,0.00001,0);
 
 		resetAngle();
 	}
@@ -152,7 +153,7 @@ public class SixDrive {
 		return rotating;
 	}
 
-	public void stop(){
+	public void stopMotors(){
 		for(int i = 0; i < motors.length; i++){
 			motors[i].setPower(0);
 		}
@@ -222,19 +223,18 @@ public class SixDrive {
 
 			if(compareCurrentAngles()){
 				rotating = false;
-				this.stop();
+				this.stopMotors();
 			}
 		} else if(isBusy()){
-			double angleError = getAngle() - targetAngle;
-			double newPower = movementPower * (angleError / 360);
-			double leftPower = movementPower - newPower, rightPower = movementPower + newPower;
+			double overall = driveHeadingPid.calculateAdjustment(getAngle());
+//
+//			double angleError = getAngle() - targetAngle;
+//			double newPower = movementPower * (angleError / 360);
+			double leftPower = motors[0].isBusy() || overall < 0 ? movementPower - overall : 0,
+					rightPower = motors[2].isBusy() || overall > 0 ? movementPower + overall : 0;
 
 			setMotorPower(leftPower, rightPower);
-
-			System.out.println("left: " + leftPower + " | right: " + rightPower);
-			System.out.println("angle error: " + angleError +
-					"OG movement power: " + movementPower + " | added power: " + newPower);
-			}
+		}
 	}
 
 	private boolean compareAngles(double a, double b, double range){
@@ -245,7 +245,7 @@ public class SixDrive {
 		}
 	}
 	private boolean compareCurrentAngles(){
-		return Math.abs(getAngle() - targetAngle) <= 1;
+		return Math.abs(getAngle() - targetAngle) <= 2;
 	}
 }
 

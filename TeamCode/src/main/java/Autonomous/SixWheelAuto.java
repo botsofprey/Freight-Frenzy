@@ -1,5 +1,7 @@
 package Autonomous;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -60,6 +62,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 		int index = 0;
 
+		//Find Start Position
 		while(!isStarted()) {
 			rightDistances[index] = rightSensor.getDistance(DistanceUnit.INCH);
 			backDistances[index] = backSensor.getDistance(DistanceUnit.INCH);
@@ -82,8 +85,9 @@ public class SixWheelAuto extends LinearOpMode {
 			telemetry.update();
 		}
 
+
 		//Move to Hub
-		sixDrive.move(120, .5);
+		sixDrive.move(36, .5);
 		while (sixDrive.isBusy() && opModeIsActive()){
 			sixDrive.update();
 		}
@@ -105,7 +109,7 @@ public class SixWheelAuto extends LinearOpMode {
 		while (bucketArm.liftIsBusy()){}
 		sleep(500);
 
-		sixDrive.move(5, .25);
+		sixDrive.move(15, .25);
 		while(sixDrive.isBusy()){
 			sixDrive.update();
 		}
@@ -115,19 +119,9 @@ public class SixWheelAuto extends LinearOpMode {
 		bucketArm.setBucketPower(0);
 
 		//Move to wall
-		sixDrive.move(-distanceFromHub, .5);
-		while (sixDrive.isBusy()){
-			sixDrive.update();}
-		sleep(500);
-
 		bucketArm.liftMoveTowards(0, .5);
-		while (bucketArm.liftIsBusy()){}
-		sleep(500);
-
-		double distanceFromWall = backSensor.getDistance(DistanceUnit.INCH);
-
-		sixDrive.move(distanceFromWall, .5);
-		while(sixDrive.isBusy()){
+		sixDrive.move(-58, .5);
+		while (sixDrive.isBusy()){
 			sixDrive.update();}
 		sleep(500);
 
@@ -145,9 +139,10 @@ public class SixWheelAuto extends LinearOpMode {
 
 		sixDrive.move(-distanceFromCaro + 6, .85);
 		while(sixDrive.isBusy()){
-			sixDrive.update();}
-
+			sixDrive.update();
+		}
 		sleep(10000);
+
 		servoRight.setPower(0);
 		servoLeft.setPower(0);
 
@@ -163,7 +158,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 	private boolean inPosition(){
 		return compare(averageValue(rightDistances), rightStartPos, 1)
-				&& compare(averageValue(backDistances), backStartPos, 0.5);
+				&& compare(averageValue(backDistances), backStartPos, 1);
 	}
 
 	private double averageValue(double[] numbers){
