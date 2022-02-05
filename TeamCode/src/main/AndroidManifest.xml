@@ -7,6 +7,7 @@
 <!-- The package name here determines the package for your R class and your BuildConfig class -->
 <manifest
     package="org.firstinspires.ftc.teamcode"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:largeHeap="true">
     <application/>
 </manifest>
