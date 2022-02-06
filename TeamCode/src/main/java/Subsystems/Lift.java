@@ -3,18 +3,13 @@ package Subsystems;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import UtilityClasses.HardwareWrappers.MagneticLimitSwitch;
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.HardwareWrappers.ServoController;
-import UtilityClasses.PIDController;
 
 public class Lift {
 	private static final double TICKS_PER_INCH = 145.1 / (0.945 * Math.PI) * (7.6 / 5.8);
@@ -57,7 +52,7 @@ public class Lift {
 		usingEncoders = true;
 		braking = false;
 
-		slide = new MotorController(hardwareMap, "liftMotor", mode, errors);
+		slide = new MotorController(hardwareMap, "liftMotor");
 		slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		slide.setDirection(DcMotorSimple.Direction.REVERSE);
 		slide.setPositionPIDFCoefficients(10);

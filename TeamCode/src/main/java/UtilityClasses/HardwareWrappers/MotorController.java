@@ -13,10 +13,6 @@ public class MotorController {
 	private LimitSwitch start = null;
 	private LimitSwitch end = null;
 
-	public MotorController(HardwareMap hw, String motorName, LinearOpMode m, boolean errors) {
-		motor = hw.get(DcMotorEx.class, motorName);
-	}
-
 	public MotorController(HardwareMap hw, String motorName) {
 		motor = hw.get(DcMotorEx.class, motorName);
 	}

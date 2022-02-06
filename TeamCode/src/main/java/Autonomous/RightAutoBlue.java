@@ -35,7 +35,7 @@ public class RightAutoBlue extends LinearOpMode {
 				new Location(0, 0, 0), this);
 		carousel = new Carousel(hardwareMap, this, true);
 		lift = new Lift(hardwareMap, this, true);
-		intake = new Intake(hardwareMap, this, true);
+		intake = new Intake(hardwareMap, this);
 
 		String[] positions = { "Right", "Center", "Left" };
 

@@ -1,9 +1,11 @@
 package DriveEngine;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -18,7 +20,7 @@ import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
 import UtilityClasses.Matrix;
 
-public class Localizer {
+public class Localizer implements com.acmerobotics.roadrunner.localization.Localizer {
 	private static final String[] MOTOR_NAMES = {
 			"frontLeftDriveMotor",
 			"backLeftDriveMotor",
@@ -36,12 +38,13 @@ public class Localizer {
 	private double wheelDiameter;
 
 	private Location currentLocation;
+	private Location currentVelocity;
 	private double initHeading;
 
 	
 	
-	public Localizer(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m) {
-		initFromConfig(hw, fileName, m);
+	public Localizer(HardwareMap hw, String fileName, Location startLocation) {
+		initFromConfig(hw, fileName);
 		
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 		
@@ -70,11 +73,11 @@ public class Localizer {
 		previousTime = System.nanoTime();
 	}
 	
-	private void initFromConfig(HardwareMap hw, String fileName, LinearOpMode m) {
+	private void initFromConfig(HardwareMap hw, String fileName) {
 		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");
-			driveMotors[i] = new MotorController(hw, motorName, m, true);
+			driveMotors[i] = new MotorController(hw, motorName);
 			driveMotors[i].setDirection(
 					reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
 							DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE
@@ -83,6 +86,11 @@ public class Localizer {
 		JSONReader motorReader = new JSONReader(hw, reader.getString("driveMotorFile"));
 		encoderCPR = motorReader.getDouble("ticks_per_revolution");
 		wheelDiameter = motorReader.getDouble("wheel_diameter");
+	}
+	
+	@Override
+	public void update() {
+		updateLocation();
 	}
 	
 	public void updateLocation() {//  calculate new position from odometry
@@ -139,9 +147,24 @@ public class Localizer {
 		Location deltaLocation = new Location(movementVectors[0] * -1.5,
 				movementVectors[1] * 2, currentRotation - currentLocation.getHeading());
 		currentLocation.add(deltaLocation);
+		currentVelocity = deltaLocation.scale(timeDiff);
 	}
 	
 	public Location getCurrentLocation() {
 		return currentLocation;
+	}
+	
+	@NonNull
+	public Pose2d getPoseEstimate() {
+		return currentLocation.toPose();
+	}
+	
+	public void setPoseEstimate(@NonNull Pose2d pose2d) {
+		currentLocation = new Location(pose2d);
+	}
+	
+	@NonNull
+	public Pose2d getPoseVelocity() {
+		return currentVelocity.toPose();
 	}
 }

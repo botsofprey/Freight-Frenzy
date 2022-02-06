@@ -26,7 +26,7 @@ public class TeleOpTest extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		//try {
 			lift = new Lift(hardwareMap, this, throwErrors);
-			intake = new Intake(hardwareMap, this, throwErrors);
+			intake = new Intake(hardwareMap, this);
 			carousel = new Carousel(hardwareMap, this, throwErrors);
 			drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
 					new Location(0, 0, 0), false, this, throwErrors);

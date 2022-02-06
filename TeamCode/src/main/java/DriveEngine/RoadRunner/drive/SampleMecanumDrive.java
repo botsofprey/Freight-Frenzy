@@ -43,20 +43,22 @@ import static DriveEngine.RoadRunner.drive.DriveConstants.kA;
 import static DriveEngine.RoadRunner.drive.DriveConstants.kStatic;
 import static DriveEngine.RoadRunner.drive.DriveConstants.kV;
 
+import DriveEngine.Localizer;
 import DriveEngine.RoadRunner.trajectorysequence.TrajectorySequence;
 import DriveEngine.RoadRunner.trajectorysequence.TrajectorySequenceBuilder;
 import DriveEngine.RoadRunner.trajectorysequence.TrajectorySequenceRunner;
 import DriveEngine.RoadRunner.util.LynxModuleUtil;
+import UtilityClasses.Location;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(2, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1;
+    public static double LATERAL_MULTIPLIER = -1.1;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -122,8 +124,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         rightRear = hardwareMap.get(DcMotorEx.class, "brMotor");
         rightFront = hardwareMap.get(DcMotorEx.class, "frMotor");
 
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -143,6 +145,8 @@ public class SampleMecanumDrive extends MecanumDrive {
             setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
         }
 
+        setLocalizer(new Localizer(hardwareMap, "RobotConfig.json",
+                new Location(0, 0, 0)));
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
@@ -296,7 +300,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return imu.getAngularOrientation().thirdAngle;
+        return imu.getAngularOrientation().firstAngle;
     }
 
     @Override
@@ -306,7 +310,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         // expected). This bug does NOT affect orientation. 
         //
         // See https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/251 for details.
-        return (double) -imu.getAngularVelocity().zRotationRate;
+        return (double) -imu.getAngularVelocity().xRotationRate;
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {

@@ -1,5 +1,7 @@
 package UtilityClasses;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
 import java.util.Objects;
 
 public class Location {
@@ -64,7 +66,6 @@ public class Location {
 		x *= s;
 		y *= s;
 		heading *= s;
-		normalizeHeading();
 		return this;
 	}
 	
@@ -97,6 +98,14 @@ public class Location {
 			h -= 360;
 		}
 		return h;
+	}
+	
+	public Pose2d toPose() {
+		return new Pose2d(+y, -x, Math.toRadians(heading));
+	}
+	
+	public Location(Pose2d pose2d) {
+		this(-pose2d.getY(), pose2d.getX(), Math.toDegrees(pose2d.getHeading()));
 	}
 	
 	

@@ -1,18 +1,10 @@
 package DriveEngine;
 
-import android.util.Log;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
-
-import org.firstinspires.ftc.robotcore.external.Func;
-
-import java.util.List;
 
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
@@ -72,7 +64,7 @@ public class NewMecanumDrive {
 		slowMode = false;
 		fastMode = false;
 
-		localizer = new Localizer(hw, fileName, startLocation, mode);
+		localizer = new Localizer(hw, fileName, startLocation);
 		
 		currentlyMoving = false;
 		currentLocation = startLocation;
@@ -83,7 +75,7 @@ public class NewMecanumDrive {
 		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");
-			motors[i] = new MotorController(hw, motorName, mode, true);
+			motors[i] = new MotorController(hw, motorName);
 			motors[i].setDirection(
 					reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
 							DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE

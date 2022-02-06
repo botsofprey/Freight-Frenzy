@@ -5,19 +5,15 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import UtilityClasses.HardwareWrappers.MotorController;
@@ -94,7 +90,7 @@ public class MecanumDrive {
 	                    LinearOpMode m, boolean errors) {
 		mode = m;
 		
-		initFromConfig(hw, fileName, errors);
+		initFromConfig(hw, fileName);
 
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -131,11 +127,11 @@ public class MecanumDrive {
 		previousTime = System.nanoTime();
 	}
 	
-	private void initFromConfig(HardwareMap hw, String fileName, boolean errors) {
+	private void initFromConfig(HardwareMap hw, String fileName) {
 		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");
-			driveMotors[i] = new MotorController(hw, motorName, mode, errors);
+			driveMotors[i] = new MotorController(hw, motorName);
 			driveMotors[i].setDirection(
 					reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
 							DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE
