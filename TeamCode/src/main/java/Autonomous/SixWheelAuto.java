@@ -67,7 +67,7 @@ public class SixWheelAuto extends LinearOpMode {
 			rightDistances[index] = rightSensor.getDistance(DistanceUnit.INCH);
 			backDistances[index] = backSensor.getDistance(DistanceUnit.INCH);
 			index++;
-			if(index >= rightDistances.length) index = 0;
+			if (index >= rightDistances.length) index = 0;
 
 			telemetry.addData("Current Distance From Carocel", averageValue(rightDistances));
 			telemetry.addData("At Start Distance On Right", compare(rightStartPos, averageValue(rightDistances), 1));
@@ -75,16 +75,17 @@ public class SixWheelAuto extends LinearOpMode {
 			telemetry.addData("At Start Distance Behind", compare(backStartPos, averageValue(backDistances), 1));
 			telemetry.update();
 
-			if(inPosition()){
+			if (inPosition()) {
 				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
 				telemetry.addData("Status", "Initialized");
-			}else{
+			} else {
 				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
 			}
 
 			telemetry.update();
 		}
 
+		sixDrive.resetAngle();
 
 		//Move to Hub
 		sixDrive.move(36, .5);
@@ -109,7 +110,7 @@ public class SixWheelAuto extends LinearOpMode {
 		while (bucketArm.liftIsBusy()){}
 		sleep(500);
 
-		sixDrive.move(15, .25);
+		sixDrive.move(2, .25);
 		while(sixDrive.isBusy()){
 			sixDrive.update();
 		}
@@ -120,7 +121,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 		//Move to wall
 		bucketArm.liftMoveTowards(0, .5);
-		sixDrive.move(-58, .5);
+		sixDrive.move(-25, .5);
 		while (sixDrive.isBusy()){
 			sixDrive.update();}
 		sleep(500);
@@ -134,10 +135,10 @@ public class SixWheelAuto extends LinearOpMode {
 		double distanceFromCaro = backSensor.getDistance(DistanceUnit.INCH);
 
 			//Turn carosel
-		servoRight.setPower(-1);
-		servoLeft.setPower(1);
+		servoRight.setPower(1);
+		servoLeft.setPower(-1);
 
-		sixDrive.move(-distanceFromCaro + 6, .85);
+		sixDrive.move(-30, .425);
 		while(sixDrive.isBusy()){
 			sixDrive.update();
 		}
@@ -147,10 +148,15 @@ public class SixWheelAuto extends LinearOpMode {
 		servoLeft.setPower(0);
 
 		//Park
-		sixDrive.move(18, .5);
+		sixDrive.move(18, .25);
 		while(sixDrive.isBusy()){
 			sixDrive.update();
 		}
+
+		sixDrive.rotatePID(-90);
+		while (sixDrive.rotating()){
+			sixDrive.update();}
+		sleep(500);
 
 		while (opModeIsActive());
 	}

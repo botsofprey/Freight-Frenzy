@@ -27,7 +27,6 @@ public class BucketArm {
 	private RevBlinkinLedDriver led;
 
 	//private double doorStartPos = 0, doorClosePos = 1;
-	private double liftStartPos;
 
 	public static final double INTAKE = 0.5, OUTTAKE = -0.5;
 	public static final int TOP = 2640, MIDDLE = 1390, BOTTOM = 727, MAX = 3120;
@@ -64,7 +63,7 @@ public class BucketArm {
 
 	public void setBucketPower(double power) {
 		if (compareNumbers(getLiftPos(), TOP, 500))
-			power = power * .75;
+			power = power * .85;
 		rightBucketMotor.setPower(power);
 		leftBucketMotor.setPower(power);
 	}
@@ -148,7 +147,7 @@ public class BucketArm {
 		}
 
 		if (getBucketPower() >= 0) {
-			if (bucketDistance() > 7) {
+			if (bucketDistance() <= 7) {
 				if (freightFound()) {
 					setBucketPower(INTAKE);
 					autoIntaking = true;

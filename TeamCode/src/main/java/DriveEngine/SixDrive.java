@@ -32,13 +32,13 @@ public class SixDrive {
 
 	private BNO055IMU imu;
 	private Orientation lastAngles = new Orientation();
-	private double globalAngle;
+	private double globalAngle = 0;
 	public String RIGHT = "right", LEFT = "left";
 
 	private double TICKS_PER_INCH = 537.7 / (4 * Math.PI), movementPower;
 	public double targetAngle = 0;
 
-	PIDController headingPid, driveHeadingPid;
+	PIDController headingPid, driveHeadingPid, b_driveHeadingPid;
 
 	public SixDrive(HardwareMap hardwareMap){
 		for (int i = 0; i < 4; i++) {
@@ -59,11 +59,11 @@ public class SixDrive {
 		imu.initialize(parameters);
 
 		headingPid = new PIDController(.005,.0025,0);
-		driveHeadingPid = new PIDController(.001,0.00001,0);
-
-		resetAngle();
+		driveHeadingPid = new PIDController(.0285,0,0);
+		b_driveHeadingPid = new PIDController(.01,0,0);
 	}
 
+	boolean backwards;
 	public void move(double inches, double power){
 		for(int i = 0; i < motors.length; i++){
 			motors[i].setTargetPosition(motors[i].getCurrentPosition() +  (int)(inches * TICKS_PER_INCH));
@@ -72,6 +72,8 @@ public class SixDrive {
 		}
 
 		movementPower = power;
+
+		backwards = inches < 0;
 	}
 
 	public void setMotorPower(double leftPower, double rightPower){
@@ -163,7 +165,7 @@ public class SixDrive {
 		return motors[0].isBusy() || motors[1].isBusy() || motors[2].isBusy() || motors[3].isBusy();
 	}
 
-	private void resetAngle()
+	public void resetAngle()
 	{
 		lastAngles = imu.getAngularOrientation
 				(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -226,12 +228,18 @@ public class SixDrive {
 				this.stopMotors();
 			}
 		} else if(isBusy()){
-			double overall = driveHeadingPid.calculateAdjustment(getAngle());
+			double difference = 0;
+			if(!backwards){
+				difference = driveHeadingPid.calculateAdjustment(-getAngle());
+			}else{
+				difference = b_driveHeadingPid.calculateAdjustment(-getAngle());
+			}
+			System.out.println("Adjustment: " + difference + " Angle: " + getAngle());
 //
 //			double angleError = getAngle() - targetAngle;
 //			double newPower = movementPower * (angleError / 360);
-			double leftPower = motors[0].isBusy() || overall < 0 ? movementPower - overall : 0,
-					rightPower = motors[2].isBusy() || overall > 0 ? movementPower + overall : 0;
+			double leftPower = movementPower - difference,
+					rightPower = movementPower + difference;
 
 			setMotorPower(leftPower, rightPower);
 		}
