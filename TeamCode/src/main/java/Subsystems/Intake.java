@@ -32,7 +32,7 @@ public class Intake {
 
 	private ColorSensor colorSensorA;
 	private ColorSensor colorSensorB;
-	private static final int RED_THRESHOLD = 72;
+	private static final int RED_THRESHOLD = 70;
 	private int blue, red, green;
 	private static final int[] block = new int[] {204, 126, 8},
 			ball = new int[] {255, 255, 255}, duck = new int[] {224, 183, 31};
@@ -58,6 +58,20 @@ public class Intake {
 
 	private boolean detectColor() {
 		return Math.max(colorSensorA.red(), colorSensorB.red()) > RED_THRESHOLD;
+	}
+	
+	public int[][] getColor() {
+		return new int[][]{
+				{ colorSensorA.red(), colorSensorA.green(), colorSensorA.blue() },
+				{ colorSensorB.red(), colorSensorB.green(), colorSensorB.blue() }
+		};
+	}
+	
+	public void intakeNoDelay() {
+		intakeMotor.setPower(MOTOR_POWER);
+		state = INTAKE;
+		
+		freezeTime = 0;
 	}
 
 	public void intake() {
@@ -94,8 +108,6 @@ public class Intake {
 	public boolean moving() { return state != BRAKE; }
 
 	public void update(long millis) {
-		boolean color = detectColor();
-		mode.telemetry.addData("Intake sensor", color);
 		if (state == INTAKE && detectColor() && millis - mil >= 1000) {
 			intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
 			brake();

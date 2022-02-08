@@ -3,36 +3,41 @@ package Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import java.util.ArrayList;
+
 import DriveEngine.NewMecanumDrive;
 import Subsystems.CameraPipeline;
 import Subsystems.Carousel;
 import Subsystems.Intake;
 import Subsystems.Lift;
+import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
 @Autonomous(name="LeftAutoBlue", group="Competition Autos")
 public class LeftAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
-	private Carousel carousel;
 	private Lift lift;
 	private Intake intake;
 
-	private Location shippingHub = new Location(-15, -20, 0);
-	private Location warehouseEntrance = new Location(0, 4, -90);
-	private Location warehouse = new Location(24, 4, -90);
-	private Location shippingHubCycle = new Location(-15, -20, -90);
+	private Location shippingHub = new Location(-18, -23, 0);
+	private Location warehouseEntrance = new Location(0, 7.5, -90);
+	private Location warehouse = new Location(24, 7.5, -90);
+	private Location shippingHubCycle = new Location(-18, -21, -90);
 
 	private void grabBlock() {
-		intake.intake();
-		drive.rawMove(0, 1.0 / 3, 0);
+		intake.intakeNoDelay();
+		drive.rawMove(0, -1.0 / 5, 0);
+		long time;
+		//long end = time + 10000;
 		while (opModeIsActive() && intake.moving()) {
-			long time = System.currentTimeMillis();
+			time = System.currentTimeMillis();
+			//if (time >= end) break;
 			intake.update(time);
+			if (!intake.moving()) break;
 			drive.updateLocation();
 		}
 		drive.brake();
-		intake.intake();
 	}
 
 	@Override
@@ -41,7 +46,6 @@ public class LeftAutoBlue extends LinearOpMode {
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
-		carousel = new Carousel(hardwareMap, this, true);
 		lift = new Lift(hardwareMap, this, true);
 		intake = new Intake(hardwareMap, this, true);
 
@@ -49,7 +53,8 @@ public class LeftAutoBlue extends LinearOpMode {
 
 		while (!isStarted() && !isStopRequested()) {
 			drive.update();
-			telemetry.addData("QR Code", positions[cameraPipeline.getShippingElementLocation()]);
+			telemetry.addData("QR Code",
+					positions[cameraPipeline.getShippingElementLocation()]);
 			telemetry.addData("Checks", cameraPipeline.numChecks);
 			telemetry.update();
 		}
@@ -85,6 +90,7 @@ public class LeftAutoBlue extends LinearOpMode {
 			sleep(100);
 			grabBlock();
 			sleep(100);
+			intake.intake();
 			drive.moveToLocation(warehouseEntrance);
 			sleep(100);
 			lift.positionUp();

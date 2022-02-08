@@ -8,13 +8,14 @@ import Subsystems.CameraPipeline;
 import Subsystems.Carousel;
 import Subsystems.Intake;
 import Subsystems.Lift;
+import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
 @Autonomous(name="RightAutoBlue", group="Competition Autos")
 public class RightAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
-	private Carousel carousel;
+	private MotorCarousel carousel;
 	private Lift lift;
 	private Intake intake;
 
@@ -33,7 +34,7 @@ public class RightAutoBlue extends LinearOpMode {
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
-		carousel = new Carousel(hardwareMap, this, true);
+		carousel = new MotorCarousel(hardwareMap, this);
 		lift = new Lift(hardwareMap, this, true);
 		intake = new Intake(hardwareMap, this, true);
 
@@ -41,7 +42,8 @@ public class RightAutoBlue extends LinearOpMode {
 
 		while (!isStarted() && !isStopRequested()) {
 			drive.update();
-			telemetry.addData("QR Code", positions[cameraPipeline.getShippingElementLocation()]);
+			telemetry.addData("QR Code",
+					positions[cameraPipeline.getShippingElementLocation()]);
 			telemetry.addData("Checks", cameraPipeline.numChecks);
 			telemetry.update();
 		}
@@ -51,9 +53,9 @@ public class RightAutoBlue extends LinearOpMode {
 
 		drive.moveToLocation(carouselLocation);
 		sleep(500);
-		carousel.autoRotate();
+		carousel.blueSpin();
 		sleep(4000);
-		carousel.stop();
+		carousel.blueSpin();
 		sleep(200);
 		drive.moveToLocation(corner1);
 		sleep(200);

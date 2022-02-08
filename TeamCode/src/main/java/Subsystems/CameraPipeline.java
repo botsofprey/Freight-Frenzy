@@ -25,7 +25,7 @@ public class CameraPipeline extends OpenCvPipeline {
 
 	private LinearOpMode mode;
 
-	private volatile int location;
+	private volatile int location = 2;
 	public volatile int x;
 	public volatile int y;
 	public volatile String data;
