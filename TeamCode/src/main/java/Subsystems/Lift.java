@@ -236,7 +236,5 @@ public class Lift {
 			freightDropped = false;
 			bucketWall.setPosition(1);
 		}
-
-		mode.telemetry.addData("Switch", pressed);
 	}
 }

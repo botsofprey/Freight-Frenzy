@@ -27,9 +27,9 @@ public class Location {
 	public double getY() { return y; }
 	public double getHeading() { return heading; }
 	
-	public void setX(double x) { this.x = x; }
-	public void setY(double y) { this.y = y; }
-	public void setHeading(double heading) { this.heading = heading; }
+	public Location setX(double x) { this.x = x; return this; }
+	public Location setY(double y) { this.y = y; return this; }
+	public Location setHeading(double heading) { this.heading = heading; return this; }
 	
 	public Location addX(double dx) { x += dx; return this; }
 	public Location addY(double dy) { y += dy; return this; }

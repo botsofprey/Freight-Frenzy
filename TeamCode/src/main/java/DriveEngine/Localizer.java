@@ -144,4 +144,6 @@ public class Localizer {
 	public Location getCurrentLocation() {
 		return currentLocation;
 	}
+
+	public void setCurrentLocation(Location location) { currentLocation = location; }
 }

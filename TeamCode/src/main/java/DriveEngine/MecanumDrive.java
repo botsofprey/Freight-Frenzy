@@ -291,8 +291,6 @@ public class MecanumDrive {
 	
 	public void update() {
 		updateLocation();
-		mode.telemetry.addData("Location", currentLocation);
-		mode.telemetry.update();
 		if (isMoving) {
 			correctTrajectory();
 		}

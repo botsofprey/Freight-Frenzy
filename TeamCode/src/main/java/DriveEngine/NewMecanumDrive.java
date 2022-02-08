@@ -334,4 +334,6 @@ public class NewMecanumDrive {
 	public Location getCurrentLocation() {
 		return currentLocation;
 	}
+
+	public void setCurrentLocation(Location location) { localizer.setCurrentLocation(location); }
 }

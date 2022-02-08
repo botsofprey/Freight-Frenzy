@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import DriveEngine.NewMecanumDrive;
 import Subsystems.CameraPipeline;
@@ -21,23 +22,26 @@ public class LeftAutoBlue extends LinearOpMode {
 	private Intake intake;
 
 	private Location shippingHub = new Location(-18, -23, 0);
-	private Location warehouseEntrance = new Location(0, 7.5, -90);
-	private Location warehouse = new Location(24, 7.5, -90);
+	private Location warehouseEntrance = new Location(-3, 10, -90);
+	private Location warehouse = new Location(24, 10, -90);
+	private Location wareHouseExit = new Location(-3, 1, -90);
 	private Location shippingHubCycle = new Location(-18, -21, -90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
-		drive.rawMove(0, -1.0 / 5, 0);
-		long time;
-		//long end = time + 10000;
+		drive.rawMove(-0.1, -1.0 / 3, 0);
 		while (opModeIsActive() && intake.moving()) {
-			time = System.currentTimeMillis();
-			//if (time >= end) break;
-			intake.update(time);
+			intake.update(System.currentTimeMillis());
 			if (!intake.moving()) break;
 			drive.updateLocation();
 		}
 		drive.brake();
+		int numMeasurements = 10;
+		double avg = 0;
+		for (int i = 0; i < numMeasurements; i++) {
+			avg += intake.getDistance() / numMeasurements;
+		}
+		drive.setCurrentLocation(new Location(40 - avg, 0, -90));
 	}
 
 	@Override
@@ -72,7 +76,7 @@ public class LeftAutoBlue extends LinearOpMode {
 		}
 		while (opModeIsActive() && lift.isMoving()) sleep(100);
 		drive.moveToLocation(shippingHub);
-		int numCycles = 2;
+		int numCycles = 1;
 		for (int i = 0; i < numCycles + 1; i++) {
 			sleep(100);
 			lift.dropFreight();
@@ -86,12 +90,11 @@ public class LeftAutoBlue extends LinearOpMode {
 			drive.moveToLocation(warehouseEntrance);
 			sleep(100);
 			drive.moveToLocation(warehouse);
-			if (!opModeIsActive() || i == numCycles) break;
 			sleep(100);
 			grabBlock();
-			sleep(100);
+			if (!opModeIsActive() || i == numCycles) break;
 			intake.intake();
-			drive.moveToLocation(warehouseEntrance);
+			drive.moveToLocation(wareHouseExit);
 			sleep(100);
 			lift.positionUp();
 			intake.brake();
