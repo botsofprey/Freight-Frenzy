@@ -21,10 +21,10 @@ public class LeftAutoBlue extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
 
-	private Location shippingHub = new Location(-18, -23, 0);
+	private Location shippingHub = new Location(-18, -22, 0);
 	private Location warehouseEntrance = new Location(-3, 10, -90);
 	private Location warehouse = new Location(24, 10, -90);
-	private Location wareHouseExit = new Location(-3, 1, -90);
+	private Location wareHouseExit = new Location(-3, 6, -90);
 	private Location shippingHubCycle = new Location(-18, -21, -90);
 
 	private void grabBlock() {
@@ -36,12 +36,13 @@ public class LeftAutoBlue extends LinearOpMode {
 			drive.updateLocation();
 		}
 		drive.brake();
+		sleep(200);
 		int numMeasurements = 10;
 		double avg = 0;
 		for (int i = 0; i < numMeasurements; i++) {
-			avg += intake.getDistance() / numMeasurements;
+			avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
 		}
-		drive.setCurrentLocation(new Location(40 - avg, 0, -90));
+		drive.setCurrentLocation(new Location(46 - avg, 5, -90));
 	}
 
 	@Override
@@ -76,30 +77,22 @@ public class LeftAutoBlue extends LinearOpMode {
 		}
 		while (opModeIsActive() && lift.isMoving()) sleep(100);
 		drive.moveToLocation(shippingHub);
-		int numCycles = 1;
+		int numCycles = 2;
 		for (int i = 0; i < numCycles + 1; i++) {
-			sleep(100);
 			lift.dropFreight();
 			sleep(1000);
 			lift.dropFreight();
-			sleep(100);
 			drive.rotate(-90);
-			sleep(100);
 			lift.positionDown();
-			sleep(100);
 			drive.moveToLocation(warehouseEntrance);
-			sleep(100);
 			drive.moveToLocation(warehouse);
-			sleep(100);
-			grabBlock();
 			if (!opModeIsActive() || i == numCycles) break;
+			grabBlock();
 			intake.intake();
 			drive.moveToLocation(wareHouseExit);
-			sleep(100);
 			lift.positionUp();
 			intake.brake();
 			drive.moveToLocation(shippingHubCycle);
-			sleep(100);
 			drive.rotate(0);
 		}
 
