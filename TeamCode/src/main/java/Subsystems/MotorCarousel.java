@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class MotorCarousel {
-	public double TELEOP_POWER = 0.47;
+	public double AUTO_POWER = 0.25;
+	public double TELEOP_POWER = 0.4;
 	private static final long ON_TIME = 900;
 	private static final long FULL_POWER = 1100;
 	private static final long CYCLE_TIME = 2000;
@@ -30,12 +31,12 @@ public class MotorCarousel {
 
 	public void blueSpin() {
 		spinning = !spinning;
-		spinner.setPower(spinning ? TELEOP_POWER : 0);
+		spinner.setPower(spinning ? AUTO_POWER : 0);
 	}
 
 	public void redSpin() {
 		spinning = !spinning;
-		spinner.setPower(spinning ? -TELEOP_POWER : 0);
+		spinner.setPower(spinning ? -AUTO_POWER : 0);
 	}
 
 	public void blueEndgame() {

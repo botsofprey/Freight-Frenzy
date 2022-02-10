@@ -20,9 +20,9 @@ public class RightAutoBlue extends LinearOpMode {
 	private Intake intake;
 
 	private Location carouselLocation = new Location(-20, -6, 0);
-	private Location corner1 = new Location(-18, -40, 0);
-	private Location shippingHub = new Location(7, -40, 90);
-	private Location corner2 = new Location(-18, -36, 90);
+	private Location corner1 = new Location(-20, -36, 0);
+	private Location shippingHub = new Location(1, -40, 90);
+	private Location corner2 = new Location(-20, -36, 90);
 	private Location corner3 = new Location(-18, -12, 90);
 	private Location ramPause = new Location(44, -12, -90);
 	private Location warehouseEntrance = new Location(35, 11, -90);
