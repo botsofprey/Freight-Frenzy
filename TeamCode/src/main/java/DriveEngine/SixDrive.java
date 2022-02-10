@@ -1,6 +1,8 @@
 package DriveEngine;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,6 +17,7 @@ import UtilityClasses.Location;
 import UtilityClasses.PIDController;
 
 public class SixDrive {
+	private LinearOpMode opmode;
 
 	private DcMotor[] motors = new DcMotor[4];
 	private String[] names = new String[] {
@@ -40,7 +43,9 @@ public class SixDrive {
 
 	PIDController headingPid, driveHeadingPid, b_driveHeadingPid;
 
-	public SixDrive(HardwareMap hardwareMap){
+	public SixDrive(HardwareMap hardwareMap, LinearOpMode opmode){
+		this.opmode = opmode;
+
 		for (int i = 0; i < 4; i++) {
 			motors[i] = hardwareMap.get(DcMotor.class, names[i]);
 			motors[i].setDirection(directions[i]);
@@ -68,6 +73,11 @@ public class SixDrive {
 		for(int i = 0; i < motors.length; i++){
 			motors[i].setTargetPosition(motors[i].getCurrentPosition() +  (int)(inches * TICKS_PER_INCH));
 			motors[i].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		}
+
+		opmode.sleep(500);
+
+		for(int i =0; i < motors.length; i++){
 			motors[i].setPower(power);
 		}
 
@@ -92,6 +102,9 @@ public class SixDrive {
 		headingPid.reset();
 		headingPid.setTargetPoint(angle);
 		targetAngle = angle;
+
+		opmode.sleep(500);
+
 		rotating = true;
 	}
 	public void rotate(double angle, double motorPower, double range){
@@ -159,6 +172,8 @@ public class SixDrive {
 		for(int i = 0; i < motors.length; i++){
 			motors[i].setPower(0);
 		}
+
+		opmode.sleep(500);
 	}
 
 	public boolean isBusy(){
@@ -232,10 +247,10 @@ public class SixDrive {
 			if(!backwards){
 				difference = driveHeadingPid.calculateAdjustment(-getAngle());
 			}else{
-				difference = b_driveHeadingPid.calculateAdjustment(-getAngle());
+				difference = b_driveHeadingPid.calculateAdjustment(getAngle());
 			}
 			System.out.println("Adjustment: " + difference + " Angle: " + getAngle());
-//
+
 //			double angleError = getAngle() - targetAngle;
 //			double newPower = movementPower * (angleError / 360);
 			double leftPower = movementPower - difference,

@@ -33,7 +33,7 @@ public class SixWheelAuto extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		bucketArm = new BucketArm(hardwareMap);
-		sixDrive = new SixDrive(hardwareMap);
+		sixDrive = new SixDrive(hardwareMap, this);
 
 		rightSensor = hardwareMap.get(DistanceSensor.class, "rightSensor");
 		leftSensor = hardwareMap.get(DistanceSensor.class, "leftSensor");
@@ -82,6 +82,7 @@ public class SixWheelAuto extends LinearOpMode {
 				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
 			}
 
+			telemetry.addData("Robot", "Not Less Sophisticated, More Better");
 			telemetry.update();
 		}
 
