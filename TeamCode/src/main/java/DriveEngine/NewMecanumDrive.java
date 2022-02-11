@@ -161,13 +161,17 @@ public class NewMecanumDrive {
 	}
 
 	public void rawMove(double x, double y, double h) {
+		rawMove(x, y, h, 1);
+	}
+
+	public void rawMove(double x, double y, double h, double speed) {
 		double[] powers = new double[]{
 				x + y - h,
 				-x + y - h,
 				x + y + h,
 				-x + y + h
 		};
-		double max = 1;
+		double max = speed;
 		for (double power : powers) {
 			max = Math.max(max, Math.abs(power));
 		}
@@ -182,8 +186,12 @@ public class NewMecanumDrive {
 	public void move(double x, double y, double h) {
 		rawMove(x, y, h);
 	}
-	
+
 	public void moveTrueNorth(double x, double y, double h) {
+		moveTrueNorth(x, y, h, 1.0);
+	}
+	
+	public void moveTrueNorth(double x, double y, double h, double speed) {
 		Matrix vec = new Matrix(new double[][]{ { x }, { y } });
 		double heading = -Math.toRadians(currentLocation.getHeading());
 		double sin = Math.sin(heading);
@@ -193,7 +201,7 @@ public class NewMecanumDrive {
 				{ -sin,  cos }
 		});
 		double[] result = rotation.mul(vec).transpose().getData()[0];
-		move(result[0], result[1], h);
+		rawMove(result[0], result[1], h, speed);
 	}
 	
 	private void calculateMovement() {
@@ -248,8 +256,12 @@ public class NewMecanumDrive {
 	public void moveToLocation(double x, double y, double h) {
 		moveToLocation(new Location(x, y, h));
 	}
-	
+
 	public void moveToLocation(Location targetLocation) {
+		moveToLocation(targetLocation, 1);
+	}
+	
+	public void moveToLocation(Location targetLocation, double speed) {
 		xController.reset();
 		yController.reset();
 		hController.reset();
@@ -262,14 +274,6 @@ public class NewMecanumDrive {
 						currentLocation.headingDifference(targetLocation) / MAX_ANGULAR));
 		while (mode.opModeIsActive()) {
 			updateLocation();
-//			mode.telemetry.addData("Status", "Moving");
-//			mode.telemetry.addData("Location", currentLocation);
-//			mode.telemetry.addData("Target", targetLocation);
-//			mode.telemetry.addData("Angle",
-//					currentLocation.headingDifference(targetLocation));
-//			mode.telemetry.addData("Time left",
-//					(endTime - System.currentTimeMillis()) / 1000.0);
-//			mode.telemetry.update();
 			double x = xController.calculateAdjustment(currentLocation.getX());
 			double y = -yController.calculateAdjustment(currentLocation.getY());
 			double h = hController.calculateAdjustment(currentLocation.getHeading());
@@ -279,7 +283,7 @@ public class NewMecanumDrive {
 				rawMove(0, 0, 0);
 				break;
 			}
-			moveTrueNorth(x, y, h);
+			moveTrueNorth(x, y, h, speed);
 		}
 	}
 	

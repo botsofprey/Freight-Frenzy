@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.NewMecanumDrive;
-import Subsystems.CameraPipeline;
 import Subsystems.CameraPipelineRed;
 import Subsystems.Intake;
 import Subsystems.Lift;

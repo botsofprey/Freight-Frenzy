@@ -3,15 +3,10 @@ package Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import DriveEngine.NewMecanumDrive;
-import Subsystems.CameraPipeline;
-import Subsystems.Carousel;
+import Subsystems.CameraPipelineBlue;
 import Subsystems.Intake;
 import Subsystems.Lift;
-import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
@@ -47,7 +42,7 @@ public class CycleAutoBlue extends LinearOpMode {
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		CameraPipeline cameraPipeline = new CameraPipeline(this);
+		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);

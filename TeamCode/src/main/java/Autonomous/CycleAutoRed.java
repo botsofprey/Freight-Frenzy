@@ -4,7 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.NewMecanumDrive;
-import Subsystems.CameraPipeline;
+import Subsystems.CameraPipelineBlue;
+import Subsystems.CameraPipelineRed;
 import Subsystems.Intake;
 import Subsystems.Lift;
 import UtilityClasses.HardwareWrappers.Camera;
@@ -42,7 +43,7 @@ public class CycleAutoRed extends LinearOpMode {
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		CameraPipeline cameraPipeline = new CameraPipeline(this);
+		CameraPipelineRed cameraPipeline = new CameraPipelineRed(this);
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
