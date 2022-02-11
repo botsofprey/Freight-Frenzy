@@ -12,19 +12,19 @@ import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="RightAutoBlue", group="Competition Autos")
-public class RightAutoBlue extends LinearOpMode {
+@Autonomous(name="DuckAutoBlue", group="Blue Autos")
+public class DuckAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private MotorCarousel carousel;
 	private Lift lift;
 	private Intake intake;
 
-	private Location carouselLocation = new Location(-20, -6, 0);
+	private Location carouselLocation = new Location(-21, -7, 0);
 	private Location corner1 = new Location(-20, -36, 0);
-	private Location shippingHub = new Location(1, -40, 90);
+	private Location shippingHub = new Location(1, -45, 90);
 	private Location corner2 = new Location(-20, -36, 90);
 	private Location corner3 = new Location(-18, -12, 90);
-	private Location ramPause = new Location(44, -12, -90);
+	private Location ramPause = new Location(32, -20, -90);
 	private Location warehouseEntrance = new Location(35, 11, -90);
 	private Location warehouse = new Location(60, 12, -90);
 
@@ -76,10 +76,16 @@ public class RightAutoBlue extends LinearOpMode {
 		sleep(200);
 		drive.moveToLocation(shippingHub);
 		sleep(200);
-		lift.dropFreight();
-		sleep(1000);
-		lift.dropFreight();
-		sleep(200);
+		lift.autoDrop();
+		long drop = System.currentTimeMillis();
+		while (opModeIsActive()) {
+			long time = System.currentTimeMillis();
+			if (time > drop + 1000) {
+				break;
+			}
+			lift.update(time);
+			sleep(50);
+		}
 		drive.moveToLocation(corner2);
 		lift.positionDown();
 		sleep(200);
@@ -87,9 +93,15 @@ public class RightAutoBlue extends LinearOpMode {
 		sleep(200);
 		drive.rotate(-90);
 		sleep(200);
-		drive.moveToLocation(warehouseEntrance);
+		drive.moveToLocation(ramPause);
 		sleep(200);
-		drive.moveToLocation(warehouse);
+		drive.rawMove(0, -1, 0);
+		sleep(1500);
+		drive.brake();
+		lift.update(System.currentTimeMillis());
+//		drive.moveToLocation(warehouseEntrance);
+//		sleep(200);
+//		drive.moveToLocation(warehouse);
 
 		telemetry.addData("Status", "Stopping");
 		telemetry.update();

@@ -4,15 +4,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import DriveEngine.MecanumDrive;
-import Subsystems.Carousel;
 import Subsystems.Intake;
 import Subsystems.Lift;
 import Subsystems.MotorCarousel;
 import UtilityClasses.Controller;
 import UtilityClasses.Location;
 
-@TeleOp(name="TeleOpTest", group="TeleOp")
-public class TeleOpTest extends LinearOpMode {
+@TeleOp(name="RedTeleOp", group="TeleOp")
+public class RedTeleOp extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
 	private MotorCarousel carousel;
@@ -95,7 +94,7 @@ public class TeleOpTest extends LinearOpMode {
 				carousel.TELEOP_POWER -= 0.01;
 			}
 			if (controller2.xPressed) {
-				carousel.blueEndgame();
+				carousel.redEndgame();
 			}
 
 			if (controller1.leftTriggerPressed) {

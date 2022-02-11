@@ -15,8 +15,8 @@ import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="LeftAutoBlue", group="Competition Autos")
-public class LeftAutoBlue extends LinearOpMode {
+@Autonomous(name="CycleAutoBlue", group="Blue Autos")
+public class CycleAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private Lift lift;
 	private Intake intake;
@@ -25,7 +25,7 @@ public class LeftAutoBlue extends LinearOpMode {
 	private Location warehouseEntrance = new Location(-3, 10, -90);
 	private Location warehouse = new Location(24, 10, -90);
 	private Location wareHouseExit = new Location(-3, 6, -90);
-	private Location shippingHubCycle = new Location(-18, -21, -90);
+	private Location shippingHubCycle = new Location(-10, -20, -90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
@@ -42,7 +42,7 @@ public class LeftAutoBlue extends LinearOpMode {
 		for (int i = 0; i < numMeasurements; i++) {
 			avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
 		}
-		drive.setCurrentLocation(new Location(46 - avg, 5, -90));
+		drive.setCurrentLocation(new Location(46 - avg, 0, -90));
 	}
 
 	@Override
@@ -79,13 +79,21 @@ public class LeftAutoBlue extends LinearOpMode {
 		drive.moveToLocation(shippingHub);
 		int numCycles = 2;
 		for (int i = 0; i < numCycles + 1; i++) {
-			lift.dropFreight();
-			sleep(1000);
-			lift.dropFreight();
+			lift.autoDrop();
+			long drop = System.currentTimeMillis();
+			while (opModeIsActive()) {
+				long time = System.currentTimeMillis();
+				if (time > drop + 1000) {
+					break;
+				}
+				lift.update(time);
+				sleep(50);
+			}
 			drive.rotate(-90);
 			lift.positionDown();
 			drive.moveToLocation(warehouseEntrance);
 			drive.moveToLocation(warehouse);
+			lift.update(System.currentTimeMillis());
 			if (!opModeIsActive() || i == numCycles) break;
 			grabBlock();
 			intake.intake();

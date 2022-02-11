@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class MotorCarousel {
-	public double AUTO_POWER = 0.25;
+	public double AUTO_POWER = 0.2;
 	public double TELEOP_POWER = 0.4;
 	private static final long ON_TIME = 900;
 	private static final long FULL_POWER = 1100;
