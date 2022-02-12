@@ -108,11 +108,11 @@ public class Localizer {
 				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle + initHeading;
 		double rotation = Math.toRadians(currentLocation.getHeading() - currentRotation);
 		double xMovement =
-				(motorDistances[0] + motorDistances[1] +//1.266 is a manually tuned constant
-						motorDistances[2] + motorDistances[3]) * 0.25 * 0.497;
+				(/*motorDistances[0]*/ + motorDistances[1] +//1.266 is a manually tuned constant
+						motorDistances[2] + motorDistances[3]) / 3.0 * 0.497;
 		double yMovement =
-				(motorDistances[1] - motorDistances[0] +//0.833 is a manually tuned constant
-						motorDistances[3] - motorDistances[2]) * 0.25 * 0.554;
+				(/*motorDistances[1] - motorDistances[0]*/ +//0.833 is a manually tuned constant
+						motorDistances[3] - motorDistances[2]) * 0.5 * 0.554;
 		double currentHeading = -Math.toRadians(currentLocation.getHeading() + 90);
 		
 		Matrix vector = new Matrix(new double[][] {

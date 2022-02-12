@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.NewMecanumDrive;
+import Subsystems.CameraPipelineBlue;
 import Subsystems.CameraPipelineRed;
 import Subsystems.Intake;
 import Subsystems.Lift;
@@ -11,25 +12,22 @@ import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="DuckAutoRed", group="Red Autos")
+@Autonomous(name="DuckAutoRed", group="Red Autos", preselectTeleOp="Red TeleOp")
 public class DuckAutoRed extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private MotorCarousel carousel;
 	private Lift lift;
 	private Intake intake;
 
-	private Location carouselLocation = new Location(21, -7, 0);
-	private Location corner1 = new Location(20, -36, 0);
-	private Location shippingHub = new Location(1, -45, -90);
-	private Location corner2 = new Location(20, -36, -90);
-	private Location corner3 = new Location(18, -12, -90);
-	private Location ramPause = new Location(-32, -20, 90);
-	private Location warehouseEntrance = new Location(-35, 11, 90);
-	private Location warehouse = new Location(-60, 12, 90);
+	private static final Location carouselLocation = new Location(21, -7, 0);
+	private static final Location corner1 = new Location(20, -41, 0);
+	private static final Location shippingHub = new Location(-3, -41, -90);
+	private static final Location corner2 = new Location(20, -41, -90);
+	private static final Location depot = new Location(30, -22, -90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		CameraPipelineRed cameraPipeline = new CameraPipelineRed(this);
+		CameraPipelineRed cameraPipeline = new CameraPipelineRed(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
@@ -44,16 +42,14 @@ public class DuckAutoRed extends LinearOpMode {
 			telemetry.addData("QR Code",
 					positions[cameraPipeline.getShippingElementLocation()]);
 			telemetry.addData("Checks", cameraPipeline.numChecks);
-			telemetry.addData("X", cameraPipeline.xPos);
 			telemetry.update();
 		}
 		int pos = cameraPipeline.getShippingElementLocation();
-		telemetry.addData("Pos", pos);
-		telemetry.update();
+		camera.stop();
 
 		drive.moveToLocation(carouselLocation);
 		sleep(500);
-		carousel.redSpin();
+		carousel.redSpin();//todo changes with color
 		sleep(4000);
 		carousel.redSpin();
 		sleep(200);
@@ -89,22 +85,9 @@ public class DuckAutoRed extends LinearOpMode {
 		drive.moveToLocation(corner2);
 		lift.positionDown();
 		sleep(200);
-		drive.moveToLocation(corner3);
-		sleep(200);
-		drive.rotate(90);
-		sleep(200);
-		drive.moveToLocation(ramPause);
-		sleep(200);
-		drive.rawMove(0, -1, 0);
-		sleep(1500);
-		drive.brake();
+		drive.moveToLocation(depot);
 		lift.update(System.currentTimeMillis());
 
-		telemetry.addData("Status", "Stopping");
-		telemetry.update();
-		camera.stop();
-		telemetry.addData("Status", "Stopped");
-		telemetry.update();
 		while (opModeIsActive()) sleep(100);
 	}
 }

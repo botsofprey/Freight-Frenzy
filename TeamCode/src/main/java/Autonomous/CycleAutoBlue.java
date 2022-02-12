@@ -10,7 +10,7 @@ import Subsystems.Lift;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="CycleAutoBlue", group="Blue Autos")
+@Autonomous(name="CycleAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
 public class CycleAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private Lift lift;
@@ -20,7 +20,7 @@ public class CycleAutoBlue extends LinearOpMode {
 	private Location warehouseEntrance = new Location(-3, 10, -90);
 	private Location warehouse = new Location(24, 10, -90);
 	private Location wareHouseExit = new Location(-3, 6, -90);
-	private Location shippingHubCycle = new Location(-10, -20, -90);
+	private Location shippingHubCycle = new Location(-18, -21, -90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
@@ -42,7 +42,7 @@ public class CycleAutoBlue extends LinearOpMode {
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);
+		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
@@ -59,6 +59,7 @@ public class CycleAutoBlue extends LinearOpMode {
 			telemetry.update();
 		}
 		int pos = cameraPipeline.getShippingElementLocation();
+		camera.stop();
 		switch (pos) {
 			case 1:
 				lift.positionMiddle();
@@ -99,11 +100,6 @@ public class CycleAutoBlue extends LinearOpMode {
 			drive.rotate(0);
 		}
 
-		telemetry.addData("Status", "Stopping");
-		telemetry.update();
-		camera.stop();
-		telemetry.addData("Status", "Stopped");
-		telemetry.update();
 		while (opModeIsActive()) sleep(100);
 	}
 }

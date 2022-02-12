@@ -11,17 +11,17 @@ import Subsystems.Lift;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="CycleAutoRed", group="Red Autos")
+@Autonomous(name="CycleAutoRed", group="Red Autos", preselectTeleOp="Red TeleOp")
 public class CycleAutoRed extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private Lift lift;
 	private Intake intake;
 
-	private Location shippingHub = new Location(-18, -22, 0);
-	private Location warehouseEntrance = new Location(-3, 10, -90);
-	private Location warehouse = new Location(24, 10, -90);
-	private Location wareHouseExit = new Location(-3, 6, -90);
-	private Location shippingHubCycle = new Location(-10, -20, -90);
+	private Location shippingHub = new Location(18, -22, 0);
+	private Location warehouseEntrance = new Location(3, 10, 90);
+	private Location warehouse = new Location(-24, 10, 90);
+	private Location wareHouseExit = new Location(3, 6, 90);
+	private Location shippingHubCycle = new Location(18, -21, 90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
@@ -38,12 +38,12 @@ public class CycleAutoRed extends LinearOpMode {
 		for (int i = 0; i < numMeasurements; i++) {
 			avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
 		}
-		drive.setCurrentLocation(new Location(46 - avg, 0, -90));
+		drive.setCurrentLocation(new Location(46 - avg, 0, 90));
 	}
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		CameraPipelineRed cameraPipeline = new CameraPipelineRed(this);
+		CameraPipelineRed cameraPipeline = new CameraPipelineRed(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
@@ -60,6 +60,7 @@ public class CycleAutoRed extends LinearOpMode {
 			telemetry.update();
 		}
 		int pos = cameraPipeline.getShippingElementLocation();
+		camera.stop();
 		switch (pos) {
 			case 1:
 				lift.positionMiddle();
@@ -85,7 +86,7 @@ public class CycleAutoRed extends LinearOpMode {
 				lift.update(time);
 				sleep(50);
 			}
-			drive.rotate(-90);
+			drive.rotate(90);
 			lift.positionDown();
 			drive.moveToLocation(warehouseEntrance);
 			drive.moveToLocation(warehouse);
@@ -100,11 +101,6 @@ public class CycleAutoRed extends LinearOpMode {
 			drive.rotate(0);
 		}
 
-		telemetry.addData("Status", "Stopping");
-		telemetry.update();
-		camera.stop();
-		telemetry.addData("Status", "Stopped");
-		telemetry.update();
 		while (opModeIsActive()) sleep(100);
 	}
 }

@@ -10,7 +10,7 @@ import Subsystems.MotorCarousel;
 import UtilityClasses.Controller;
 import UtilityClasses.Location;
 
-@TeleOp(name="RedTeleOp", group="TeleOp")
+@TeleOp(name="Red TeleOp", group="TeleOp")
 public class RedTeleOp extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
