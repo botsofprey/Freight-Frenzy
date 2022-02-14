@@ -138,7 +138,7 @@ public class SixWheelTank extends LinearOpMode {
 				bucketArm.setBucketPower(BucketArm.OUTTAKE);
 			}else if(controller.rightBumperHeld) {
 				bucketArm.setBucketPower(BucketArm.INTAKE);
-			} else {
+			} else if(!bucketArm.autoIntaking){
 				bucketArm.setBucketPower(0);
 			}
 
@@ -171,8 +171,10 @@ public class SixWheelTank extends LinearOpMode {
 //			}
 
 			telemetry.addData("Lift Position", bucketArm.getLiftPos());
-			telemetry.addData("Magnet Switch Pressed", bucketArm.limitSwitch());
-			telemetry.addData("Lift Power", bucketArm.getLiftPower());
+			telemetry.addData("R", bucketArm.getColor()[0]);
+			telemetry.addData("G", bucketArm.getColor()[1]);
+			telemetry.addData("B", bucketArm.getColor()[2]);
+			telemetry.addData("Freight found", bucketArm.freightFound());
 
 			bucketArm.update();
 

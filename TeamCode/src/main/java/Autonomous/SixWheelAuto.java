@@ -15,7 +15,7 @@ import Subsystems.BucketArm;
 import UtilityClasses.HardwareWrappers.CRServoController;
 
 
-@Autonomous (name="Better Robot", group="Autonomous")
+@Autonomous (name="Six R-blued", group="Autonomous")
 public class SixWheelAuto extends LinearOpMode {
 
 	private BucketArm bucketArm;
@@ -82,7 +82,7 @@ public class SixWheelAuto extends LinearOpMode {
 				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
 			}
 
-			telemetry.addData("Robot", "Not Less Sophisticated, More Better");
+			telemetry.addData("Status", "Initialized");
 			telemetry.update();
 		}
 
@@ -90,7 +90,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 		//Move to Hub
 		sixDrive.move(36, .5);
-		while (sixDrive.isBusy() && opModeIsActive()){
+		while (sixDrive.isBusy()){
 			sixDrive.update();
 		}
 
@@ -111,7 +111,7 @@ public class SixWheelAuto extends LinearOpMode {
 		while (bucketArm.liftIsBusy()){}
 		sleep(500);
 
-		sixDrive.move(2, .25);
+		sixDrive.move(5, .25);
 		while(sixDrive.isBusy()){
 			sixDrive.update();
 		}
@@ -122,7 +122,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 		//Move to wall
 		bucketArm.liftMoveTowards(0, .5);
-		sixDrive.move(-25, .5);
+		sixDrive.move(-23, .1);
 		while (sixDrive.isBusy()){
 			sixDrive.update();}
 		sleep(500);

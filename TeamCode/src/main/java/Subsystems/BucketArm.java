@@ -104,7 +104,7 @@ public class BucketArm {
 
 	public boolean freightFound() {
 		int[] curColor = getColor();
-		return curColor[0] > 35 && curColor[1] > 65;
+		return curColor[0] > 40 && curColor[1] > 70;
 	}
 
 	private boolean compareNumbers(double a, double b, double range) {
@@ -137,7 +137,7 @@ public class BucketArm {
 		return bucketSensor.getDistance(DistanceUnit.CM);
 	}
 
-	boolean autoIntaking = false, bucketFull = false;
+	public boolean autoIntaking = false, bucketFull = false;
 
 	public void update() {
 		if (bucketFull) {
@@ -152,7 +152,8 @@ public class BucketArm {
 					setBucketPower(INTAKE);
 					autoIntaking = true;
 				}
-			} else if (autoIntaking && bucketDistance() < 5.5 || autoIntaking && !freightFound()) {
+			}
+			if (autoIntaking && !freightFound()) {
 				setBucketPower(0);
 				autoIntaking = false;
 				bucketFull = true;

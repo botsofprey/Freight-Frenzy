@@ -63,9 +63,9 @@ public class SixDrive {
 
 		imu.initialize(parameters);
 
-		headingPid = new PIDController(.005,.0025,0);
+		headingPid = new PIDController(.00125,.00125,.00075);
 		driveHeadingPid = new PIDController(.0285,0,0);
-		b_driveHeadingPid = new PIDController(.01,0,0);
+		b_driveHeadingPid = new PIDController(.05,.0001,0);
 	}
 
 	boolean backwards;
