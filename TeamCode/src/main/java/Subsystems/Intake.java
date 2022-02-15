@@ -15,7 +15,7 @@ public class Intake {
 	public static final int INTAKE_BUTTON = 0;
 	public static final int OUTTAKE_BUTTON = 1;
 
-	private static final double MOTOR_POWER = 0.75;
+	private static final double MOTOR_POWER = 1;
 	private static final int BRAKE = 0;
 	private static final int INTAKE = 1;
 	private static final int OUTTAKE = 2;

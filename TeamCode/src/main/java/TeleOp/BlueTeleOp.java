@@ -2,6 +2,7 @@ package TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 
 import DriveEngine.MecanumDrive;
 import Subsystems.Carousel;
@@ -19,6 +20,7 @@ public class BlueTeleOp extends LinearOpMode {
 	private Controller controller1;
 	private Controller controller2;
 	private MecanumDrive drive;
+	private AnalogInput analog;
 
 	private static final boolean throwErrors = true;
 
@@ -32,10 +34,13 @@ public class BlueTeleOp extends LinearOpMode {
 				new Location(0, 0, 0), false, this, throwErrors);
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
+		analog = hardwareMap.get(AnalogInput.class, "forceSensor");
 
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 		waitForStart();
+
+		long startTime = System.currentTimeMillis();
 
 		double[] cycleTimes = new double[32];
 		int cycle = 0;
@@ -44,16 +49,18 @@ public class BlueTeleOp extends LinearOpMode {
 		while (opModeIsActive()) {
 			controller1.update();
 			controller2.update();
-
+/*
 			if (controller1.rightTriggerHeld) {
 				double power = 1.0 / 3;
 				//drive.moveRobot(0, power, Math.sqrt(0.5) * power);
 				drive.moveRobot(0, power, 0);
 			}
-			else {
+			else */{
 				drive.moveRobot(controller1.leftStick.x, -controller1.leftStick.y,
 						-controller1.rightStick.x);
 			}
+			telemetry.addData("Force", analog.getVoltage());
+			telemetry.addData("Force Max", analog.getMaxVoltage());
 
 			if (controller2.rightTriggerHeld && !controller2.leftTriggerHeld) {
 				lift.upAnalog(controller2.rightTrigger);
@@ -105,6 +112,17 @@ public class BlueTeleOp extends LinearOpMode {
 				drive.noSlowMode();
 			}
 			long time = System.currentTimeMillis();
+
+			if ((time - startTime) / 1000.0 >= 85 &&
+					(time - startTime) / 1000.0 < 89 && !controller1.isRumbling()) {
+				controller1.rumble(5000);
+				controller2.rumble(5000);
+			}
+			else if ((time - startTime) / 1000.0 >= 115 &&
+					(time - startTime) / 1000.0 < 120 && !controller1.isRumbling()) {
+				controller1.rumble(5000);
+				controller2.rumble(5000);
+			}
 
 			lift.update(time);
 			intake.update(time);

@@ -36,6 +36,8 @@ public class RedTeleOp extends LinearOpMode {
 		telemetry.update();
 		waitForStart();
 
+		long startTime = System.currentTimeMillis();
+
 		double[] cycleTimes = new double[32];
 		int cycle = 0;
 		long previousTime = System.currentTimeMillis();
@@ -104,6 +106,17 @@ public class RedTeleOp extends LinearOpMode {
 				drive.noSlowMode();
 			}
 			long time = System.currentTimeMillis();
+
+			if ((time - startTime) / 1000.0 >= 85 &&
+					(time - startTime) / 1000.0 < 89 && !controller1.isRumbling()) {
+				controller1.rumble(5000);
+				controller2.rumble(5000);
+			}
+			else if ((time - startTime) / 1000.0 >= 115 &&
+					(time - startTime) / 1000.0 < 120 && !controller1.isRumbling()) {
+				controller1.rumble(5000);
+				controller2.rumble(5000);
+			}
 
 			lift.update(time);
 			intake.update(time);
