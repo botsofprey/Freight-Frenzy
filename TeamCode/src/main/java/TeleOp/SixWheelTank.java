@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Func;
@@ -47,15 +48,15 @@ public class SixWheelTank extends LinearOpMode {
 		servoLeft = new CRServoController(hardwareMap, "leftWheel");
 		servoRight = new CRServoController(hardwareMap, "rightWheel");
 
-		bucketArm.liftMoveTowards(2, 0.5);
-		while (bucketArm.liftIsBusy()) {
-		}
-
-		bucketArm.setLiftPower(-.75);
-		while (!bucketArm.limitSwitch()) {
-		}
-		bucketArm.setLiftPower(0);
-		bucketArm.resetLiftEncoder();
+//		bucketArm.liftMoveTowards(2, 0.5);
+//		while (bucketArm.liftIsBusy()) {
+//		}
+//
+//		bucketArm.setLiftPower(-.75);
+//		while (!bucketArm.limitSwitch()) {
+//		}
+//		bucketArm.setLiftPower(0);
+//		bucketArm.resetLiftEncoder();
 
 		double xValue, yValue, leftPower, rightPower;
 
@@ -63,6 +64,10 @@ public class SixWheelTank extends LinearOpMode {
 			motors[i] = hardwareMap.get(DcMotor.class, names[i]);
 			motors[i].setDirection(directions[i]);
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		}
+
+		if(getBatteryVoltage() < 9){
+			telemetry.addData("Low ", true);
 		}
 
 		telemetry.addData("Start set", bucketArm.startPosSet);
@@ -78,26 +83,6 @@ public class SixWheelTank extends LinearOpMode {
 
 		while (opModeIsActive()) {
 			controller.update();
-//			if(gamepad1.left_trigger != 0){
-//				motors[0].setPower(1);
-//				motors[1].setPower(1);
-//			}else{
-//				motors[0].setPower(0);
-//				motors[1].setPower(0);
-//			}
-//
-//			if(gamepad1.right_trigger != 0){
-//
-//				motors[2].setPower(1);
-//				motors[3].setPower(1);
-//			}else{
-//				motors[2].setPower(0);
-//				motors[3].setPower(0);
-//			}
-//			motors[0].setPower(controller.leftStick.y);
-//			motors[1].setPower(controller.leftStick.y);
-//			motors[2].setPower(controller.rightStick.y);
-//			motors[3].setPower(controller.rightStick.y);
 
 			yValue = controller.leftStick.y;
 			xValue = controller.rightStick.x * -1;
@@ -113,7 +98,6 @@ public class SixWheelTank extends LinearOpMode {
 			telemetry.addData("Mode", "running");
 			telemetry.addData("stick", "  y=" + yValue + "  x=" + xValue);
 			telemetry.addData("power", "  left=" + leftPower + "  right=" + rightPower);
-			telemetry.update();
 
 			//Lift Control
 			if (controller.leftTrigger == 0) {
@@ -140,7 +124,7 @@ public class SixWheelTank extends LinearOpMode {
 				bucketArm.setBucketPower(BucketArm.INTAKE);
 			} else if(!bucketArm.autoIntaking){
 				bucketArm.setBucketPower(0);
-			}
+ 			}
 
 			//Carasoul
 			if(controller.bHeld){
@@ -151,30 +135,8 @@ public class SixWheelTank extends LinearOpMode {
 				servoRight.setPower(0);
 			}
 
-			//			double forward = -gamepad1.left_stick_y;
-//			double turn = gamepad1.right_stick_x;
-//			double left = forward + turn;
-//			double right = forward - turn;
-//			if (gamepad1.left_trigger > 0.1) {
-//				left /= 3;
-//				right /= 3;
-//			}
-//			double[] powers = new double[] {
-//					left,
-//					left,
-//					right,
-//					right
-//			};
-//			normalize(powers);
-//			for (int i = 0; i < 4; i++) {
-//				motors[i].setPower(powers[i]);
-//			}
-
 			telemetry.addData("Lift Position", bucketArm.getLiftPos());
-			telemetry.addData("R", bucketArm.getColor()[0]);
-			telemetry.addData("G", bucketArm.getColor()[1]);
-			telemetry.addData("B", bucketArm.getColor()[2]);
-			telemetry.addData("Freight found", bucketArm.freightFound());
+			telemetry.addData("Volts", getBatteryVoltage());
 
 			bucketArm.update();
 
@@ -192,6 +154,16 @@ public class SixWheelTank extends LinearOpMode {
 
 			telemetry.update();
 		}
+	}
+
+	double getBatteryVoltage() {
+		double result = Double.POSITIVE_INFINITY;
+		for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+			double voltage = sensor.getVoltage();
+			if (voltage > 0)
+				result = Math.min(result, voltage);
+		}
+		return result;
 	}
 
 	private void normalize(double[] powers) {
