@@ -13,6 +13,7 @@ public class Camera {
 
 	private LinearOpMode mode;
 	private boolean open = false;
+	public volatile boolean isStopped = false;
 
 	public Camera(HardwareMap hw, String name, OpenCvPipeline pipeline, LinearOpMode m) {
 		mode = m;
@@ -45,6 +46,7 @@ public class Camera {
 	}
 
 	public void stop() {
-		camera.stopStreaming();
+		camera.closeCameraDeviceAsync(()->{});
+		isStopped = true;
 	}
 }

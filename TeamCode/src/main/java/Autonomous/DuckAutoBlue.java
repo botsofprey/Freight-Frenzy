@@ -4,33 +4,29 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.NewMecanumDrive;
-import Subsystems.CameraPipeline;
-import Subsystems.Carousel;
+import Subsystems.CameraPipelineBlue;
 import Subsystems.Intake;
 import Subsystems.Lift;
 import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="RightAutoBlue", group="Competition Autos")
-public class RightAutoBlue extends LinearOpMode {
+@Autonomous(name="DuckAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
+public class DuckAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private MotorCarousel carousel;
 	private Lift lift;
 	private Intake intake;
 
-	private Location carouselLocation = new Location(-20, -6, 0);
-	private Location corner1 = new Location(-18, -40, 0);
-	private Location shippingHub = new Location(7, -40, 90);
-	private Location corner2 = new Location(-18, -36, 90);
-	private Location corner3 = new Location(-18, -12, 90);
-	private Location ramPause = new Location(44, -12, -90);
-	private Location warehouseEntrance = new Location(35, 11, -90);
-	private Location warehouse = new Location(60, 12, -90);
+	private static final Location carouselLocation = new Location(-21, -7, 0);
+	private static final Location corner1 = new Location(-20, -41, 0);
+	private static final Location shippingHub = new Location(3, -41, 90);
+	private static final Location corner2 = new Location(-20, -41, 90);
+	private static final Location depot = new Location(-30, -22, 90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		CameraPipeline cameraPipeline = new CameraPipeline(this);
+		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
@@ -48,12 +44,11 @@ public class RightAutoBlue extends LinearOpMode {
 			telemetry.update();
 		}
 		int pos = cameraPipeline.getShippingElementLocation();
-		telemetry.addData("Pos", pos);
-		telemetry.update();
+		camera.stop();
 
 		drive.moveToLocation(carouselLocation);
 		sleep(500);
-		carousel.blueSpin();
+		carousel.blueSpin();//todo changes with color
 		sleep(4000);
 		carousel.blueSpin();
 		sleep(200);
@@ -76,26 +71,22 @@ public class RightAutoBlue extends LinearOpMode {
 		sleep(200);
 		drive.moveToLocation(shippingHub);
 		sleep(200);
-		lift.dropFreight();
-		sleep(1000);
-		lift.dropFreight();
-		sleep(200);
+		lift.autoDrop();
+		long drop = System.currentTimeMillis();
+		while (opModeIsActive()) {
+			long time = System.currentTimeMillis();
+			if (time > drop + 1000) {
+				break;
+			}
+			lift.update(time);
+			sleep(50);
+		}
 		drive.moveToLocation(corner2);
 		lift.positionDown();
 		sleep(200);
-		drive.moveToLocation(corner3);
-		sleep(200);
-		drive.rotate(-90);
-		sleep(200);
-		drive.moveToLocation(warehouseEntrance);
-		sleep(200);
-		drive.moveToLocation(warehouse);
+		drive.moveToLocation(depot);
+		lift.update(System.currentTimeMillis());
 
-		telemetry.addData("Status", "Stopping");
-		telemetry.update();
-		camera.stop();
-		telemetry.addData("Status", "Stopped");
-		telemetry.update();
 		while (opModeIsActive()) sleep(100);
 	}
 }

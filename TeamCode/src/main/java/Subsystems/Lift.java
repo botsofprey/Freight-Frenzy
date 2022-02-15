@@ -51,6 +51,7 @@ public class Lift {
 
 	private long dropTime;
 	private boolean freightDropped;
+	private boolean resetServo;
 
 	public Lift(HardwareMap hardwareMap, LinearOpMode opMode, boolean errors) {
 		mode = opMode;
@@ -76,6 +77,7 @@ public class Lift {
 
 		dropTime = System.currentTimeMillis();
 		freightDropped = false;
+		resetServo = false;
 	}
 
 	public void zeroSlider(){
@@ -184,14 +186,15 @@ public class Lift {
 		return slide.getCurrentPosition();
 	}
 
+	@Deprecated
 	public void dropFreight() {
 		bucketWall.setPosition(1 - bucketWall.getPosition());
 	}
 
 	public void autoDrop() {
-		bucketWall.setPosition(0);
 		dropTime = System.currentTimeMillis();
 		freightDropped = true;
+		resetServo = false;
 	}
 
 	private boolean detectColor() {
@@ -232,11 +235,23 @@ public class Lift {
 			liftLed.setPattern(midColor);
 		}
 
-		if (freightDropped && millis >= 2000 + dropTime) {
-			freightDropped = false;
-			bucketWall.setPosition(1);
+		long delay = 600;
+		if (freightDropped) {
+			if (millis >= delay + dropTime) {
+				bucketWall.setPosition(0);
+				freightDropped = false;
+				resetServo = true;
+				dropTime = millis;
+			}
+			else {
+				double pos = 1 - (millis - dropTime) / (double)delay;
+				bucketWall.setPosition(pos);
+			}
 		}
 
-		mode.telemetry.addData("Switch", pressed);
+		if (resetServo && millis >= dropTime + 2000) {
+			resetServo = false;
+			bucketWall.setPosition(1);
+		}
 	}
 }

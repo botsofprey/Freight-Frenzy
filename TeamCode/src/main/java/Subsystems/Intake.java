@@ -4,7 +4,10 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import UtilityClasses.HardwareWrappers.MotorController;
 
@@ -24,6 +27,8 @@ public class Intake {
 	private int state;
 
 
+	private DistanceSensor intakeDistance;
+
 	private MotorController intakeMotor;
 
 	private RevBlinkinLedDriver intakeLEDs;
@@ -33,10 +38,6 @@ public class Intake {
 	private ColorSensor colorSensorA;
 	private ColorSensor colorSensorB;
 	private static final int RED_THRESHOLD = 70;
-	private int blue, red, green;
-	private static final int[] block = new int[] {204, 126, 8},
-			ball = new int[] {255, 255, 255}, duck = new int[] {224, 183, 31};
-	private static  final int range = 25;
 
 	private long mil = 0;
 	private long freezeTime = 0;
@@ -54,6 +55,12 @@ public class Intake {
 
 		intakeLEDs = hw.get(RevBlinkinLedDriver.class, "intakeLED");
 		intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+
+		intakeDistance = hw.get(DistanceSensor.class, "intakeDistance");
+	}
+
+	public double getDistance() {
+		return intakeDistance.getDistance(DistanceUnit.INCH);
 	}
 
 	private boolean detectColor() {

@@ -2,12 +2,15 @@ package Subsystems;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class MotorCarousel {
-	private static final double TELEOP_POWER = 0.5;
-	private static final long ON_TIME = 1000;
-	private static final long CYCLE_TIME = 1500;
+	public double AUTO_POWER = 0.2;
+	public double TELEOP_POWER = 0.4;
+	private static final long ON_TIME = 900;
+	private static final long FULL_POWER = 1100;
+	private static final long CYCLE_TIME = 2000;
 
 	private LinearOpMode mode;
 
@@ -21,16 +24,19 @@ public class MotorCarousel {
 	public MotorCarousel(HardwareMap hw, LinearOpMode m) {
 		mode = m;
 		spinner = hw.get(DcMotor.class, "duckSpinner");
+		spinner.setDirection(DcMotorSimple.Direction.REVERSE);
+		spinner.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		spinner.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 	}
 
 	public void blueSpin() {
 		spinning = !spinning;
-		spinner.setPower(spinning ? TELEOP_POWER : 0);
+		spinner.setPower(spinning ? AUTO_POWER : 0);
 	}
 
 	public void redSpin() {
 		spinning = !spinning;
-		spinner.setPower(spinning ? -TELEOP_POWER : 0);
+		spinner.setPower(spinning ? -AUTO_POWER : 0);
 	}
 
 	public void blueEndgame() {
@@ -61,6 +67,9 @@ public class MotorCarousel {
 	}
 
 	private double powerCurve(long t) {
-		return (t > ON_TIME) ? 0 : TELEOP_POWER;
+		double f = (t > ON_TIME) ? 1 : TELEOP_POWER;
+		double p = Math.max(TELEOP_POWER, 0/*TELEOP_POWER + (t - ON_TIME) * (1.0 - TELEOP_POWER) /
+				(double)(FULL_POWER - ON_TIME)*/);//ramp up power by interpolating
+		return (t <= FULL_POWER) ? f : 0;
 	}
 }

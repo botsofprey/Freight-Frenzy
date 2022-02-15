@@ -11,7 +11,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.QRCodeDetector;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class CameraPipeline extends OpenCvPipeline {
+public class CameraPipelineBlue extends OpenCvPipeline {
 	private boolean init = true;
 
 	private static final Point[] LOCATIONS = {
@@ -33,7 +33,7 @@ public class CameraPipeline extends OpenCvPipeline {
 
 	public volatile int xPos;
 
-	public CameraPipeline(LinearOpMode m) {
+	public CameraPipelineBlue(LinearOpMode m) {
 		mode = m;
 	}
 

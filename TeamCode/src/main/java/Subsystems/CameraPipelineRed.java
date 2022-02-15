@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.QRCodeDetector;
 import org.openftc.easyopencv.OpenCvPipeline;
 
@@ -12,8 +14,8 @@ public class CameraPipelineRed extends OpenCvPipeline {
 	private boolean init = true;
 
 	private static final Point[] LOCATIONS = {
-			new Point(1165, 500),
-			new Point(450, 500)
+			new Point(800, 500),
+			new Point(1450, 500)
 	};
 
 	private QRCodeDetector detector = new QRCodeDetector();
@@ -22,10 +24,11 @@ public class CameraPipelineRed extends OpenCvPipeline {
 
 	private LinearOpMode mode;
 
-	private volatile int location;
+	private volatile int location = 2;
 	public volatile int x;
 	public volatile int y;
 	public volatile String data;
+	public volatile int numChecks = 0;
 
 	public volatile int xPos;
 
@@ -50,15 +53,15 @@ public class CameraPipelineRed extends OpenCvPipeline {
 			xPos = x;
 			y = (int)(point.y / 4.0);
 
-//			Imgproc.rectangle(image, new Point(x - 50, y - 50),
-//					new Point(x + 50, y + 50), new Scalar(0, 0, 255), 3);
+			Imgproc.rectangle(image, new Point(x - 50, y - 50),
+					new Point(x + 50, y + 50), new Scalar(0, 0, 255), 3);
 
 			double[] distances = new double[2];
 			for (int i = 0; i < 2; i++) {
 				distances[i] = Math.abs(x - LOCATIONS[i].x);
 			}
 
-			if (Math.abs(point.x - LOCATIONS[0].x) > Math.abs(point.x - LOCATIONS[1].x)) {
+			if (distances[0] > distances[1]) {
 				location = 1;
 			}
 			else {
@@ -68,6 +71,8 @@ public class CameraPipelineRed extends OpenCvPipeline {
 		else {
 			location = 0;
 		}
+		int temp = numChecks;
+		numChecks = temp + 1;
 
 		return image;
 	}

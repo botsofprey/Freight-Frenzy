@@ -3,46 +3,46 @@ package Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import java.util.ArrayList;
-
 import DriveEngine.NewMecanumDrive;
-import Subsystems.CameraPipeline;
-import Subsystems.Carousel;
+import Subsystems.CameraPipelineBlue;
 import Subsystems.Intake;
 import Subsystems.Lift;
-import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="LeftAutoBlue", group="Competition Autos")
-public class LeftAutoBlue extends LinearOpMode {
+@Autonomous(name="CycleAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
+public class CycleAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private Lift lift;
 	private Intake intake;
 
-	private Location shippingHub = new Location(-18, -23, 0);
-	private Location warehouseEntrance = new Location(0, 7.5, -90);
-	private Location warehouse = new Location(24, 7.5, -90);
+	private Location shippingHub = new Location(-18, -22, 0);
+	private Location warehouseEntrance = new Location(-3, 10, -90);
+	private Location warehouse = new Location(24, 10, -90);
+	private Location wareHouseExit = new Location(-3, 6, -90);
 	private Location shippingHubCycle = new Location(-18, -21, -90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
-		drive.rawMove(0, -1.0 / 5, 0);
-		long time;
-		//long end = time + 10000;
+		drive.rawMove(-0.1, -1.0 / 3, 0);
 		while (opModeIsActive() && intake.moving()) {
-			time = System.currentTimeMillis();
-			//if (time >= end) break;
-			intake.update(time);
+			intake.update(System.currentTimeMillis());
 			if (!intake.moving()) break;
 			drive.updateLocation();
 		}
 		drive.brake();
+		sleep(200);
+		int numMeasurements = 10;
+		double avg = 0;
+		for (int i = 0; i < numMeasurements; i++) {
+			avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
+		}
+		drive.setCurrentLocation(new Location(46 - avg, 0, -90));
 	}
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		CameraPipeline cameraPipeline = new CameraPipeline(this);
+		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
@@ -59,6 +59,7 @@ public class LeftAutoBlue extends LinearOpMode {
 			telemetry.update();
 		}
 		int pos = cameraPipeline.getShippingElementLocation();
+		camera.stop();
 		switch (pos) {
 			case 1:
 				lift.positionMiddle();
@@ -74,37 +75,31 @@ public class LeftAutoBlue extends LinearOpMode {
 		drive.moveToLocation(shippingHub);
 		int numCycles = 2;
 		for (int i = 0; i < numCycles + 1; i++) {
-			sleep(100);
-			lift.dropFreight();
-			sleep(1000);
-			lift.dropFreight();
-			sleep(100);
+			lift.autoDrop();
+			long drop = System.currentTimeMillis();
+			while (opModeIsActive()) {
+				long time = System.currentTimeMillis();
+				if (time > drop + 1000) {
+					break;
+				}
+				lift.update(time);
+				sleep(50);
+			}
 			drive.rotate(-90);
-			sleep(100);
 			lift.positionDown();
-			sleep(100);
 			drive.moveToLocation(warehouseEntrance);
-			sleep(100);
 			drive.moveToLocation(warehouse);
+			lift.update(System.currentTimeMillis());
 			if (!opModeIsActive() || i == numCycles) break;
-			sleep(100);
 			grabBlock();
-			sleep(100);
 			intake.intake();
-			drive.moveToLocation(warehouseEntrance);
-			sleep(100);
+			drive.moveToLocation(wareHouseExit);
 			lift.positionUp();
 			intake.brake();
 			drive.moveToLocation(shippingHubCycle);
-			sleep(100);
 			drive.rotate(0);
 		}
 
-		telemetry.addData("Status", "Stopping");
-		telemetry.update();
-		camera.stop();
-		telemetry.addData("Status", "Stopped");
-		telemetry.update();
 		while (opModeIsActive()) sleep(100);
 	}
 }
