@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.BatteryChecker;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Func;
@@ -15,6 +16,7 @@ import Subsystems.BucketArm;
 import UtilityClasses.Controller;
 import UtilityClasses.HardwareWrappers.CRServoController;
 import UtilityClasses.HardwareWrappers.RevTouchSensor;
+import UtilityClasses.BatteryVoltage;
 
 @TeleOp(name="6 Wheel Tank", group="Tank")
 public class SixWheelTank extends LinearOpMode {
@@ -37,6 +39,7 @@ public class SixWheelTank extends LinearOpMode {
 	private Controller controller;
 
 	private BucketArm bucketArm;
+	private BatteryVoltage batteryChecker;
 
 	private CRServoController servoLeft, servoRight;
 
@@ -44,6 +47,7 @@ public class SixWheelTank extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		controller = new Controller(gamepad1);
 		bucketArm = new BucketArm(hardwareMap);
+		batteryChecker = new BatteryVoltage(hardwareMap);
 
 		servoLeft = new CRServoController(hardwareMap, "leftWheel");
 		servoRight = new CRServoController(hardwareMap, "rightWheel");
@@ -66,7 +70,7 @@ public class SixWheelTank extends LinearOpMode {
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		}
 
-		if(getBatteryVoltage() < 9){
+		if(batteryChecker.checkBatterVoltage()){
 			telemetry.addData("Low ", true);
 		}
 
@@ -136,7 +140,7 @@ public class SixWheelTank extends LinearOpMode {
 			}
 
 			telemetry.addData("Lift Position", bucketArm.getLiftPos());
-			telemetry.addData("Volts", getBatteryVoltage());
+			telemetry.addData("Volts", batteryChecker.getBatteryVoltage());
 
 			bucketArm.update();
 
@@ -154,16 +158,6 @@ public class SixWheelTank extends LinearOpMode {
 
 			telemetry.update();
 		}
-	}
-
-	double getBatteryVoltage() {
-		double result = Double.POSITIVE_INFINITY;
-		for (VoltageSensor sensor : hardwareMap.voltageSensor) {
-			double voltage = sensor.getVoltage();
-			if (voltage > 0)
-				result = Math.min(result, voltage);
-		}
-		return result;
 	}
 
 	private void normalize(double[] powers) {

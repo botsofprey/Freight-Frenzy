@@ -33,12 +33,14 @@ public class SixDrive {
 			DcMotorSimple.Direction.FORWARD
 	};
 
+	private double[] startPos = new double[4], endPos = new double[4];
+
 	private BNO055IMU imu;
 	private Orientation lastAngles = new Orientation();
 	private double globalAngle = 0;
 	public String RIGHT = "right", LEFT = "left";
 
-	private double TICKS_PER_INCH = 537.7 / (4 * Math.PI), movementPower;
+	public double TICKS_PER_INCH = 537.7 / (4 * Math.PI), movementPower;
 	public double targetAngle = 0;
 
 	PIDController headingPid, driveHeadingPid, b_driveHeadingPid;
@@ -177,7 +179,11 @@ public class SixDrive {
 	}
 
 	public boolean isBusy(){
-		return motors[0].isBusy() || motors[1].isBusy() || motors[2].isBusy() || motors[3].isBusy();
+		if(motors[0].isBusy() || motors[1].isBusy() || motors[2].isBusy() || motors[3].isBusy()) {
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	public void resetAngle()
@@ -222,6 +228,28 @@ public class SixDrive {
 	}
 	public double getRightPower(){
 		return motors[2].getPower();
+	}
+
+	public double getDistanceTraveled(){
+		double startTotal = 0, endTotal = 0;
+
+		for(int i = 0; i < motors.length; i++){
+			endPos[i] = motors[i].getCurrentPosition();
+		}
+
+		for(int i = 0; i < 4; i++){
+			startTotal += startPos[i];
+			endTotal += endPos[i];
+		}
+		startTotal /=4; endTotal /=4;
+
+		return endTotal - startTotal;
+	}
+	public void setStartPos(){
+		startPos[0] = (motors[0].getCurrentPosition());
+		startPos[1] = (motors[1].getCurrentPosition());
+		startPos[2] = (motors[2].getCurrentPosition());
+		startPos[3] = (motors[3].getCurrentPosition());
 	}
 
 	public void update(){

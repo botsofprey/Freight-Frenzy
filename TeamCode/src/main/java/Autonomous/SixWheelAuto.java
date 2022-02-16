@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import DriveEngine.SixDrive;
 import Subsystems.BucketArm;
 import UtilityClasses.HardwareWrappers.CRServoController;
+import UtilityClasses.BatteryVoltage;
 
 
 @Autonomous (name="Six R-blued", group="Autonomous")
@@ -89,9 +90,10 @@ public class SixWheelAuto extends LinearOpMode {
 //
 //			telemetry.update();
 //		}
+			BatteryVoltage lowBattery = new BatteryVoltage(hardwareMap);
 
 		while(!isStarted()) {
-			telemetry.addData("Voltage", getBatteryVoltage());
+			telemetry.addData("Voltage", lowBattery.getBatteryVoltage());
 			telemetry.update();
 		}
 
@@ -190,16 +192,6 @@ public class SixWheelAuto extends LinearOpMode {
 
 	private boolean compare(double a, double b, double range){
 		return Math.abs(a - b) < range;
-	}
-
-	double getBatteryVoltage() {
-		double result = Double.POSITIVE_INFINITY;
-		for (VoltageSensor sensor : hardwareMap.voltageSensor) {
-			double voltage = sensor.getVoltage();
-			if (voltage > 0)
-				result = Math.min(result, voltage);
-		}
-		return result;
 	}
 }
 
