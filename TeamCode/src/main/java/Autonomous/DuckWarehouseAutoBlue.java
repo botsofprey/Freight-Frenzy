@@ -11,8 +11,8 @@ import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="DuckAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
-public class DuckAutoBlue extends LinearOpMode {
+@Autonomous(name="DuckWarehouseAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
+public class DuckWarehouseAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private MotorCarousel carousel;
 	private Lift lift;
@@ -22,7 +22,8 @@ public class DuckAutoBlue extends LinearOpMode {
 	private static final Location corner1 = new Location(-10, -47, 0);
 	private static final Location shippingHub = new Location(10, -48, 90);
 	private static final Location corner2 = new Location(-10, -47, 90);
-	private static final Location depot = new Location(-20, -28, 90);
+	private static final Location corner3 = new Location(-12, -12, -90);
+	private static final Location corner4 = new Location(27, -12, -90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
@@ -83,9 +84,18 @@ public class DuckAutoBlue extends LinearOpMode {
 		}
 		drive.moveToLocation(corner2);
 		lift.positionDown();
+		drive.rotate(-90);
 		sleep(200);
-		drive.moveToLocation(depot);
+		drive.moveToLocation(corner3);
+		sleep(200);
+		drive.moveToLocation(corner4);
 		lift.update(System.currentTimeMillis());
+		sleep(200);
+		drive.rotate(-100);
+		sleep(200);
+		drive.rawMove(0, -1, 0);
+		sleep(2000);
+		drive.brake();
 
 		while (opModeIsActive()) sleep(100);
 	}
