@@ -128,4 +128,36 @@ public class Controller {
 		rightStick.y = -gamepad.right_stick_y;
 		rightStick.convertToAngleMagnitude();
 	}
+
+	public void rumble(double left, double right, int duration) {
+		gamepad.rumble(left, right, duration);
+	}
+
+	public void rumble(double left, double right) {
+		gamepad.rumble(left, right, Gamepad.RUMBLE_DURATION_CONTINUOUS);
+	}
+
+	public void rumble(int duration) {
+		gamepad.rumble(duration);
+	}
+
+	public void rumble() {
+		gamepad.rumble(Gamepad.RUMBLE_DURATION_CONTINUOUS);
+	}
+
+	public void stopRumble() {
+		gamepad.stopRumble();
+	}
+
+	public void rumble(Gamepad.RumbleEffect rumbleEffect) {
+		gamepad.runRumbleEffect(rumbleEffect);
+	}
+
+	public void rumbleBlips(int blips) {
+		gamepad.rumbleBlips(blips);
+	}
+
+	public boolean isRumbling() {
+		return gamepad.isRumbling();
+	}
 }

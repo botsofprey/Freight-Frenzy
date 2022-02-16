@@ -19,11 +19,11 @@ public class DuckAutoRed extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
 
-	private static final Location carouselLocation = new Location(21, -7, 0);
-	private static final Location corner1 = new Location(20, -41, 0);
-	private static final Location shippingHub = new Location(-3, -41, -90);
-	private static final Location corner2 = new Location(20, -41, -90);
-	private static final Location depot = new Location(30, -22, -90);
+	private static final Location carouselLocation = new Location(21, 2, 0);
+	private static final Location corner1 = new Location(10, -36, 0);
+	private static final Location shippingHub = new Location(-6, -32, -90);
+	private static final Location corner2 = new Location(10, -36, -90);
+	private static final Location depot = new Location(20, -18, -90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
@@ -55,7 +55,7 @@ public class DuckAutoRed extends LinearOpMode {
 		sleep(200);
 		drive.moveToLocation(corner1);
 		sleep(200);
-		drive.rotate(-90);
+		drive.rotate(-90);//todo changes with color
 		sleep(200);
 		switch (pos) {
 			case 1:

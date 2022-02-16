@@ -5,28 +5,30 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.NewMecanumDrive;
 import Subsystems.CameraPipelineBlue;
+import Subsystems.CameraPipelineRed;
 import Subsystems.Intake;
 import Subsystems.Lift;
 import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="DuckAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
-public class DuckAutoBlue extends LinearOpMode {
+@Autonomous(name="DuckWarehouseAutoRed", group="Red Autos", preselectTeleOp="Blue TeleOp")
+public class DuckWarehouseAutoRed extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private MotorCarousel carousel;
 	private Lift lift;
 	private Intake intake;
 
-	private static final Location carouselLocation = new Location(-21, -14, 0);
-	private static final Location corner1 = new Location(-10, -47, 0);
-	private static final Location shippingHub = new Location(10, -48, 90);
-	private static final Location corner2 = new Location(-10, -47, 90);
-	private static final Location depot = new Location(-20, -28, 90);
+	private static final Location carouselLocation = new Location(18, 3, 0);
+	private static final Location corner1 = new Location(10, -31, 0);
+	private static final Location shippingHub = new Location(-5, -31, -90);
+	private static final Location corner2 = new Location(10, -31, -90);
+	private static final Location corner3 = new Location(10, -6, 90);
+	private static final Location corner4 = new Location(-36, -6, 90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);//todo changes with color
+		CameraPipelineRed cameraPipeline = new CameraPipelineRed(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
@@ -48,13 +50,13 @@ public class DuckAutoBlue extends LinearOpMode {
 
 		drive.moveToLocation(carouselLocation);
 		sleep(500);
-		carousel.blueSpin();//todo changes with color
+		carousel.redSpin();//todo changes with color
 		sleep(4000);
-		carousel.blueSpin();
+		carousel.redSpin();
 		sleep(200);
 		drive.moveToLocation(corner1);
 		sleep(200);
-		drive.rotate(90);
+		drive.rotate(-90);//todo changes with color
 		sleep(200);
 		switch (pos) {
 			case 1:
@@ -83,9 +85,18 @@ public class DuckAutoBlue extends LinearOpMode {
 		}
 		drive.moveToLocation(corner2);
 		lift.positionDown();
+		drive.rotate(90);
 		sleep(200);
-		drive.moveToLocation(depot);
+		drive.moveToLocation(corner3);
+		sleep(200);
+		drive.moveToLocation(corner4);
 		lift.update(System.currentTimeMillis());
+		sleep(200);
+		drive.rotate(100);
+		sleep(200);
+		drive.rawMove(0, -1, 0);
+		sleep(2000);
+		drive.brake();
 
 		while (opModeIsActive()) sleep(100);
 	}

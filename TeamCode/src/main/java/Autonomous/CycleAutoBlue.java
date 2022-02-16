@@ -24,7 +24,7 @@ public class CycleAutoBlue extends LinearOpMode {
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
-		drive.rawMove(-0.1, -1.0 / 3, 0);
+		drive.rawMove(-0.25, -1.0 / 3, 0);
 		while (opModeIsActive() && intake.moving()) {
 			intake.update(System.currentTimeMillis());
 			if (!intake.moving()) break;
