@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import UtilityClasses.BatterySaving;
+import UtilityClasses.HardwareWrappers.CRServoController;
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.HardwareWrappers.RevTouchSensor;
 
@@ -34,6 +36,8 @@ public class BucketArm {
 
 	public boolean startPosSet = false;
 
+	private BatterySaving batterySaving;
+
 	public BucketArm(HardwareMap hardwareMap) {
 
 		liftMotor = hardwareMap.get(DcMotor.class, "lift");
@@ -48,6 +52,8 @@ public class BucketArm {
 		bucketSensor = hardwareMap.get(ColorRangeSensor.class, "bucketSensor");
 
 		led = hardwareMap.get(RevBlinkinLedDriver.class, "Led Indicate");
+
+		batterySaving = new BatterySaving(hardwareMap, led);
 
 		liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 	}
@@ -140,6 +146,8 @@ public class BucketArm {
 	public boolean autoIntaking = false, bucketFull = false;
 
 	public void update() {
+		batterySaving.update();
+
 		if (bucketFull) {
 			led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
 		} else {

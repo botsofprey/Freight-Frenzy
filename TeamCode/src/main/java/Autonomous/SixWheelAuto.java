@@ -1,20 +1,16 @@
 package Autonomous;
 
-import androidx.annotation.NonNull;
-
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.sun.tools.javac.util.List;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import DriveEngine.SixDrive;
 import Subsystems.BucketArm;
 import UtilityClasses.HardwareWrappers.CRServoController;
-import UtilityClasses.BatteryVoltage;
+import UtilityClasses.BatterySaving;
 
 
 @Autonomous (name="Six R-blued", group="Autonomous")
@@ -52,45 +48,45 @@ public class SixWheelAuto extends LinearOpMode {
 
 		//Zero Lift Position
 		{
-//			bucketArm.liftMoveTowards(2, 0.5);
-//			while (bucketArm.liftIsBusy()) {
-//			}
-//
-//			bucketArm.setLiftPower(-.75);
-//			while (!bucketArm.limitSwitch()) {
-//				telemetry.addData("Magnet sensor pressed", bucketArm.limitSwitch());
-//				telemetry.addData("Lift Position", bucketArm.getLiftPos());
-//				telemetry.update();
-//			}
-//			bucketArm.setLiftPower(0);
-//			bucketArm.resetLiftEncoder();
-//		}
+			bucketArm.liftMoveTowards(2, 0.5);
+			while (bucketArm.liftIsBusy()) {
+			}
+
+			bucketArm.setLiftPower(-.75);
+			while (!bucketArm.limitSwitch()) {
+				telemetry.addData("Magnet sensor pressed", bucketArm.limitSwitch());
+				telemetry.addData("Lift Position", bucketArm.getLiftPos());
+				telemetry.update();
+			}
+			bucketArm.setLiftPower(0);
+			bucketArm.resetLiftEncoder();
+		}
 
 		int index = 0;
 
 		//Find Start Position
-//		while(!isStarted()) {
-//			rightDistances[index] = rightSensor.getDistance(DistanceUnit.INCH);
-//			backDistances[index] = backSensor.getDistance(DistanceUnit.INCH);
-//			index++;
-//			if (index >= rightDistances.length) index = 0;
-//
-//			telemetry.addData("Current Distance From Carocel", averageValue(rightDistances));
-//			telemetry.addData("At Start Distance On Right", compare(rightStartPos, averageValue(rightDistances), 1));
-//			telemetry.addData("Current Distance From Wall", averageValue(backDistances));
-//			telemetry.addData("At Start Distance Behind", compare(backStartPos, averageValue(backDistances), 1));
-//			telemetry.update();
-//
-//			if (inPosition()) {
-//				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-//				telemetry.addData("Status", "Initialized");
-//			} else {
-//				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-//			}
-//
-//			telemetry.update();
-//		}
-			BatteryVoltage lowBattery = new BatteryVoltage(hardwareMap);
+		while(!isStarted()) {
+			rightDistances[index] = rightSensor.getDistance(DistanceUnit.INCH);
+			backDistances[index] = backSensor.getDistance(DistanceUnit.INCH);
+			index++;
+			if (index >= rightDistances.length) index = 0;
+
+			telemetry.addData("Current Distance From Carocel", averageValue(rightDistances));
+			telemetry.addData("At Start Distance On Right", compare(rightStartPos, averageValue(rightDistances), 1));
+			telemetry.addData("Current Distance From Wall", averageValue(backDistances));
+			telemetry.addData("At Start Distance Behind", compare(backStartPos, averageValue(backDistances), 1));
+			telemetry.update();
+
+			if (inPosition()) {
+				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+				telemetry.addData("Status", "Initialized");
+			} else {
+				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+			}
+
+			telemetry.update();
+		}
+			BatterySaving lowBattery = new BatterySaving(hardwareMap, led);
 
 		while(!isStarted()) {
 			telemetry.addData("Voltage", lowBattery.getBatteryVoltage());
@@ -173,7 +169,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 		while (opModeIsActive());
 	}
-	}
+
 
 	private boolean inPosition(){
 		return compare(averageValue(rightDistances), rightStartPos, 1)

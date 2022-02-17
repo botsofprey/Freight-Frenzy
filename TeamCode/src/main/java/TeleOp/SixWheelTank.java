@@ -2,21 +2,14 @@ package TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.util.BatteryChecker;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.Func;
 
 import Subsystems.BucketArm;
 import UtilityClasses.Controller;
 import UtilityClasses.HardwareWrappers.CRServoController;
-import UtilityClasses.HardwareWrappers.RevTouchSensor;
-import UtilityClasses.BatteryVoltage;
+import UtilityClasses.BatterySaving;
 
 @TeleOp(name="6 Wheel Tank", group="Tank")
 public class SixWheelTank extends LinearOpMode {
@@ -39,7 +32,7 @@ public class SixWheelTank extends LinearOpMode {
 	private Controller controller;
 
 	private BucketArm bucketArm;
-	private BatteryVoltage batteryChecker;
+	private BatterySaving batteryChecker;
 
 	private CRServoController servoLeft, servoRight;
 
@@ -47,10 +40,11 @@ public class SixWheelTank extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		controller = new Controller(gamepad1);
 		bucketArm = new BucketArm(hardwareMap);
-		batteryChecker = new BatteryVoltage(hardwareMap);
 
 		servoLeft = new CRServoController(hardwareMap, "leftWheel");
 		servoRight = new CRServoController(hardwareMap, "rightWheel");
+
+		batteryChecker = new BatterySaving(hardwareMap);
 
 //		bucketArm.liftMoveTowards(2, 0.5);
 //		while (bucketArm.liftIsBusy()) {
@@ -68,10 +62,6 @@ public class SixWheelTank extends LinearOpMode {
 			motors[i] = hardwareMap.get(DcMotor.class, names[i]);
 			motors[i].setDirection(directions[i]);
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-		}
-
-		if(batteryChecker.checkBatterVoltage()){
-			telemetry.addData("Low ", true);
 		}
 
 		telemetry.addData("Start set", bucketArm.startPosSet);
