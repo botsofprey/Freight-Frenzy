@@ -2,19 +2,14 @@ package TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.Func;
 
 import Subsystems.BucketArm;
 import UtilityClasses.Controller;
 import UtilityClasses.HardwareWrappers.CRServoController;
-import UtilityClasses.HardwareWrappers.RevTouchSensor;
+import UtilityClasses.BatterySaving;
 
 @TeleOp(name="6 Wheel Tank", group="Tank")
 public class SixWheelTank extends LinearOpMode {
@@ -37,6 +32,7 @@ public class SixWheelTank extends LinearOpMode {
 	private Controller controller;
 
 	private BucketArm bucketArm;
+	private BatterySaving batteryChecker;
 
 	private CRServoController servoLeft, servoRight;
 
@@ -47,6 +43,8 @@ public class SixWheelTank extends LinearOpMode {
 
 		servoLeft = new CRServoController(hardwareMap, "leftWheel");
 		servoRight = new CRServoController(hardwareMap, "rightWheel");
+
+		batteryChecker = new BatterySaving(hardwareMap);
 
 //		bucketArm.liftMoveTowards(2, 0.5);
 //		while (bucketArm.liftIsBusy()) {
@@ -64,10 +62,6 @@ public class SixWheelTank extends LinearOpMode {
 			motors[i] = hardwareMap.get(DcMotor.class, names[i]);
 			motors[i].setDirection(directions[i]);
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-		}
-
-		if(getBatteryVoltage() < 9){
-			telemetry.addData("Low ", true);
 		}
 
 		telemetry.addData("Start set", bucketArm.startPosSet);
@@ -136,7 +130,7 @@ public class SixWheelTank extends LinearOpMode {
 			}
 
 			telemetry.addData("Lift Position", bucketArm.getLiftPos());
-			telemetry.addData("Volts", getBatteryVoltage());
+			telemetry.addData("Volts", batteryChecker.getBatteryVoltage());
 
 			bucketArm.update();
 
@@ -154,16 +148,6 @@ public class SixWheelTank extends LinearOpMode {
 
 			telemetry.update();
 		}
-	}
-
-	double getBatteryVoltage() {
-		double result = Double.POSITIVE_INFINITY;
-		for (VoltageSensor sensor : hardwareMap.voltageSensor) {
-			double voltage = sensor.getVoltage();
-			if (voltage > 0)
-				result = Math.min(result, voltage);
-		}
-		return result;
 	}
 
 	private void normalize(double[] powers) {
