@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
+import UtilityClasses.BatterySaving;
 import UtilityClasses.HardwareWrappers.MagneticLimitSwitch;
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.HardwareWrappers.ServoController;
@@ -51,6 +52,8 @@ public class Lift {
 
 	private RevBlinkinLedDriver liftLed;
 
+	private BatterySaving batterySaving;
+
 	private long dropTime;
 	private boolean freightDropped;
 	private boolean resetServo;
@@ -77,6 +80,8 @@ public class Lift {
 
 		liftLed = hardwareMap.get(RevBlinkinLedDriver.class, "liftLED");
 		liftLed.setPattern(downColor);
+
+		batterySaving = new BatterySaving(hardwareMap, liftLed);
 
 		bucketColor = hardwareMap.get(ColorSensor.class, "bucketColor");
 
@@ -241,12 +246,14 @@ public class Lift {
 			brake();
 		}
 
-		if (pressed) {
-			liftLed.setPattern(downColor);
-		} else if (slide.getCurrentPosition() > POSITIONS[2] - 50) {
-			liftLed.setPattern(upColor);
-		} else {
-			liftLed.setPattern(midColor);
+		if(!batterySaving.currentStatus()) {
+			if (pressed) {
+				liftLed.setPattern(downColor);
+			} else if (slide.getCurrentPosition() > POSITIONS[2] - 50) {
+				liftLed.setPattern(upColor);
+			} else {
+				liftLed.setPattern(midColor);
+			}
 		}
 
 		long delay = 600;
