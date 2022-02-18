@@ -131,6 +131,7 @@ public class SixWheelTank extends LinearOpMode {
 
 			telemetry.addData("Lift Position", bucketArm.getLiftPos());
 			telemetry.addData("Volts", batteryChecker.getBatteryVoltage());
+			telemetry.addData("is red", batteryChecker.areRed);
 
 			bucketArm.update();
 
