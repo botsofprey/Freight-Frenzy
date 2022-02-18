@@ -119,7 +119,7 @@ public class SixWheelAuto extends LinearOpMode {
 		while (bucketArm.liftIsBusy()){}
 		sleep(500);
 
-		sixDrive.move(5, .25);
+		sixDrive.move(8, .25);
 		while(sixDrive.isBusy()){
 			sixDrive.update();
 		}
@@ -130,7 +130,7 @@ public class SixWheelAuto extends LinearOpMode {
 
 		//Move to wall
 		bucketArm.liftMoveTowards(0, .5);
-		sixDrive.move(-23, .1);
+		sixDrive.move(-32, .1);
 		while (sixDrive.isBusy()){
 			sixDrive.update();}
 		sleep(500);
@@ -157,7 +157,7 @@ public class SixWheelAuto extends LinearOpMode {
 		servoLeft.setPower(0);
 
 		//Park
-		sixDrive.move(18, .25);
+		sixDrive.move(18, .5);
 		while(sixDrive.isBusy()){
 			sixDrive.update();
 		}

@@ -113,7 +113,7 @@ public class BlueTeleOp extends LinearOpMode {
 			}
 
 			if(controller1.rightStick.y != 0){
-				lift.moveCapperPosition(controller1.rightStick.y);
+				lift.moveCappingArm(controller1.rightStick.y);
 			}
 
 			long time = System.currentTimeMillis();
