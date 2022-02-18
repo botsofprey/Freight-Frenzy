@@ -12,7 +12,7 @@ import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="DuckWarehouseAutoRed", group="Red Autos", preselectTeleOp="Blue TeleOp")
+@Autonomous(name="DuckWarehouseAutoRed", group="Red Autos", preselectTeleOp="Red TeleOp")
 public class DuckWarehouseAutoRed extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private MotorCarousel carousel;

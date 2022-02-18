@@ -66,11 +66,11 @@ public class CameraPipelineBlue extends OpenCvPipeline {
 				location = 1;
 			}
 			else {
-				location = 0;
+				location = 2;
 			}
 		}
 		else {
-			location = 2;
+			location = 0;
 		}
 		int temp = numChecks;
 		numChecks = temp + 1;
