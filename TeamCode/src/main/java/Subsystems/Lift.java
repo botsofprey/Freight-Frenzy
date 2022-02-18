@@ -9,8 +9,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import UtilityClasses.BatterySaving;
+import UtilityClasses.HardwareWrappers.CRServoController;
 import UtilityClasses.HardwareWrappers.MagneticLimitSwitch;
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.HardwareWrappers.ServoController;
@@ -53,6 +56,11 @@ public class Lift {
 	private boolean freightDropped;
 	private boolean resetServo;
 
+	private ServoController arm;
+	public static final double CAPPER_DOWN = 0, CAPPER_UP = 1;
+
+	private BatterySaving batterySaving;
+
 	public Lift(HardwareMap hardwareMap, LinearOpMode opMode, boolean errors) {
 		mode = opMode;
 		usingEncoders = true;
@@ -73,11 +81,15 @@ public class Lift {
 		liftLed = hardwareMap.get(RevBlinkinLedDriver.class, "liftLED");
 		liftLed.setPattern(downColor);
 
+		batterySaving = new BatterySaving(hardwareMap, liftLed);
+
 		bucketColor = hardwareMap.get(ColorSensor.class, "bucketColor");
 
 		dropTime = System.currentTimeMillis();
 		freightDropped = false;
 		resetServo = false;
+
+		arm = hardwareMap.get(ServoController.class, "capper");
 	}
 
 	public void zeroSlider(){
@@ -216,7 +228,17 @@ public class Lift {
 				&& Math.abs(colorA[2] - colorB[2]) <= range;
 	}
 
+	public void moveCapperPosition(double position){
+		arm.setPosition(position);
+	}
+
+	public double getCapperPositon(){
+		return arm.getPosition();
+	}
+
 	public void update(long millis) {
+		batterySaving.update();
+
 		boolean pressed = limitSwitch.isPressed();
 		if (pressed && !switchPressed) {
 			slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -227,12 +249,14 @@ public class Lift {
 			brake();
 		}
 
-		if (pressed) {
-			liftLed.setPattern(downColor);
-		} else if (slide.getCurrentPosition() > POSITIONS[2] - 50) {
-			liftLed.setPattern(upColor);
-		} else {
-			liftLed.setPattern(midColor);
+		if(!batterySaving.currentStatus()) {
+			if (pressed) {
+				liftLed.setPattern(downColor);
+			} else if (slide.getCurrentPosition() > POSITIONS[2] - 50) {
+				liftLed.setPattern(upColor);
+			} else {
+				liftLed.setPattern(midColor);
+			}
 		}
 
 		long delay = 600;

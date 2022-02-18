@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import UtilityClasses.BatterySaving;
 import UtilityClasses.HardwareWrappers.MotorController;
 
 public class Intake {
@@ -33,6 +34,8 @@ public class Intake {
 
 	private RevBlinkinLedDriver intakeLEDs;
 
+	private BatterySaving batterySaving;
+
 	private LinearOpMode mode;
 
 	private ColorSensor colorSensorA;
@@ -55,6 +58,8 @@ public class Intake {
 
 		intakeLEDs = hw.get(RevBlinkinLedDriver.class, "intakeLED");
 		intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+
+		batterySaving = new BatterySaving(hw, intakeLEDs);
 
 		intakeDistance = hw.get(DistanceSensor.class, "intakeDistance");
 	}
@@ -115,11 +120,15 @@ public class Intake {
 	public boolean moving() { return state != BRAKE; }
 
 	public void update(long millis) {
-		if (state == INTAKE && detectColor() && millis - mil >= 1000) {
-			intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-			brake();
-			freezeTime = millis;
+		if(!batterySaving.currentStatus()){
+			if (state == INTAKE && detectColor() && millis - mil >= 1000) {
+				intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+				brake();
+				freezeTime = millis;
+			}
 		}
+
+		batterySaving.update();
 
 		if (freezeTime != 0 && freezeTime + 500 <= millis) {
 			intake();

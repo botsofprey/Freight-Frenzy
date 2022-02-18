@@ -73,5 +73,7 @@ public class BatterySaving {
 
                 System.out.println("Led is red: " + areRed);
             }
+
+            batteryLow = checkBatterVoltage();
     }
 }

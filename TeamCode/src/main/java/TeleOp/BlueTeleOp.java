@@ -111,6 +111,11 @@ public class BlueTeleOp extends LinearOpMode {
 			if (controller1.leftTriggerReleased) {
 				drive.noSlowMode();
 			}
+
+			if(controller1.rightStick.y != 0){
+				lift.moveCapperPosition(controller1.rightStick.y);
+			}
+
 			long time = System.currentTimeMillis();
 
 			if ((time - startTime) / 1000.0 >= 85 &&

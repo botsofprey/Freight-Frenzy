@@ -148,10 +148,12 @@ public class BucketArm {
 	public void update() {
 		batterySaving.update();
 
-		if (bucketFull) {
-			led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-		} else {
-			led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+		if(!batterySaving.currentStatus()) {
+			if (bucketFull) {
+				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+			} else {
+				led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+			}
 		}
 
 		if (getBucketPower() >= 0) {
