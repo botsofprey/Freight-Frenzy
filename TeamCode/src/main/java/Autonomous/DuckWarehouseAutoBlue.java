@@ -1,5 +1,6 @@
 package Autonomous;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -34,6 +35,11 @@ public class DuckWarehouseAutoBlue extends LinearOpMode {
 		carousel = new MotorCarousel(hardwareMap, this);
 		lift = new Lift(hardwareMap, this, true);
 		intake = new Intake(hardwareMap, this, true);
+//		int chargeSoundId = hardwareMap.appContext.getResources().getIdentifier("charge",
+//				"raw", hardwareMap.appContext.getPackageName());
+//		boolean chargeFound = false;
+//		if (chargeSoundId != 0)
+//			chargeFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, chargeSoundId);
 
 		String[] positions = { "Right", "Center", "Left" };
 
@@ -62,10 +68,10 @@ public class DuckWarehouseAutoBlue extends LinearOpMode {
 				lift.positionMiddle();
 				break;
 			case 2:
-				lift.positionUp();
+				lift.positionDown();
 				break;
 			default:
-				lift.positionDown();
+				lift.positionUp();
 				break;
 		}
 		while (opModeIsActive() && lift.isMoving()) sleep(100);
@@ -93,8 +99,10 @@ public class DuckWarehouseAutoBlue extends LinearOpMode {
 		sleep(200);
 		drive.rotate(-100);
 		sleep(200);
+//		if (chargeFound)
+//			SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, chargeSoundId);
 		drive.rawMove(0, -1, 0);
-		sleep(2000);
+		sleep(1500);
 		drive.brake();
 
 		while (opModeIsActive()) sleep(100);

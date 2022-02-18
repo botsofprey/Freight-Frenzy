@@ -16,11 +16,11 @@ public class CycleAutoBlue extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
 
-	private Location shippingHub = new Location(-18, -22, 0);
+	private Location shippingHub = new Location(-20, -24, 0);
 	private Location warehouseEntrance = new Location(-3, 10, -90);
 	private Location warehouse = new Location(24, 10, -90);
 	private Location wareHouseExit = new Location(-3, 6, -90);
-	private Location shippingHubCycle = new Location(-18, -21, -90);
+	private Location shippingHubCycle = new Location(-12, -21, -90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
@@ -65,10 +65,10 @@ public class CycleAutoBlue extends LinearOpMode {
 				lift.positionMiddle();
 				break;
 			case 2:
-				lift.positionUp();
+				lift.positionDown();
 				break;
 			default:
-				lift.positionDown();
+				lift.positionUp();
 				break;
 		}
 		while (opModeIsActive() && lift.isMoving()) sleep(100);

@@ -63,10 +63,10 @@ public class DuckWarehouseAutoRed extends LinearOpMode {
 				lift.positionMiddle();
 				break;
 			case 2:
-				lift.positionUp();
+				lift.positionDown();
 				break;
 			default:
-				lift.positionDown();
+				lift.positionUp();
 				break;
 		}
 		while (opModeIsActive() && lift.isMoving()) sleep(100);
@@ -95,7 +95,7 @@ public class DuckWarehouseAutoRed extends LinearOpMode {
 		drive.rotate(100);
 		sleep(200);
 		drive.rawMove(0, -1, 0);
-		sleep(2000);
+		sleep(1500);
 		drive.brake();
 
 		while (opModeIsActive()) sleep(100);

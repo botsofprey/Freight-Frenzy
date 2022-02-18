@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.Range;
 
 import UtilityClasses.HardwareWrappers.MagneticLimitSwitch;
 import UtilityClasses.HardwareWrappers.MotorController;
@@ -33,6 +34,7 @@ public class Lift {
 	private ModernRoboticsTouchSensor limitSwitch;
 
 	private ServoController bucketWall;
+	private ServoController cappingArm;
 
 	private MotorController slide;
 	private LinearOpMode mode;
@@ -65,6 +67,9 @@ public class Lift {
 
 		bucketWall = new ServoController(hardwareMap, "bucketServo", mode, errors);
 		bucketWall.setPosition(1);
+
+		cappingArm = new ServoController(hardwareMap, "cappingArm", mode, errors);
+		cappingArm.setPosition(0);
 
 		limitSwitch = hardwareMap.get(ModernRoboticsTouchSensor.class, "liftLimit");
 
@@ -214,6 +219,15 @@ public class Lift {
 	private boolean colorChecker(int[] colorA, int[] colorB) {
 		return Math.abs(colorA[0] - colorB[0]) <= range && Math.abs(colorA[1] - colorB[1]) <= range
 				&& Math.abs(colorA[2] - colorB[2]) <= range;
+	}
+
+	public void setCappingArm(double position) {
+		cappingArm.setPosition(position);
+	}
+
+	public void moveCappingArm(double offset) {
+		cappingArm.setPosition(
+				Range.clip(cappingArm.getPosition() + offset, -1, 1));
 	}
 
 	public void update(long millis) {

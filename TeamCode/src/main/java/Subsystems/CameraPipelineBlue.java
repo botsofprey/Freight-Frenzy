@@ -25,7 +25,7 @@ public class CameraPipelineBlue extends OpenCvPipeline {
 
 	private LinearOpMode mode;
 
-	private volatile int location = 2;
+	private volatile int location = 0;
 	public volatile int x;
 	public volatile int y;
 	public volatile String data;
@@ -66,11 +66,11 @@ public class CameraPipelineBlue extends OpenCvPipeline {
 				location = 1;
 			}
 			else {
-				location = 2;
+				location = 0;
 			}
 		}
 		else {
-			location = 0;
+			location = 2;
 		}
 		int temp = numChecks;
 		numChecks = temp + 1;

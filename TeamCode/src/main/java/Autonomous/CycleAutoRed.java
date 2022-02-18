@@ -66,10 +66,10 @@ public class CycleAutoRed extends LinearOpMode {
 				lift.positionMiddle();
 				break;
 			case 2:
-				lift.positionUp();
+				lift.positionDown();
 				break;
 			default:
-				lift.positionDown();
+				lift.positionUp();
 				break;
 		}
 		while (opModeIsActive() && lift.isMoving()) sleep(100);

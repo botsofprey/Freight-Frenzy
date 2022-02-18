@@ -113,6 +113,8 @@ public class BlueTeleOp extends LinearOpMode {
 			}
 			long time = System.currentTimeMillis();
 
+			lift.moveCappingArm(controller2.rightStick.y * (time - previousTime) / 1000.0);
+
 			if ((time - startTime) / 1000.0 >= 85 &&
 					(time - startTime) / 1000.0 < 89 && !controller1.isRumbling()) {
 				controller1.rumble(5000);

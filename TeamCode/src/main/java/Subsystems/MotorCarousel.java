@@ -9,8 +9,8 @@ public class MotorCarousel {
 	public double AUTO_POWER = 0.2;
 	public double TELEOP_POWER = 0.4;
 	private static final long ON_TIME = 900;
-	private static final long FULL_POWER = 1100;
-	private static final long CYCLE_TIME = 2000;
+	private static final long FULL_POWER = 1300;
+	private static final long CYCLE_TIME = 2200;
 
 	private LinearOpMode mode;
 
