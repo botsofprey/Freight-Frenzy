@@ -17,6 +17,7 @@ public class Intake {
 	public static final int OUTTAKE_BUTTON = 1;
 
 	private static final double MOTOR_POWER = 1;
+	private static final double AUTO_POWER = 0.75;
 	private static final int BRAKE = 0;
 	private static final int INTAKE = 1;
 	private static final int OUTTAKE = 2;
@@ -80,7 +81,7 @@ public class Intake {
 	}
 	
 	public void intakeNoDelay() {
-		intakeMotor.setPower(MOTOR_POWER);
+		intakeMotor.setPower(AUTO_POWER);
 		state = INTAKE;
 		
 		freezeTime = 0;

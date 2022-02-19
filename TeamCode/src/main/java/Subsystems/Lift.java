@@ -69,7 +69,7 @@ public class Lift {
 		bucketWall.setPosition(1);
 
 		cappingArm = new ServoController(hardwareMap, "cappingArm", mode, errors);
-		cappingArm.setPosition(0);
+		cappingArm.setPosition(1);
 
 		limitSwitch = hardwareMap.get(ModernRoboticsTouchSensor.class, "liftLimit");
 

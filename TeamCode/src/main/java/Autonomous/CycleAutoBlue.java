@@ -16,11 +16,11 @@ public class CycleAutoBlue extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
 
-	private Location shippingHub = new Location(-20, -24, 0);
+	private Location shippingHub = new Location(-20, -27, 0);
 	private Location warehouseEntrance = new Location(-3, 10, -90);
 	private Location warehouse = new Location(24, 10, -90);
 	private Location wareHouseExit = new Location(-3, 6, -90);
-	private Location shippingHubCycle = new Location(-12, -21, -90);
+	private Location shippingHubCycle = new Location(-16, -23, -90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
@@ -30,14 +30,15 @@ public class CycleAutoBlue extends LinearOpMode {
 			if (!intake.moving()) break;
 			drive.updateLocation();
 		}
-		drive.brake();
+		drive.rawMove(-0.25, 0.5, 0);
 		sleep(200);
+		drive.brake();
 		int numMeasurements = 10;
 		double avg = 0;
 		for (int i = 0; i < numMeasurements; i++) {
 			avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
 		}
-		drive.setCurrentLocation(new Location(46 - avg, 0, -90));
+		drive.setCurrentLocation(new Location(44 - avg, 0, -90));
 	}
 
 	@Override
@@ -88,9 +89,9 @@ public class CycleAutoBlue extends LinearOpMode {
 			drive.rotate(-90);
 			lift.positionDown();
 			drive.moveToLocation(warehouseEntrance);
+			if (!opModeIsActive() || i == numCycles) break;
 			drive.moveToLocation(warehouse);
 			lift.update(System.currentTimeMillis());
-			if (!opModeIsActive() || i == numCycles) break;
 			grabBlock();
 			intake.intake();
 			drive.moveToLocation(wareHouseExit);
@@ -99,6 +100,10 @@ public class CycleAutoBlue extends LinearOpMode {
 			drive.moveToLocation(shippingHubCycle);
 			drive.rotate(0);
 		}
+		lift.update(System.currentTimeMillis());
+		drive.rawMove(-0.25, -1, 0);
+		sleep(1000);
+		drive.brake();
 
 		while (opModeIsActive()) sleep(100);
 	}

@@ -112,10 +112,6 @@ public class BlueTeleOp extends LinearOpMode {
 				drive.noSlowMode();
 			}
 
-			if(controller1.rightStick.y != 0){
-				lift.moveCapperPosition(controller1.rightStick.y);
-			}
-
 			long time = System.currentTimeMillis();
 
 			lift.moveCappingArm(controller2.rightStick.y * (time - previousTime) / 1000.0);
