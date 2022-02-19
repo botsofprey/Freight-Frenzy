@@ -107,7 +107,7 @@ public class RedTeleOp extends LinearOpMode {
 			}
 			long time = System.currentTimeMillis();
 
-			lift.moveCappingArm(controller2.rightStick.y * (time - previousTime) / 1000.0);
+			lift.moveCappingArm(controller2.rightStick.y * (time - previousTime) / 2000.0);
 
 			if ((time - startTime) / 1000.0 >= 85 &&
 					(time - startTime) / 1000.0 < 89 && !controller1.isRumbling()) {

@@ -30,7 +30,7 @@ public class CycleAutoBlue extends LinearOpMode {
 			if (!intake.moving()) break;
 			drive.updateLocation();
 		}
-		drive.rawMove(-0.25, 0.5, 0);
+		drive.rawMove(-0.25, 1, 0);
 		sleep(200);
 		drive.brake();
 		int numMeasurements = 10;
@@ -38,7 +38,7 @@ public class CycleAutoBlue extends LinearOpMode {
 		for (int i = 0; i < numMeasurements; i++) {
 			avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
 		}
-		drive.setCurrentLocation(new Location(44 - avg, 0, -90));
+		drive.setCurrentLocation(new Location(44 - avg, 0, -90));//todo changes with color
 	}
 
 	@Override

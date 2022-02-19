@@ -41,7 +41,7 @@ public class Intake {
 
 	private ColorSensor colorSensorA;
 	private ColorSensor colorSensorB;
-	private static final int RED_THRESHOLD = 70;
+	private static final int RED_THRESHOLD = 73;
 
 	private long mil = 0;
 	private long freezeTime = 0;
@@ -70,7 +70,10 @@ public class Intake {
 	}
 
 	private boolean detectColor() {
-		return Math.max(colorSensorA.red(), colorSensorB.red()) > RED_THRESHOLD;
+		int color = Math.max(colorSensorA.red(), colorSensorB.red());
+		mode.telemetry.addData("Color", color);
+		mode.telemetry.update();
+		return color > RED_THRESHOLD;
 	}
 	
 	public int[][] getColor() {
@@ -121,15 +124,15 @@ public class Intake {
 	public boolean moving() { return state != BRAKE; }
 
 	public void update(long millis) {
-		if(!batterySaving.currentStatus()){
+//		if(!batterySaving.currentStatus()){
 			if (state == INTAKE && detectColor() && millis - mil >= 1000) {
 				intakeLEDs.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
 				brake();
 				freezeTime = millis;
 			}
-		}
-
-		batterySaving.update();
+//		}
+//
+//		batterySaving.update();
 
 		if (freezeTime != 0 && freezeTime + 500 <= millis) {
 			intake();

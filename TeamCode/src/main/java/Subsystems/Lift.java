@@ -24,7 +24,7 @@ public class Lift {
 	private static final int[] POSITIONS = {
 			0,
 			350,
-			700
+			800
 	};
 	private static final RevBlinkinLedDriver.BlinkinPattern
 			downColor =  RevBlinkinLedDriver.BlinkinPattern.GREEN,
@@ -246,7 +246,7 @@ public class Lift {
 			brake();
 		}
 
-		if(!batterySaving.currentStatus()) {
+//		if(!batterySaving.currentStatus()) {
 			if (pressed) {
 				liftLed.setPattern(downColor);
 			} else if (slide.getCurrentPosition() > POSITIONS[2] - 50) {
@@ -254,7 +254,7 @@ public class Lift {
 			} else {
 				liftLed.setPattern(midColor);
 			}
-		}
+//		}
 
 		long delay = 600;
 		if (freightDropped) {

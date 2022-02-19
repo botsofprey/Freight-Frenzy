@@ -17,20 +17,22 @@ public class CycleAutoRed extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
 
-	private Location shippingHub = new Location(18, -22, 0);
-	private Location warehouseEntrance = new Location(3, 10, 90);
-	private Location warehouse = new Location(-24, 10, 90);
-	private Location wareHouseExit = new Location(3, 6, 90);
-	private Location shippingHubCycle = new Location(18, -21, 90);
+	private Location shippingHub = new Location(21, -14, 0);
+	private Location warehouseEntrance = new Location(3, 12, 90);
+	private Location warehouse = new Location(-24, 12, 90);
+	private Location wareHouseExit = new Location(5, 13, 90);
+	private Location shippingHubCycle = new Location(23, -17, 90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
-		drive.rawMove(-0.25, -1.0 / 3, 0);
+		drive.rawMove(0.15, -1.0 / 3.5, 0);
 		while (opModeIsActive() && intake.moving()) {
 			intake.update(System.currentTimeMillis());
 			if (!intake.moving()) break;
 			drive.updateLocation();
 		}
+		drive.rawMove(0.15, 1, 0);
+		sleep(200);
 		drive.brake();
 		sleep(200);
 		int numMeasurements = 10;
@@ -38,7 +40,7 @@ public class CycleAutoRed extends LinearOpMode {
 		for (int i = 0; i < numMeasurements; i++) {
 			avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
 		}
-		drive.setCurrentLocation(new Location(46 - avg, 0, 90));
+		drive.setCurrentLocation(new Location(avg - 49, 8, 90));//todo changes with color
 	}
 
 	@Override
@@ -89,9 +91,9 @@ public class CycleAutoRed extends LinearOpMode {
 			drive.rotate(90);
 			lift.positionDown();
 			drive.moveToLocation(warehouseEntrance);
+			if (!opModeIsActive() || i == numCycles) break;
 			drive.moveToLocation(warehouse);
 			lift.update(System.currentTimeMillis());
-			if (!opModeIsActive() || i == numCycles) break;
 			grabBlock();
 			intake.intake();
 			drive.moveToLocation(wareHouseExit);
@@ -100,6 +102,10 @@ public class CycleAutoRed extends LinearOpMode {
 			drive.moveToLocation(shippingHubCycle);
 			drive.rotate(0);
 		}
+		lift.update(System.currentTimeMillis());
+		drive.rawMove(0.25, -1, 0);
+		sleep(1000);
+		drive.brake();
 
 		while (opModeIsActive()) sleep(100);
 	}
