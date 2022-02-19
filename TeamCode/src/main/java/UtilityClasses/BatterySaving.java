@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 public class BatterySaving {
     private HardwareMap hardwareMap;
-    private static final double low = 9, blinkTime = 2.5;
+    private static final double low = 9, redBlinkTime = 7.0/4, blackBlinkTime = 1.0/4;
+    private double blinkTime = redBlinkTime;
     private boolean batteryLow;
 
     private RevBlinkinLedDriver led;
@@ -61,19 +62,26 @@ public class BatterySaving {
         return total/(double)batteryAverage.length;
     }
 
-    public boolean areRed = false;
+    public boolean areRed = true;
 
     double millisPassed;
     public void update(){
-            if(System.currentTimeMillis() - millisPassed >= blinkTime * 1000){
-                led.setPattern(areRed ? RevBlinkinLedDriver.BlinkinPattern.RED :
-                        RevBlinkinLedDriver.BlinkinPattern.BLACK);
-                areRed = !areRed;
+        if(areRed){
+            if(System.currentTimeMillis() - millisPassed >= redBlinkTime * 1000){
+                led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+                areRed = false;
                 millisPassed = System.currentTimeMillis();
-
                 System.out.println("Led is red: " + areRed);
             }
+        }else{
+            if(System.currentTimeMillis() - millisPassed >= blackBlinkTime * 1000){
+                led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+                areRed = true;
+                millisPassed = System.currentTimeMillis();
+                System.out.println("Led is red: " + areRed);
+            }
+        }
 
-            batteryLow = checkBatterVoltage();
+        batteryLow = !checkBatterVoltage();
     }
 }
