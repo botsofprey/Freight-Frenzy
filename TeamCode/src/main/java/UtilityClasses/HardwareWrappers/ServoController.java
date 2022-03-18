@@ -7,82 +7,33 @@ import com.qualcomm.robotcore.hardware.Servo;
 import java.util.Objects;
 
 public class ServoController {
-	private LinearOpMode mode;
-
 	public Servo servo;
-	private String name;
-	private boolean throwErrors;
 
-	private void error(Exception e) {
-		e.printStackTrace();
-		mode.telemetry.addData("Could not access servo", name);
-		if (throwErrors) {
-			throw new Error("Could not access servo: " + name);
-		}
-	}
-
-	public ServoController(HardwareMap hw, String servoName, LinearOpMode m, boolean errors) {
-		mode = m;
-		name = servoName;
-		throwErrors = errors;
-
-		if (errors) {
-			servo = hw.get(Servo.class, name);
-		}
-		else {
-			try {
-				servo = hw.get(Servo.class, name);
-			} catch (IllegalArgumentException e) {
-				error(e);
-			}
-		}
+	public ServoController(HardwareMap hw, String servoName) {
+		servo = hw.get(Servo.class, servoName);
 	}
 
 	public void setPosition(double position) {
-		try {
-			servo.setPosition(position);
-		}
-		catch (NullPointerException e) {
-			error(e);
-		}
+		servo.setPosition(position);
 	}
 
 	public double getPosition() {
-		try {
-			return servo.getPosition();
-		}
-		catch (NullPointerException e) {
-			error(e);
-			return 0;
-		}
+		return servo.getPosition();
 	}
 
 	public void setDirection(Servo.Direction direction) {
-		try {
-			servo.setDirection(direction);
-		}
-		catch (NullPointerException e) {
-			error(e);
-		}
+		servo.setDirection(direction);
 	}
 
 	public Servo.Direction getDirection() {
-		try {
-			return servo.getDirection();
-		}
-		catch (NullPointerException e) {
-			error(e);
-			return Servo.Direction.FORWARD;
-		}
+		return servo.getDirection();
 	}
 
 
 	@Override
 	public String toString() {
 		return "ServoController{" +
-				"mode=" + mode +
-				", servo=" + servo +
-				", name='" + name + '\'' +
+				"servo=" + servo +
 				'}';
 	}
 
@@ -91,11 +42,11 @@ public class ServoController {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		ServoController that = (ServoController) o;
-		return mode.equals(that.mode) && servo.equals(that.servo) && name.equals(that.name);
+		return servo.equals(that.servo);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(mode, servo, name);
+		return Objects.hash(servo);
 	}
 }

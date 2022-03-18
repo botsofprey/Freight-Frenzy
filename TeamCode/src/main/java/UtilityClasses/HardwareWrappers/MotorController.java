@@ -1,6 +1,5 @@
 package UtilityClasses.HardwareWrappers;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -12,10 +11,6 @@ public class MotorController {
 	private DcMotorEx motor;
 	private LimitSwitch start = null;
 	private LimitSwitch end = null;
-
-	public MotorController(HardwareMap hw, String motorName, LinearOpMode m, boolean errors) {
-		motor = hw.get(DcMotorEx.class, motorName);
-	}
 
 	public MotorController(HardwareMap hw, String motorName) {
 		motor = hw.get(DcMotorEx.class, motorName);
@@ -100,6 +95,10 @@ public class MotorController {
 		if (end != null && !end.getState() && getPower() > 0) {
 			motor.setPower(0);
 		}
+	}
+
+	protected DcMotorEx getMotor() {
+		return motor;
 	}
 
 

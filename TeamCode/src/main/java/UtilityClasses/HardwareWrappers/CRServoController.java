@@ -8,11 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import java.util.Objects;
 
 public class CRServoController {
-	private LinearOpMode mode;
-
 	public CRServo servo;
 	private String name;
-	private boolean throwErrors;
 
 	public CRServoController(HardwareMap hw, String servoName) {
 		name = servoName;
@@ -40,7 +37,6 @@ public class CRServoController {
 	@Override
 	public String toString() {
 		return "ServoController{" +
-				"mode=" + mode +
 				", servo=" + servo +
 				", name='" + name + '\'' +
 				'}';
@@ -51,11 +47,11 @@ public class CRServoController {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		CRServoController that = (CRServoController) o;
-		return mode.equals(that.mode) && servo.equals(that.servo) && name.equals(that.name);
+		return servo.equals(that.servo) && name.equals(that.name);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(mode, servo, name);
+		return Objects.hash(servo, name);
 	}
 }

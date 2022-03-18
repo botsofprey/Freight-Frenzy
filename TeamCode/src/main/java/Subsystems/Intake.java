@@ -50,7 +50,7 @@ public class Intake {
 	public Intake(HardwareMap hw, LinearOpMode m, boolean errors) {
 		mode = m;
 
-		intakeMotor = new MotorController(hw, "intakeMotor", mode, errors);
+		intakeMotor = new MotorController(hw, "intakeMotor");
 		intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 		state = BRAKE;
 

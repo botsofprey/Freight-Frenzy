@@ -83,7 +83,7 @@ public class NewMecanumDrive {
 		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");
-			motors[i] = new MotorController(hw, motorName, mode, true);
+			motors[i] = new MotorController(hw, motorName);
 			motors[i].setDirection(
 					reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
 							DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE

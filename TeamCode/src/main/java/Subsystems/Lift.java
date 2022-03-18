@@ -63,15 +63,15 @@ public class Lift {
 		usingEncoders = true;
 		braking = false;
 
-		slide = new MotorController(hardwareMap, "liftMotor", mode, errors);
+		slide = new MotorController(hardwareMap, "liftMotor");
 		slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		slide.setDirection(DcMotorSimple.Direction.REVERSE);
 		slide.setPositionPIDFCoefficients(10);
 
-		bucketWall = new ServoController(hardwareMap, "bucketServo", mode, errors);
+		bucketWall = new ServoController(hardwareMap, "bucketServo");
 		bucketWall.setPosition(1);
 
-		cappingArm = new ServoController(hardwareMap, "cappingArm", mode, errors);
+		cappingArm = new ServoController(hardwareMap, "cappingArm");
 		cappingArm.setPosition(1);
 
 		limitSwitch = hardwareMap.get(ModernRoboticsTouchSensor.class, "liftLimit");
