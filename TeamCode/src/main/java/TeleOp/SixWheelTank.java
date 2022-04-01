@@ -1,5 +1,6 @@
 package TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,6 +13,7 @@ import UtilityClasses.HardwareWrappers.CRServoController;
 import UtilityClasses.BatterySaving;
 
 @TeleOp(name="6 Wheel Tank", group="Tank")
+@Disabled
 public class SixWheelTank extends LinearOpMode {
 	private String[] names = new String[] {
 			"frontLeft",

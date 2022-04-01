@@ -2,6 +2,7 @@ package UtilityClasses;
 
 import java.util.Objects;
 
+@Deprecated
 public class Location {
 	public static final Location ORIGIN = new Location(0, 0, 0);
 

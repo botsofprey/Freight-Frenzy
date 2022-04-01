@@ -1,5 +1,6 @@
 package TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import Subsystems.Intake;
 
 @TeleOp(name="Color Calibration", group="test")
+@Disabled
 public class ColorCalibration extends LinearOpMode {
 	private Intake intake;
 	

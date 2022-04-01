@@ -1,4 +1,4 @@
 {
-  "ticks_per_revolution": 2000,
-  "wheel_diameter": 1.5
+  "ticksPerRevolution": 2000,
+  "wheelDiameter": 1.5
 }

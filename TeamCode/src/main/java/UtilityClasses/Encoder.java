@@ -3,6 +3,7 @@ package UtilityClasses;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+@Deprecated
 public class Encoder {
 	private DcMotor encoder;
 	
