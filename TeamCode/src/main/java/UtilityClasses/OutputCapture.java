@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -90,14 +89,6 @@ public class OutputCapture {
 	//writes a list of time steps to the specified file
 	public void store(String fileName) {
 		try {
-			File f = new File(fileName);
-			f.createNewFile();//creates file if it does not exist
-		}
-		catch (IOException e) {
-			System.out.println("Capture error: " + e);
-			e.printStackTrace();
-		}
-		try {
 			FileOutputStream file = new FileOutputStream(fileName);
 			ObjectOutputStream out = new ObjectOutputStream(file);
 			for (TimeStep timeStep : timeSteps)
@@ -106,7 +97,6 @@ public class OutputCapture {
 			file.close();
 		}
 		catch (IOException e) {
-			System.out.println("Capture error: " + e);
 			e.printStackTrace();
 		}
 	}
@@ -123,7 +113,6 @@ public class OutputCapture {
 					obj = in.readObject();
 				}
 				catch (ClassNotFoundException e) {
-					System.out.println("Capture error: " + e);
 					e.printStackTrace();
 				}
 				
@@ -138,7 +127,6 @@ public class OutputCapture {
 			}
 		}
 		catch (IOException e) {
-			System.out.println("Capture error: " + e);
 			e.printStackTrace();
 		}
 	}

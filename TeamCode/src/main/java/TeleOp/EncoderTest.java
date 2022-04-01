@@ -1,6 +1,5 @@
 package TeleOp;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,7 +9,6 @@ import DriveEngine.NewLocalizer;
 import UtilityClasses.Controller;
 
 @TeleOp(name="Encoder Test", group="test")
-//@Disabled
 public class EncoderTest extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
@@ -52,9 +50,6 @@ public class EncoderTest extends LinearOpMode {
 			
 			for (int i = 0; i < 4; i++)
 				motors[i].setPower(powers[i]);
-			for (int i = 0; i < 4; i++) {
-				telemetry.addData("Motor " + i, motors[i].getCurrentPosition());
-			}
 			
 			telemetry.addData("Location", localizer.getCurrentLocation());
 			telemetry.update();
