@@ -12,9 +12,15 @@ public class OdometryWheel {
     private double wheelCircumference;
 
     private long prevTicks = 0;
+    private long direction = 1;
 
     public OdometryWheel(HardwareMap hw, MotorController encoder, String configFile) {
         odom = encoder.getMotor();
+
+        initFromConfigFile(hw, configFile);
+    }
+    public OdometryWheel(HardwareMap hw, String motorName, String configFile) {
+        odom = hw.get(DcMotorEx.class, motorName);
 
         initFromConfigFile(hw, configFile);
     }
@@ -24,10 +30,12 @@ public class OdometryWheel {
 
         ticksPerRevolution = reader.getDouble("ticksPerRevolution");
         wheelCircumference = reader.getDouble("wheelDiameter") * Math.PI;
+
+        prevTicks = getTick();
     }
 
     public long getTick() {
-        return odom.getCurrentPosition();
+        return odom.getCurrentPosition() * direction;
     }
     public double getInch() {
         return getTick() * wheelCircumference / ticksPerRevolution;
@@ -41,5 +49,11 @@ public class OdometryWheel {
     }
     public double getInchDiff() {
         return getTickDiff() * wheelCircumference / ticksPerRevolution;
+    }
+    
+    public void setDirection(long direction) { this.direction = direction; }
+    public long getDirection() { return direction; }
+    public void setDirection(String direction) {
+        setDirection(direction.equals("forward") ? 1 : -1);
     }
 }

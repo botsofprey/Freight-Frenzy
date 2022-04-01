@@ -10,5 +10,14 @@
   "driveMotorFile": "DriveMotor.json",
   "trackWidth": 10.75,
   "trackLength": 11.25,
-  "maxDriveTorque": 1.824
+  "maxDriveTorque": 1.824,
+  "leftDeadWheelMotorName": "backRight",
+  "rightDeadWheelMotorName": "frontLeft",
+  "perpendicularDeadWheelMotorName": "frontRight",
+  "leftDeadWheelDirection": "forward",
+  "rightDeadWheelDirection": "reverse",
+  "perpendicularDeadDirection": "forward",
+  "deadWheelFile": "DeadWheelEncoder.json",
+  "odometryTrackWidth": 14.0,
+  "odometryForwardOffset": 7.0
 }

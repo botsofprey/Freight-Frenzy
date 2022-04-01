@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import DriveEngine.NewLocalizer;
 import UtilityClasses.Controller;
+import UtilityClasses.OutputCapture;
 
-@TeleOp(name="Encoder Test", group="test")
-public class EncoderTest extends LinearOpMode {
+@TeleOp(name="Capture", group="Autonomous")
+public class Capture extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		String[] motorNames = {
@@ -28,15 +28,18 @@ public class EncoderTest extends LinearOpMode {
 		
 		Controller controller = new Controller(gamepad1);
 		
-		NewLocalizer localizer = new NewLocalizer(hardwareMap, "RobotConfig.json");
-
+		OutputCapture capture = new OutputCapture(hardwareMap);
+		
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 		waitForStart();
-
+		
+		capture.startCapturing(System.nanoTime());
+		
 		while (opModeIsActive()) {
 			controller.update();
-			localizer.update(System.nanoTime());
+			
+			capture.capture(System.nanoTime());
 			
 			double x = +controller.leftStick.y, y = -controller.leftStick.x,
 					a = -controller.rightStick.x;
@@ -51,7 +54,11 @@ public class EncoderTest extends LinearOpMode {
 			for (int i = 0; i < 4; i++)
 				motors[i].setPower(powers[i]);
 			
-			telemetry.addData("Location", localizer.getCurrentLocation());
+			if (controller.bPressed) capture.pause();
+			if (controller.aPressed) capture.resume();
+			if (controller.xPressed) capture.store("Capture.bin");
+			
+			telemetry.addData("Capturing", capture.isCapturing());
 			telemetry.update();
 		}
 	}

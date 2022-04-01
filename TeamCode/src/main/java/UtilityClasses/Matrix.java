@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import java.util.Arrays;
 import java.util.Objects;
 
+@Deprecated
 public class Matrix {
 	private double[][] data;
 	private int height;
