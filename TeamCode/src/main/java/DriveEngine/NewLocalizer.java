@@ -92,7 +92,10 @@ public class NewLocalizer {
 		//update the time
 		previousTime = timeNanos;
 	}
-	
+
+	public void setLocation(NewLocation location) {
+		this.location = location;
+	}
 	public NewLocation getCurrentLocation() { return location; }
 	public NewLocation getVelocity() { return velocity; }
 	public double getAngularVelocity() { return angularVelocity; }

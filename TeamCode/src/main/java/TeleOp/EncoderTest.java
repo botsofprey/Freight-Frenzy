@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import DriveEngine.NewLocalizer;
 import UtilityClasses.Controller;
+import UtilityClasses.NewLocation;
 
 @TeleOp(name="Encoder Test", group="test")
 public class EncoderTest extends LinearOpMode {
@@ -37,10 +38,12 @@ public class EncoderTest extends LinearOpMode {
 		Controller controller = new Controller(gamepad1);
 		
 		NewLocalizer localizer = new NewLocalizer(hardwareMap, "RobotConfig.json");
+		localizer.update(System.nanoTime());
 
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 		waitForStart();
+		localizer.setLocation(NewLocation.ORIGIN);
 
 		while (opModeIsActive()) {
 			controller.update();
@@ -55,12 +58,14 @@ public class EncoderTest extends LinearOpMode {
 					x - y + a,
 					x + y + a
 			};
+
+			double scale = 1;
+			if (controller.leftTriggerHeld) scale /= 5.0;
 			
 			for (int i = 0; i < 4; i++)
-				motors[i].setPower(powers[i]);
+				motors[i].setPower(powers[i] * scale);
 			
 			telemetry.addData("Location", localizer.getCurrentLocation());
-			localizer.outputEncoders(this);
 			telemetry.update();
 		}
 	}

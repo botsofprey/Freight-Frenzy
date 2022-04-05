@@ -18,6 +18,6 @@
   "rightDeadWheelDirection": "forward",
   "perpendicularDeadWheelDirection": "reverse",
   "deadWheelFile": "DeadWheelEncoder.json",
-  "odometryTrackWidth": 10.0,
+  "odometryTrackWidth": 9.684,
   "odometryForwardOffset": 5.0
 }
