@@ -1,5 +1,6 @@
 package UtilityClasses.HardwareWrappers;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -18,11 +19,15 @@ public class OdometryWheel {
         odom = encoder.getMotor();
 
         initFromConfigFile(hw, configFile);
+
+        zeroEncoder();
     }
     public OdometryWheel(HardwareMap hw, String motorName, String configFile) {
         odom = hw.get(DcMotorEx.class, motorName);
 
         initFromConfigFile(hw, configFile);
+
+        zeroEncoder();
     }
 
     private void initFromConfigFile(HardwareMap hw, String configFile) {
@@ -32,6 +37,11 @@ public class OdometryWheel {
         wheelCircumference = reader.getDouble("wheelDiameter") * Math.PI;
 
         prevTicks = getTick();
+    }
+
+    private void zeroEncoder() {
+        odom.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odom.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public long getTick() {

@@ -12,10 +12,10 @@ import UtilityClasses.Controller;
 @Disabled
 public class OdometryTest extends LinearOpMode {
 	private static final String[] MOTOR_NAMES = {
-			"FLMotor",
-			"BLMotor",
-			"BRMotor",
-			"FRMotor"
+			"flMotor",
+			"blMotor",
+			"brMotor",
+			"frMotor"
 	};
 	private static final DcMotorSimple.Direction[] DIRECTIONS = {
 			DcMotorSimple.Direction.FORWARD,

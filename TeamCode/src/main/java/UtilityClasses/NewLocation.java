@@ -66,9 +66,9 @@ public class NewLocation {
     @Override
     public String toString() {
         return "NewLocation{" +
-                "x=" + x +
-                ", y=" + y +
-                ", heading=" + heading +
+                "x=" + round(x) +
+                ", y=" + round(y) +
+                ", heading=" + round(heading) +
                 '}';
     }
 
@@ -95,5 +95,12 @@ public class NewLocation {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
+    }
+
+    private double round(double num) {
+        int scale = 100;
+        num *= scale;
+        int n = (int)num;
+        return (double)n / scale;
     }
 }

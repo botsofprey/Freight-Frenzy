@@ -1,5 +1,6 @@
 package DriveEngine;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import UtilityClasses.HardwareWrappers.OdometryWheel;
@@ -31,7 +32,7 @@ public class NewLocalizer {
 		perpendicularWheel = new OdometryWheel(hw,
 				reader.getString("perpendicularDeadWheelMotorName"), wheelFile);
 		
-		leftWheel.setDirection(reader.getString("leftDeadWheelDirection"));
+		leftWheel.setDirection(reader.getString("leftDeadWheelDirection"));//todo make an op mode to tune encoder directions
 		rightWheel.setDirection(reader.getString("rightDeadWheelDirection"));
 		perpendicularWheel.setDirection(reader.getString("perpendicularDeadWheelDirection"));
 		
@@ -95,4 +96,9 @@ public class NewLocalizer {
 	public NewLocation getCurrentLocation() { return location; }
 	public NewLocation getVelocity() { return velocity; }
 	public double getAngularVelocity() { return angularVelocity; }
+	public void outputEncoders(LinearOpMode mode) {
+		mode.telemetry.addData("LeftDeadWheel", leftWheel.getInch());
+		mode.telemetry.addData("RightDeadWheel", rightWheel.getInch());
+		mode.telemetry.addData("PerpendicularDeadWheel", perpendicularWheel.getInch());
+	}
 }

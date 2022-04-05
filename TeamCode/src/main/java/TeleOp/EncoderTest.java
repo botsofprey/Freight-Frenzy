@@ -4,12 +4,19 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import DriveEngine.NewLocalizer;
 import UtilityClasses.Controller;
 
 @TeleOp(name="Encoder Test", group="test")
 public class EncoderTest extends LinearOpMode {
+	private static final DcMotorSimple.Direction[] DIRECTIONS = {
+			DcMotorSimple.Direction.FORWARD,
+			DcMotorSimple.Direction.FORWARD,
+			DcMotorSimple.Direction.REVERSE,
+			DcMotorSimple.Direction.REVERSE
+	};
 	@Override
 	public void runOpMode() throws InterruptedException {
 		String[] motorNames = {
@@ -24,6 +31,7 @@ public class EncoderTest extends LinearOpMode {
 			motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+			motors[i].setDirection(DIRECTIONS[i]);
 		}
 		
 		Controller controller = new Controller(gamepad1);
@@ -52,6 +60,7 @@ public class EncoderTest extends LinearOpMode {
 				motors[i].setPower(powers[i]);
 			
 			telemetry.addData("Location", localizer.getCurrentLocation());
+			localizer.outputEncoders(this);
 			telemetry.update();
 		}
 	}

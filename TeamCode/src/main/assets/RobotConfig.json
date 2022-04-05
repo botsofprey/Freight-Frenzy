@@ -11,13 +11,13 @@
   "trackWidth": 10.75,
   "trackLength": 11.25,
   "maxDriveTorque": 1.824,
-  "leftDeadWheelMotorName": "backRight",
-  "rightDeadWheelMotorName": "frontLeft",
-  "perpendicularDeadWheelMotorName": "frontRight",
+  "leftDeadWheelMotorName": "flMotor",
+  "rightDeadWheelMotorName": "brMotor",
+  "perpendicularDeadWheelMotorName": "frMotor",
   "leftDeadWheelDirection": "forward",
-  "rightDeadWheelDirection": "reverse",
-  "perpendicularDeadDirection": "forward",
+  "rightDeadWheelDirection": "forward",
+  "perpendicularDeadWheelDirection": "reverse",
   "deadWheelFile": "DeadWheelEncoder.json",
-  "odometryTrackWidth": 14.0,
-  "odometryForwardOffset": 7.0
+  "odometryTrackWidth": 10.0,
+  "odometryForwardOffset": 5.0
 }
