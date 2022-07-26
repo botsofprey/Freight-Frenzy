@@ -14,6 +14,22 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * <p style="color:#FF0000";>
+ * DOES NOT CURRENTLY WORK
+ * </p>
+ * <p>
+ * This is an experimental class for saving and replaying a tele op game.
+ * It should store a list of TimeSteps, each of which stores the power of each motor and cr servo,
+ * the position of each servo, and the time it was recorded.
+ * After the tele op is done, the class can be saved to a file on the control hub
+ * and later replayed in an autonomous op mode.
+ * </p>
+ * <p>
+ * Currently, saving the data to a file does not work because
+ * the directory the code tries to save to is read only.
+ * </p>
+ */
 public class OutputCapture {
 	//stores all powers and positions at one moment in time
 	private class TimeStep implements Serializable {

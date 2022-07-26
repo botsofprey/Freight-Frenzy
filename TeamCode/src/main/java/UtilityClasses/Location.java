@@ -4,6 +4,16 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
+/**
+ * This is a class for representing a place on the field.
+ * It is similar to the standard cartesian(x, y) plane,
+ * but it is rotated 90 degrees counterclockwise.
+ * This means that the x-axis is straight forward and down the field,
+ * which makes the coordinates a bit cleaner.
+ * A heading of 0 refers to the direction along the x-axis.
+ *
+ * @author Alex Prichard
+ */
 public class Location {
     public static final Location ORIGIN = new Location(0, 0);
     public static final Location UPPER_LEFT = new Location(72, 72);
@@ -48,7 +58,7 @@ public class Location {
         return normalizeHeading(h - heading);
     }
     public double headingToLocation(Location location) {
-        return Math.toDegrees(Math.atan2(location.x - x, location.y - y));
+        return Math.toDegrees(Math.atan2(location.y - y, location.x - x));
     }
 
     private void normalizeHeading() { heading = normalizeHeading(heading); }

@@ -8,6 +8,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.io.InputStream;
 
+/**
+ * This class is used to read data from a .json file.
+ * The normal way to do it is a bit verbose, as can be seen from the code,
+ * so we abstract it to make reading from config files easier.
+ *
+ * @author Alex Prichard
+ */
 public class JSONReader {
 	private JsonObject jsonObject;
 	
@@ -49,7 +56,7 @@ public class JSONReader {
 		return jsonObject.get(n).getAsBoolean();
 	}
 	
-	public OldLocationClass getLocation(String n) {
+	public Location getLocation(String n) {
 		String locationString = jsonObject.get(n).getAsString();
 		locationString = locationString.substring(1, locationString.length() - 1);
 		String[] locationData = locationString.split(", ");
@@ -58,13 +65,11 @@ public class JSONReader {
 			locationVals[i] = Double.parseDouble(locationData[i]);
 		}
 		if (locationData.length == 2) {
-			return new OldLocationClass(locationVals[0], locationVals[1]);
+			return new Location(locationVals[0], locationVals[1]);
 		}
-		else if (locationData.length == 3) {
-			return new OldLocationClass(locationVals[0], locationVals[1], locationVals[2]);
+		if (locationData.length == 3) {
+			return new Location(locationVals[0], locationVals[1], locationVals[2]);
 		}
-		else {
-			throw new JsonSyntaxException("Location invalid");
-		}
+		throw new JsonSyntaxException("Location invalid");
 	}
 }

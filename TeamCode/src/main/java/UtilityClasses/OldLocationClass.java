@@ -24,6 +24,10 @@ public class OldLocationClass {
 		this(location.x, location.y, heading);
 	}
 	
+	public OldLocationClass(Location location) {
+		this(-location.getY(), location.getX(), location.getHeading());
+	}
+	
 	public double getX() { return x; }
 	public double getY() { return y; }
 	public double getHeading() { return heading; }
