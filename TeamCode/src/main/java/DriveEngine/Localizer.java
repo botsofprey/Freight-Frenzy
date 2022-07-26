@@ -1,148 +1,107 @@
 package DriveEngine;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-
-import java.util.List;
-
-import UtilityClasses.HardwareWrappers.MotorController;
+import UtilityClasses.HardwareWrappers.OdometryWheel;
 import UtilityClasses.JSONReader;
-import UtilityClasses.OldLocationClass;
-import UtilityClasses.Matrix;
+import UtilityClasses.Location;
 
 public class Localizer {
-	private static final String[] MOTOR_NAMES = {
-			"frontLeftDriveMotor",
-			"backLeftDriveMotor",
-			"backRightDriveMotor",
-			"frontRightDriveMotor"
-	};
-	private MotorController[] driveMotors = new MotorController[4];
-	private BNO055IMU imu;
+	private OdometryWheel leftWheel;
+	private OdometryWheel rightWheel;
+	private OdometryWheel perpendicularWheel;
+	
+	private double trackWidth;
+	private double forwardOffset;
+	
+	private Location location;
+	private Location velocity;
+	private double angularVelocity;
+	
 	private long previousTime;
-	private long[] positions = new long[]{ 0, 0, 0, 0 };
-	private long[] previousPositions;
-	private double[] motorSpeeds;
-	public double[] motorRPMs;
-	private double encoderCPR;
-	private double wheelDiameter;
-
-	private OldLocationClass currentLocation;
-	private double initHeading;
-
 	
-	
-	public Localizer(HardwareMap hw, String fileName, OldLocationClass startLocation, LinearOpMode m) {
-		initFromConfig(hw, fileName, m);
+	public Localizer(HardwareMap hw, String fileName, Location start) {
+		JSONReader reader = new JSONReader(hw, fileName);
+		String wheelFile = reader.getString("deadWheelFile");
 		
-		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+		leftWheel = new OdometryWheel(hw,
+				reader.getString("leftDeadWheelMotorName"), wheelFile);
+		rightWheel = new OdometryWheel(hw,
+				reader.getString("rightDeadWheelMotorName"), wheelFile);
+		perpendicularWheel = new OdometryWheel(hw,
+				reader.getString("perpendicularDeadWheelMotorName"), wheelFile);
 		
-		parameters.mode                = BNO055IMU.SensorMode.IMU;
-		parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-		parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-		parameters.loggingEnabled      = false;
+		leftWheel.setDirection(reader.getString("leftDeadWheelDirection"));//todo make an op mode to tune encoder directions
+		rightWheel.setDirection(reader.getString("rightDeadWheelDirection"));
+		perpendicularWheel.setDirection(reader.getString("perpendicularDeadWheelDirection"));
 		
-		// Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
-		// on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
-		// and named "imu".
-		imu = hw.get(BNO055IMU.class, "imu");
+		trackWidth = reader.getDouble("odometryTrackWidth");
+		forwardOffset = reader.getDouble("odometryForwardOffset");
 		
-		imu.initialize(parameters);
-		
-		List<LynxModule> allHubs = hw.getAll(LynxModule.class);
-		for (LynxModule hub : allHubs) {
-			hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-		}
-		
-		currentLocation = startLocation;
-		initHeading = startLocation.getHeading();
-		previousPositions = new long[] { 0, 0, 0, 0 };
-		motorSpeeds = new double[] { 0, 0, 0, 0 };
-		motorRPMs = new double[] { 0, 0, 0, 0 };
+		location = start;
 		previousTime = System.nanoTime();
 	}
-	
-	private void initFromConfig(HardwareMap hw, String fileName, LinearOpMode m) {
-		JSONReader reader = new JSONReader(hw, fileName);
-		for (int i = 0; i < 4; i++) {
-			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");
-			driveMotors[i] = new MotorController(hw, motorName);
-			driveMotors[i].setDirection(
-					reader.getString(MOTOR_NAMES[i] + "Direction").equals("forward") ?
-							DcMotorSimple.Direction.FORWARD : DcMotorSimple.Direction.REVERSE
-			);
-		}
-		JSONReader motorReader = new JSONReader(hw, reader.getString("driveMotorFile"));
-		encoderCPR = motorReader.getDouble("ticks_per_revolution");
-		wheelDiameter = motorReader.getDouble("wheel_diameter");
+	public Localizer(HardwareMap hw, String fileName) {
+		this(hw, fileName, Location.ORIGIN);
 	}
 	
-	public void updateLocation() {//  calculate new position from odometry
-		for (int i = 0; i < 4; i++) {
-			positions[i] = driveMotors[i].getCurrentPosition();
-		}
-		long currentTime = System.nanoTime();
+	//updates to position and velocity for a detailed description of the algorithm see the link
+	//https://gm0.org/en/latest/docs/software/odometry.html
+	public void update(long timeNanos) {
+		double deltaLeft = leftWheel.getInchDiff();
+		double deltaRight = rightWheel.getInchDiff();
+		double deltaPerpendicular = perpendicularWheel.getInchDiff();
 		
-		long deltaTime = currentTime - previousTime;
-		previousTime = currentTime;
-		double timeDiff = deltaTime / 1_000_000_000.0;//convert nanoseconds to seconds
-		double[] rotationAngles = new double[4];
-		double[] motorDistances = new double[4];
-		for (int i = 0; i < 4; i++) {
-			positions[i] -= previousPositions[i];
-			previousPositions[i] += positions[i];
-			rotationAngles[i] = positions[i] / (encoderCPR * 2 * Math.PI);
-			motorDistances[i] = Math.PI * wheelDiameter * positions[i] / encoderCPR;
-			motorSpeeds[i] = rotationAngles[i] / timeDiff;
-			motorRPMs[i] = rotationAngles[i] * 2 * Math.PI;
-		}
-		double currentRotation = imu.getAngularOrientation(AxesReference.INTRINSIC,
-				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle + initHeading;
-		double rotation = Math.toRadians(currentLocation.getHeading() - currentRotation);
-		double xMovement =
-				(/*motorDistances[0]*/ + motorDistances[1] +//1.266 is a manually tuned constant
-						motorDistances[2] + motorDistances[3]) / 3.0 * 0.497;
-		double yMovement =
-				(/*motorDistances[1] - motorDistances[0]*/ +//0.833 is a manually tuned constant
-						motorDistances[3] - motorDistances[2]) * 0.5 * 0.554;
-		double currentHeading = -Math.toRadians(currentLocation.getHeading() + 90);
+		//this formula gives angle counterclockwise instead of clockwise,
+		// so it is the negative of what is described in the link
+		double phi = (deltaRight - deltaLeft) / trackWidth;
+		double deltaCenter = (deltaLeft + deltaRight) / 2.0;
+		double deltaHorizontal = deltaPerpendicular - forwardOffset * phi;
 		
-		Matrix vector = new Matrix(new double[][] {
-				{xMovement,
-				yMovement,
-				rotation}
-		});
-		Matrix PoseExponential = new Matrix(3, 3);
-		if (rotation != 0) {
-			PoseExponential = new Matrix(new double[][]{
-					{	Math.sin(rotation) / rotation,			(Math.cos(rotation) - 1) / rotation,	0},
-					{	(1 - Math.cos(rotation)) / rotation,	Math.sin(rotation) / rotation,			0},
-					{	0,										0,										1}
-			});
-		}
-		Matrix rotationMatrix = new Matrix(new double[][] {
-				{ Math.cos(currentHeading), -Math.sin(currentHeading),  0 },
-				{ Math.sin(currentHeading), Math.cos(currentHeading),   0 },
-				{ 0,                        0,                          1}
-		});
-		vector.mul(PoseExponential.transpose());
-		vector.mul(rotationMatrix.transpose());
-		double[] movementVectors = vector.getData()[0];
-		OldLocationClass deltaLocation = new OldLocationClass(movementVectors[0] * -1.5,
-				movementVectors[1] * 2, currentRotation - currentLocation.getHeading());
-		currentLocation.add(deltaLocation);
-	}
-	
-	public OldLocationClass getCurrentLocation() {
-		return currentLocation;
+		//calculate a few values to use in the matrices
+		double theta = Math.toRadians(location.getHeading());
+		double sinPhi = phi == 0 ? 1 : Math.sin(phi) / phi;//ternary operator handles limiting case
+		double cosPhi = phi == 0 ? 0 : (1 - Math.cos(phi)) / phi;
+		double sinTheta = Math.sin(theta);
+		double cosTheta = Math.cos(theta);
+		
+		//first matrix expansion
+		double a = sinPhi * deltaCenter - cosPhi * deltaHorizontal;
+		double b = cosPhi * deltaCenter + sinPhi * deltaHorizontal;
+		
+		//second matrix expansion
+		double deltaX = cosTheta * a - sinTheta * b;
+		double deltaY = sinTheta * a + cosTheta * b;
+		
+		//convert radians for math to degrees for ease of use
+		phi = Math.toDegrees(phi);
+		
+		//calculate time difference in seconds
+		double timeDiff = (timeNanos - previousTime) / 1_000_000_000.0;
+		
+		//update velocity information
+		velocity = new Location(deltaX * timeDiff, deltaY * timeDiff);
+		angularVelocity = phi * timeDiff;
+		
+		//update position information
+		location.addX(deltaX);
+		location.addY(deltaY);
+		location.addHeading(phi);
+		
+		//update the time
+		previousTime = timeNanos;
 	}
 
-	public void setCurrentLocation(OldLocationClass location) { currentLocation = location; }
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+	public Location getCurrentLocation() { return location; }
+	public Location getVelocity() { return velocity; }
+	public double getAngularVelocity() { return angularVelocity; }
+	public void outputEncoders(LinearOpMode mode) {
+		mode.telemetry.addData("LeftDeadWheel", leftWheel.getInch());
+		mode.telemetry.addData("RightDeadWheel", rightWheel.getInch());
+		mode.telemetry.addData("PerpendicularDeadWheel", perpendicularWheel.getInch());
+	}
 }

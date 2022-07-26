@@ -3,7 +3,7 @@ package TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import DriveEngine.MecanumDrive;
+import DriveEngine.OldMecanumDriveClass;
 import Subsystems.Intake;
 import Subsystems.Lift;
 import Subsystems.MotorCarousel;
@@ -17,7 +17,7 @@ public class RedTeleOp extends LinearOpMode {
 	private MotorCarousel carousel;
 	private Controller controller1;
 	private Controller controller2;
-	private MecanumDrive drive;
+	private OldMecanumDriveClass drive;
 
 	private static final boolean throwErrors = true;
 
@@ -27,7 +27,7 @@ public class RedTeleOp extends LinearOpMode {
 		lift = new Lift(hardwareMap, this, throwErrors);
 		intake = new Intake(hardwareMap, this, throwErrors);
 		carousel = new MotorCarousel(hardwareMap, this);
-		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
+		drive = new OldMecanumDriveClass(hardwareMap, "RobotConfig.json",
 				new OldLocationClass(0, 0, 0), false, this, throwErrors);
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);

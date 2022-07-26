@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import DriveEngine.NewLocalizer;
+import DriveEngine.Localizer;
 import UtilityClasses.Controller;
 import UtilityClasses.Location;
 
@@ -37,7 +37,7 @@ public class EncoderTest extends LinearOpMode {
 		
 		Controller controller = new Controller(gamepad1);
 		
-		NewLocalizer localizer = new NewLocalizer(hardwareMap, "RobotConfig.json");
+		Localizer localizer = new Localizer(hardwareMap, "RobotConfig.json");
 		localizer.update(System.nanoTime());
 
 		telemetry.addData("Status", "Initialized");

@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import DriveEngine.NewMecanumDrive;
+import DriveEngine.MecanumDrive;
 import UtilityClasses.Controller;
 import UtilityClasses.OldLocationClass;
 
@@ -13,7 +13,7 @@ import UtilityClasses.OldLocationClass;
 public class Traction extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
-		NewMecanumDrive drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
+		MecanumDrive drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
 				new OldLocationClass(0, 0, 0), this);
 		Controller controller = new Controller(gamepad1);
 

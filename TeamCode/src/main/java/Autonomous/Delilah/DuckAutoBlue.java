@@ -3,7 +3,7 @@ package Autonomous.Delilah;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import DriveEngine.NewMecanumDrive;
+import DriveEngine.MecanumDrive;
 import Subsystems.CameraPipelineBlue;
 import Subsystems.Intake;
 import Subsystems.Lift;
@@ -13,7 +13,7 @@ import UtilityClasses.OldLocationClass;
 
 @Autonomous(name="DuckAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
 public class DuckAutoBlue extends LinearOpMode {
-	private NewMecanumDrive drive;
+	private MecanumDrive drive;
 	private MotorCarousel carousel;
 	private Lift lift;
 	private Intake intake;
@@ -28,7 +28,7 @@ public class DuckAutoBlue extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
-		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
+		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
 				new OldLocationClass(0, 0, 0), this);
 		carousel = new MotorCarousel(hardwareMap, this);
 		lift = new Lift(hardwareMap, this, true);
