@@ -5,24 +5,20 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 import UtilityClasses.Matrix;
 import UtilityClasses.PIDController;
 import UtilityClasses.Vec2d;
@@ -50,8 +46,8 @@ public class MecanumDrive {
 	private double maxTorque;
 	private double buffer = 0.8;
 	
-	private volatile Location currentLocation;
-	private volatile Location currentVelocity;
+	private volatile OldLocationClass currentLocation;
+	private volatile OldLocationClass currentVelocity;
 	private volatile double prePreviousAngle;
 	private volatile double previousAngle;
 	
@@ -90,7 +86,7 @@ public class MecanumDrive {
 	private boolean trueNorth;
 	
 	
-	public MecanumDrive(HardwareMap hw, String fileName, Location startLocation, boolean north,
+	public MecanumDrive(HardwareMap hw, String fileName, OldLocationClass startLocation, boolean north,
 	                    LinearOpMode m, boolean errors) {
 		mode = m;
 		
@@ -214,7 +210,7 @@ public class MecanumDrive {
 		vector.mul(PoseExponential.transpose());
 		vector.mul(rotationMatrix.transpose());
 		double[] movementVectors = vector.getData()[0];
-		Location deltaLocation = new Location(movementVectors[0], movementVectors[1],
+		OldLocationClass deltaLocation = new OldLocationClass(movementVectors[0], movementVectors[1],
 				currentRotation - currentLocation.getHeading());
 		prePreviousAngle = previousAngle;
 		previousAngle = currentLocation.getHeading();
@@ -276,7 +272,7 @@ public class MecanumDrive {
 		}
 
 //		double location = Math.min((previousTime - moveStart) * pointCoefficient, 1);
-		Location target = path.getTargetLocation(currentLocation, 3);//look three inches down the path
+		OldLocationClass target = path.getTargetLocation(currentLocation, 3);//look three inches down the path
 //		Location target = path.interpolateLocation(location);
 		mode.telemetry.addData("target", target.toString());
 		mode.telemetry.addData("position", currentLocation.toString());
@@ -297,7 +293,7 @@ public class MecanumDrive {
 	}
 
 
-	public void moveToLocation(Location location) {
+	public void moveToLocation(OldLocationClass location) {
 		path = new Path(currentLocation, location);
 		isMoving = true;
 		moveStart = System.nanoTime();
@@ -310,11 +306,11 @@ public class MecanumDrive {
 		}
 	}
 	
-	public Location getCurrentLocation() {
+	public OldLocationClass getCurrentLocation() {
 		return currentLocation;
 	}
 
-	public Location getCurrentVelocity() { return currentVelocity; }
+	public OldLocationClass getCurrentVelocity() { return currentVelocity; }
 
 	public boolean isMoving() {
 		return isMoving;

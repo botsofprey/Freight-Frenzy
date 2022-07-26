@@ -4,13 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.NewMecanumDrive;
-import Subsystems.CameraPipelineBlue;
 import Subsystems.CameraPipelineRed;
 import Subsystems.Intake;
 import Subsystems.Lift;
 import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 
 @Autonomous(name="DuckAutoRed", group="Red Autos", preselectTeleOp="Red TeleOp")
 public class DuckAutoRed extends LinearOpMode {
@@ -19,18 +18,18 @@ public class DuckAutoRed extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
 
-	private static final Location carouselLocation = new Location(21, 2, 0);
-	private static final Location corner1 = new Location(10, -36, 0);
-	private static final Location shippingHub = new Location(-6, -32, -90);
-	private static final Location corner2 = new Location(10, -36, -90);
-	private static final Location depot = new Location(20, -18, -90);
+	private static final OldLocationClass carouselLocation = new OldLocationClass(21, 2, 0);
+	private static final OldLocationClass corner1 = new OldLocationClass(10, -36, 0);
+	private static final OldLocationClass shippingHub = new OldLocationClass(-6, -32, -90);
+	private static final OldLocationClass corner2 = new OldLocationClass(10, -36, -90);
+	private static final OldLocationClass depot = new OldLocationClass(20, -18, -90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
 		CameraPipelineRed cameraPipeline = new CameraPipelineRed(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(0, 0, 0), this);
+				new OldLocationClass(0, 0, 0), this);
 		carousel = new MotorCarousel(hardwareMap, this);
 		lift = new Lift(hardwareMap, this, true);
 		intake = new Intake(hardwareMap, this, true);

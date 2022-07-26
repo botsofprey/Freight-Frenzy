@@ -5,12 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 
 import DriveEngine.MecanumDrive;
-import Subsystems.Carousel;
 import Subsystems.Intake;
 import Subsystems.Lift;
 import Subsystems.MotorCarousel;
 import UtilityClasses.Controller;
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 
 @TeleOp(name="Blue TeleOp", group="TeleOp")
 public class BlueTeleOp extends LinearOpMode {
@@ -31,7 +30,7 @@ public class BlueTeleOp extends LinearOpMode {
 		intake = new Intake(hardwareMap, this, throwErrors);
 		carousel = new MotorCarousel(hardwareMap, this);
 		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(0, 0, 0), false, this, throwErrors);
+				new OldLocationClass(0, 0, 0), false, this, throwErrors);
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
 		analog = hardwareMap.get(AnalogInput.class, "forceSensor");

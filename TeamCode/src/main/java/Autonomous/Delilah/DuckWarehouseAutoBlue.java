@@ -1,6 +1,5 @@
 package Autonomous.Delilah;
 
-import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -10,7 +9,7 @@ import Subsystems.Intake;
 import Subsystems.Lift;
 import Subsystems.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 
 @Autonomous(name="DuckWarehouseAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
 public class DuckWarehouseAutoBlue extends LinearOpMode {
@@ -19,19 +18,19 @@ public class DuckWarehouseAutoBlue extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
 
-	private static final Location carouselLocation = new Location(-21, -14, 0);
-	private static final Location corner1 = new Location(-10, -47, 0);
-	private static final Location shippingHub = new Location(10, -48, 90);
-	private static final Location corner2 = new Location(-10, -47, 90);
-	private static final Location corner3 = new Location(-12, -12, -90);
-	private static final Location corner4 = new Location(27, -12, -90);
+	private static final OldLocationClass carouselLocation = new OldLocationClass(-21, -14, 0);
+	private static final OldLocationClass corner1 = new OldLocationClass(-10, -47, 0);
+	private static final OldLocationClass shippingHub = new OldLocationClass(10, -48, 90);
+	private static final OldLocationClass corner2 = new OldLocationClass(-10, -47, 90);
+	private static final OldLocationClass corner3 = new OldLocationClass(-12, -12, -90);
+	private static final OldLocationClass corner4 = new OldLocationClass(27, -12, -90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
 		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(0, 0, 0), this);
+				new OldLocationClass(0, 0, 0), this);
 		carousel = new MotorCarousel(hardwareMap, this);
 		lift = new Lift(hardwareMap, this, true);
 		intake = new Intake(hardwareMap, this, true);

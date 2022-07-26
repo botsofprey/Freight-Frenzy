@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import UtilityClasses.HardwareWrappers.OdometryWheel;
 import UtilityClasses.JSONReader;
-import UtilityClasses.NewLocation;
+import UtilityClasses.Location;
 
 public class NewLocalizer {
 	private OdometryWheel leftWheel;
@@ -15,13 +15,13 @@ public class NewLocalizer {
 	private double trackWidth;
 	private double forwardOffset;
 	
-	private NewLocation location;
-	private NewLocation velocity;
+	private Location location;
+	private Location velocity;
 	private double angularVelocity;
 	
 	private long previousTime;
 	
-	public NewLocalizer(HardwareMap hw, String fileName, NewLocation start) {
+	public NewLocalizer(HardwareMap hw, String fileName, Location start) {
 		JSONReader reader = new JSONReader(hw, fileName);
 		String wheelFile = reader.getString("deadWheelFile");
 		
@@ -43,7 +43,7 @@ public class NewLocalizer {
 		previousTime = System.nanoTime();
 	}
 	public NewLocalizer(HardwareMap hw, String fileName) {
-		this(hw, fileName, NewLocation.ORIGIN);
+		this(hw, fileName, Location.ORIGIN);
 	}
 	
 	//updates to position and velocity for a detailed description of the algorithm see the link
@@ -81,7 +81,7 @@ public class NewLocalizer {
 		double timeDiff = (timeNanos - previousTime) / 1_000_000_000.0;
 		
 		//update velocity information
-		velocity = new NewLocation(deltaX * timeDiff, deltaY * timeDiff);
+		velocity = new Location(deltaX * timeDiff, deltaY * timeDiff);
 		angularVelocity = phi * timeDiff;
 		
 		//update position information
@@ -93,11 +93,11 @@ public class NewLocalizer {
 		previousTime = timeNanos;
 	}
 
-	public void setLocation(NewLocation location) {
+	public void setLocation(Location location) {
 		this.location = location;
 	}
-	public NewLocation getCurrentLocation() { return location; }
-	public NewLocation getVelocity() { return velocity; }
+	public Location getCurrentLocation() { return location; }
+	public Location getVelocity() { return velocity; }
 	public double getAngularVelocity() { return angularVelocity; }
 	public void outputEncoders(LinearOpMode mode) {
 		mode.telemetry.addData("LeftDeadWheel", leftWheel.getInch());

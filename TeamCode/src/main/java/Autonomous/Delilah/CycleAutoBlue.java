@@ -8,7 +8,7 @@ import Subsystems.CameraPipelineBlue;
 import Subsystems.Intake;
 import Subsystems.Lift;
 import UtilityClasses.HardwareWrappers.Camera;
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 
 @Autonomous(name="CycleAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
 public class CycleAutoBlue extends LinearOpMode {
@@ -16,11 +16,11 @@ public class CycleAutoBlue extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;
 
-	private Location shippingHub = new Location(-20, -27, 0);
-	private Location warehouseEntrance = new Location(-3, 10, -90);
-	private Location warehouse = new Location(24, 10, -90);
-	private Location wareHouseExit = new Location(-3, 6, -90);
-	private Location shippingHubCycle = new Location(-16, -23, -90);
+	private OldLocationClass shippingHub = new OldLocationClass(-20, -27, 0);
+	private OldLocationClass warehouseEntrance = new OldLocationClass(-3, 10, -90);
+	private OldLocationClass warehouse = new OldLocationClass(24, 10, -90);
+	private OldLocationClass wareHouseExit = new OldLocationClass(-3, 6, -90);
+	private OldLocationClass shippingHubCycle = new OldLocationClass(-16, -23, -90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
@@ -38,7 +38,7 @@ public class CycleAutoBlue extends LinearOpMode {
 		for (int i = 0; i < numMeasurements; i++) {
 			avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
 		}
-		drive.setCurrentLocation(new Location(44 - avg, 0, -90));//todo changes with color
+		drive.setCurrentLocation(new OldLocationClass(44 - avg, 0, -90));//todo changes with color
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class CycleAutoBlue extends LinearOpMode {
 		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(0, 0, 0), this);
+				new OldLocationClass(0, 0, 0), this);
 		lift = new Lift(hardwareMap, this, true);
 		intake = new Intake(hardwareMap, this, true);
 

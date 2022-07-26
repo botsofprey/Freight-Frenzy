@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import DriveEngine.NewMecanumDrive;
 import UtilityClasses.Controller;
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 
 @TeleOp(name="Traction")
 @Disabled
@@ -14,7 +14,7 @@ public class Traction extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
 		NewMecanumDrive drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(0, 0, 0), this);
+				new OldLocationClass(0, 0, 0), this);
 		Controller controller = new Controller(gamepad1);
 
 		telemetry.addData("Status", "Initialized");

@@ -8,7 +8,7 @@ import Subsystems.Intake;
 import Subsystems.Lift;
 import Subsystems.MotorCarousel;
 import UtilityClasses.Controller;
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 
 @TeleOp(name="Red TeleOp", group="TeleOp")
 public class RedTeleOp extends LinearOpMode {
@@ -28,7 +28,7 @@ public class RedTeleOp extends LinearOpMode {
 		intake = new Intake(hardwareMap, this, throwErrors);
 		carousel = new MotorCarousel(hardwareMap, this);
 		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
-				new Location(0, 0, 0), false, this, throwErrors);
+				new OldLocationClass(0, 0, 0), false, this, throwErrors);
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
 

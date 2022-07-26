@@ -3,7 +3,6 @@ package DriveEngine;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -15,7 +14,7 @@ import java.util.List;
 
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 import UtilityClasses.Matrix;
 
 public class Localizer {
@@ -35,12 +34,12 @@ public class Localizer {
 	private double encoderCPR;
 	private double wheelDiameter;
 
-	private Location currentLocation;
+	private OldLocationClass currentLocation;
 	private double initHeading;
 
 	
 	
-	public Localizer(HardwareMap hw, String fileName, Location startLocation, LinearOpMode m) {
+	public Localizer(HardwareMap hw, String fileName, OldLocationClass startLocation, LinearOpMode m) {
 		initFromConfig(hw, fileName, m);
 		
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -136,14 +135,14 @@ public class Localizer {
 		vector.mul(PoseExponential.transpose());
 		vector.mul(rotationMatrix.transpose());
 		double[] movementVectors = vector.getData()[0];
-		Location deltaLocation = new Location(movementVectors[0] * -1.5,
+		OldLocationClass deltaLocation = new OldLocationClass(movementVectors[0] * -1.5,
 				movementVectors[1] * 2, currentRotation - currentLocation.getHeading());
 		currentLocation.add(deltaLocation);
 	}
 	
-	public Location getCurrentLocation() {
+	public OldLocationClass getCurrentLocation() {
 		return currentLocation;
 	}
 
-	public void setCurrentLocation(Location location) { currentLocation = location; }
+	public void setCurrentLocation(OldLocationClass location) { currentLocation = location; }
 }

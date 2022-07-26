@@ -4,11 +4,11 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 
 public class Path {
-	private Location start;
-	private Location end;
+	private OldLocationClass start;
+	private OldLocationClass end;
 	private double error;
 	private double angleError;
 
@@ -18,7 +18,7 @@ public class Path {
 
 
 
-	public Path(Location s, Location e, double error) {
+	public Path(OldLocationClass s, OldLocationClass e, double error) {
 		start = s;
 		end = e;
 		this.error = error;
@@ -26,20 +26,20 @@ public class Path {
 		calculateConstants();
 	}
 
-	public Path(Location s, Location e) {
+	public Path(OldLocationClass s, OldLocationClass e) {
 		this(s, e, 1.5);
 	}
 
-	public Path(Location location, double error) {
+	public Path(OldLocationClass location, double error) {
 		this(location, location, error);
 	}
 
-	public Path(Location location) {
+	public Path(OldLocationClass location) {
 		this(location, 1.5);
 	}
 
 	public Path(double error) {
-		this(new Location(0, 0, 0), error);
+		this(new OldLocationClass(0, 0, 0), error);
 	}
 
 	public Path() {
@@ -55,11 +55,11 @@ public class Path {
 	}
 
 
-	public Location getStart() {
+	public OldLocationClass getStart() {
 		return start;
 	}
 
-	public Location getEnd() {
+	public OldLocationClass getEnd() {
 		return end;
 	}
 	
@@ -74,15 +74,15 @@ public class Path {
 	public double getPathLength() { return pathLength; }
 	
 	public double getPathAngleChange() {
-		return Math.abs(Location.normalizeHeading(start.getHeading() - end.getHeading()));
+		return Math.abs(OldLocationClass.normalizeHeading(start.getHeading() - end.getHeading()));
 	}
 
-	public void setStart(Location start) {
+	public void setStart(OldLocationClass start) {
 		this.start = start;
 		calculateConstants();
 	}
 
-	public void setEnd(Location end) {
+	public void setEnd(OldLocationClass end) {
 		this.end = end;
 		calculateConstants();
 	}
@@ -99,18 +99,18 @@ public class Path {
 		return a + t * (b - a);
 	}
 
-	public Location interpolateLocation(double t) {
+	public OldLocationClass interpolateLocation(double t) {
 		double x = interpolate(start.getX(), end.getX(), t);
 		double y = interpolate(start.getY(), end.getY(), t);
 		double rotatedEndAngle =
-				Location.normalizeHeading(end.getHeading() - start.getHeading());
-		double a = Location.normalizeHeading(
+				OldLocationClass.normalizeHeading(end.getHeading() - start.getHeading());
+		double a = OldLocationClass.normalizeHeading(
 				start.getHeading() + interpolate(0, rotatedEndAngle, t)
 		);
-		return new Location(x, y, a);
+		return new OldLocationClass(x, y, a);
 	}
 
-	public double reverse_interpolate(Location location) {
+	public double reverse_interpolate(OldLocationClass location) {
 		double newM = -1 / m;
 		double newB = location.getY() - newM * location.getX();
 
@@ -118,13 +118,13 @@ public class Path {
 		return (start.getX() - x) / (start.getX() - end.getX()); // TODO handle case of / by 0
 	}
 
-	public Location getTargetLocation(Location location, double distance) {
+	public OldLocationClass getTargetLocation(OldLocationClass location, double distance) {
 		double t = reverse_interpolate(location);
 		double e = location.distanceToLocation(interpolateLocation(t));
 		double distForward = Math.sqrt(distance * distance - e * e);
 		t = Math.min(t + distForward / pathLength, 1);
-		Location targetLocation = interpolateLocation(t);
-		double r = Location.normalizeHeading(start.getHeading()
+		OldLocationClass targetLocation = interpolateLocation(t);
+		double r = OldLocationClass.normalizeHeading(start.getHeading()
 				+ t * (end.getHeading() - start.getHeading()));
 		targetLocation.setHeading(r);
 		return targetLocation;

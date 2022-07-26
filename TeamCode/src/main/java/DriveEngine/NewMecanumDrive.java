@@ -1,22 +1,14 @@
 package DriveEngine;
 
-import android.util.Log;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
-import org.firstinspires.ftc.robotcore.external.Func;
-
-import java.util.List;
-
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 import UtilityClasses.Matrix;
 import UtilityClasses.PIDController;
 
@@ -46,8 +38,8 @@ public class NewMecanumDrive {
 	private double Kv;
 	
 	private Localizer localizer;
-	private Location currentLocation;
-	public Location targetLocation;
+	private OldLocationClass currentLocation;
+	public OldLocationClass targetLocation;
 	private Trajectory currentTrajectory;
 	private boolean currentlyMoving;
 	private static final double buffer = 0.1;
@@ -64,7 +56,7 @@ public class NewMecanumDrive {
 	private PIDController hController = new PIDController(headingCoefficients);
 
 	public NewMecanumDrive(HardwareMap hw, String fileName,
-	                       Location startLocation, LinearOpMode m) {
+	                       OldLocationClass startLocation, LinearOpMode m) {
 		mode = m;
 		
 		initFromConfig(hw, fileName);
@@ -228,8 +220,8 @@ public class NewMecanumDrive {
 		double time = (currentTime - previousTime) / 1_000_000_000.0;
 		double inches = Math.min(time * MAX_SPEED, path.getLength());
 		targetLocation = path.getPoint(inches, 0.1);
-		targetLocation = new Location(0, 1, 0);
-		Location base =
+		targetLocation = new OldLocationClass(0, 1, 0);
+		OldLocationClass base =
 				path.getAccelControlVelocity(inches / path.getLength(), MAX_SPEED, MAX_ANGULAR);
 		
 		xController.setTargetPoint(targetLocation.getX());
@@ -254,14 +246,14 @@ public class NewMecanumDrive {
 	}
 	
 	public void moveToLocation(double x, double y, double h) {
-		moveToLocation(new Location(x, y, h));
+		moveToLocation(new OldLocationClass(x, y, h));
 	}
 
-	public void moveToLocation(Location targetLocation) {
+	public void moveToLocation(OldLocationClass targetLocation) {
 		moveToLocation(targetLocation, 1);
 	}
 	
-	public void moveToLocation(Location targetLocation, double speed) {
+	public void moveToLocation(OldLocationClass targetLocation, double speed) {
 		xController.reset();
 		yController.reset();
 		hController.reset();
@@ -335,9 +327,9 @@ public class NewMecanumDrive {
 		return currentlyMoving;
 	}
 
-	public Location getCurrentLocation() {
+	public OldLocationClass getCurrentLocation() {
 		return currentLocation;
 	}
 
-	public void setCurrentLocation(Location location) { localizer.setCurrentLocation(location); }
+	public void setCurrentLocation(OldLocationClass location) { localizer.setCurrentLocation(location); }
 }

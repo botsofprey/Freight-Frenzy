@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import DriveEngine.NewLocalizer;
 import UtilityClasses.Controller;
-import UtilityClasses.NewLocation;
+import UtilityClasses.Location;
 
 @TeleOp(name="Encoder Test", group="test")
 public class EncoderTest extends LinearOpMode {
@@ -43,7 +43,7 @@ public class EncoderTest extends LinearOpMode {
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 		waitForStart();
-		localizer.setLocation(NewLocation.ORIGIN);
+		localizer.setLocation(Location.ORIGIN);
 
 		while (opModeIsActive()) {
 			controller.update();

@@ -2,9 +2,7 @@ package DriveEngine;
 
 import com.qualcomm.robotcore.util.Range;
 
-import java.awt.font.NumericShaper;
-
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 import UtilityClasses.Matrix;
 
 public class SplineCurve {
@@ -30,7 +28,7 @@ public class SplineCurve {
 	private double[][] coefficients;//the coefficient at n is multiplied by x^n
 	private double length;
 	
-	public SplineCurve(Location start, Location end, Location startTangent, Location endTangent) {
+	public SplineCurve(OldLocationClass start, OldLocationClass end, OldLocationClass startTangent, OldLocationClass endTangent) {
 		degree = 5;
 		coefficients = new double[3][degree + 1];
 		Matrix solution = new Matrix(new double[][]{//  this matrix solves for the given
@@ -68,7 +66,7 @@ public class SplineCurve {
 		length = getIntervalLength(0, 1);
 	}
 	
-	public SplineCurve(Location start, Location end, Location tangent, boolean fixedAngle) {
+	public SplineCurve(OldLocationClass start, OldLocationClass end, OldLocationClass tangent, boolean fixedAngle) {
 		degree = 4;
 		double x0 = start.getX();
 		double x1 = end.getX();
@@ -116,7 +114,7 @@ public class SplineCurve {
 		length = getIntervalLength(0, 1);
 	}
 	
-	public SplineCurve(Location start, Location end) {
+	public SplineCurve(OldLocationClass start, OldLocationClass end) {
 		degree = 1;
 		double b0 = start.getX();
 		double a0 = end.getX() - b0;
@@ -132,7 +130,7 @@ public class SplineCurve {
 		length = getIntervalLength(0, 1);
 	}
 	
-	public Location getPoint(double t) {
+	public OldLocationClass getPoint(double t) {
 		t = Math.max(0, Math.min(1, t));
 		double x = 0;
 		double y = 0;
@@ -143,22 +141,22 @@ public class SplineCurve {
 			y += coefficients[1][i] * pow;
 			h += coefficients[2][i] * pow;
 		}
-		return new Location(x, y, Location.normalizeHeading(h));
+		return new OldLocationClass(x, y, OldLocationClass.normalizeHeading(h));
 	}
 
-	public Location getPoint(double dist, double precision) {
+	public OldLocationClass getPoint(double dist, double precision) {
 		if (dist <= 0) return getPoint(0);
 		if (dist >= length) return getPoint(1);
-		Location[] point = new Location[1];
+		OldLocationClass[] point = new OldLocationClass[1];
 		findPoint(dist, point, 0, precision, 0, 1);
 		return point[0];
 	}
 
-	public Location getEnd() {
+	public OldLocationClass getEnd() {
 		return getPoint(1);
 	}
 
-	public Location getTangent(double t) {
+	public OldLocationClass getTangent(double t) {
 		t = Math.max(0, Math.min(1, t));
 		double x = 0;
 		double y = 0;
@@ -169,26 +167,26 @@ public class SplineCurve {
 			y += i * pow * coefficients[1][i];
 			h += i * pow * coefficients[2][i];
 		}
-		return new Location(x, y, h);
+		return new OldLocationClass(x, y, h);
 	}
 
-	public Location getVelocity(double t, double maxVelocity, double maxAngular) {
-		Location tangent = getTangent(t);
-		double velocity = tangent.distanceToLocation(new Location(0, 0, 0));
+	public OldLocationClass getVelocity(double t, double maxVelocity, double maxAngular) {
+		OldLocationClass tangent = getTangent(t);
+		double velocity = tangent.distanceToLocation(new OldLocationClass(0, 0, 0));
 		double angular = tangent.getHeading();
 		double scale = Math.min(maxVelocity / velocity, maxAngular / angular);
-		return new Location(tangent.getX() * scale,
+		return new OldLocationClass(tangent.getX() * scale,
 				tangent.getY() * scale, tangent.getHeading() * scale);
 	}
 
-	public Location getPowers(double t, double maxVelocity, double maxAngular) {
-		Location toNormalize = getVelocity(t, maxVelocity, maxAngular);
+	public OldLocationClass getPowers(double t, double maxVelocity, double maxAngular) {
+		OldLocationClass toNormalize = getVelocity(t, maxVelocity, maxAngular);
 		double scale = Math.max(1, Math.max(Math.abs(toNormalize.getX()),
 				Math.max(Math.abs(toNormalize.getY()), Math.abs(toNormalize.getHeading()))));
 		return toNormalize.scale(1.0 / scale);
 	}
 
-	public Location getAccelControlVelocity(double t, double maxVelocity, double maxAngular) {
+	public OldLocationClass getAccelControlVelocity(double t, double maxVelocity, double maxAngular) {
 		return getVelocity((1 - Math.cos(Range.clip(t, 0, 1) * Math.PI)) / 2.0,
 				maxVelocity, maxAngular);
 	}
@@ -217,10 +215,10 @@ public class SplineCurve {
 		return slope * area;
 	}
 	
-	public Location getEndTangent() {
-		Location acc = new Location(0, 0, 0);
+	public OldLocationClass getEndTangent() {
+		OldLocationClass acc = new OldLocationClass(0, 0, 0);
 		for (int i = 0; i < coefficients[0].length; i++) {
-			acc.addWithoutNormalizing(new Location(
+			acc.addWithoutNormalizing(new OldLocationClass(
 					i * coefficients[0][i],
 					i * coefficients[1][i],
 					i * coefficients[2][i]
@@ -246,18 +244,18 @@ public class SplineCurve {
 		return length;
 	}
 	
-	public Location[] getEvenlySpacedPoints(double spacing, double precision) {
+	public OldLocationClass[] getEvenlySpacedPoints(double spacing, double precision) {
 		int numPoints = (int)(length / spacing);
 		double[] distances = new double[numPoints];
 		for (int i = 0; i < numPoints; i++) {
 			distances[i] = spacing * i;
 		}
-		Location[] points = new Location[numPoints];
+		OldLocationClass[] points = new OldLocationClass[numPoints];
 		findPoints(distances, points, spacing, precision, 0, numPoints, 0, 1);
 		return points;
 	}
 	
-	private void findPoints(double[] distances, Location[] points, double spacing,
+	private void findPoints(double[] distances, OldLocationClass[] points, double spacing,
 	                        double precision, int a, int b, double lower, double upper) {
 		if (a == b) return;
 		if (a + 1 == b) {
@@ -271,8 +269,8 @@ public class SplineCurve {
 		findPoints(distances, points, spacing, precision, c, b, mid, upper);
 	}
 	
-	private void findPoint(double distance, Location[] points, int index,
-	                           double precision, double lower, double upper) {
+	private void findPoint(double distance, OldLocationClass[] points, int index,
+	                       double precision, double lower, double upper) {
 		while (true) {
 			double mid = (lower + upper) / 2.0;
 			double midDistance = getIntervalLength(0, mid);

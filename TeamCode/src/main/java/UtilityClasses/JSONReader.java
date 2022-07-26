@@ -49,7 +49,7 @@ public class JSONReader {
 		return jsonObject.get(n).getAsBoolean();
 	}
 	
-	public Location getLocation(String n) {
+	public OldLocationClass getLocation(String n) {
 		String locationString = jsonObject.get(n).getAsString();
 		locationString = locationString.substring(1, locationString.length() - 1);
 		String[] locationData = locationString.split(", ");
@@ -58,10 +58,10 @@ public class JSONReader {
 			locationVals[i] = Double.parseDouble(locationData[i]);
 		}
 		if (locationData.length == 2) {
-			return new Location(locationVals[0], locationVals[1]);
+			return new OldLocationClass(locationVals[0], locationVals[1]);
 		}
 		else if (locationData.length == 3) {
-			return new Location(locationVals[0], locationVals[1], locationVals[2]);
+			return new OldLocationClass(locationVals[0], locationVals[1], locationVals[2]);
 		}
 		else {
 			throw new JsonSyntaxException("Location invalid");

@@ -1,6 +1,6 @@
 package DriveEngine;
 
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 
 public class TrajectoryPoint {
 	public double t;
@@ -14,7 +14,7 @@ public class TrajectoryPoint {
 	public double ay;
 	public double ah;
 	
-	public TrajectoryPoint(Location location) {
+	public TrajectoryPoint(OldLocationClass location) {
 		x = location.getX();
 		y = location.getY();
 		h = location.getHeading();

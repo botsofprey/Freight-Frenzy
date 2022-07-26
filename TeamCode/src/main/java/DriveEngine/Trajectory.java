@@ -2,20 +2,20 @@ package DriveEngine;
 
 import java.util.ArrayList;
 
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 
 public class Trajectory {
 	private TrajectoryPoint[] trajectory;
 	private int previousMotion;
 	
-	public Trajectory(ArrayList<Location> waypoints,
-	                  ArrayList<Location> tangents, DriveConstraints constraints) {
+	public Trajectory(ArrayList<OldLocationClass> waypoints,
+	                  ArrayList<OldLocationClass> tangents, DriveConstraints constraints) {
 		ArrayList<SplineCurve> splines = new ArrayList<>();
 		for (int i = 1; i < waypoints.size(); i++) {
-			Location start = waypoints.get(i - 1);
-			Location end = waypoints.get(i);
-			Location startTangent = tangents.get(i - 1);
-			Location endTangent = tangents.get(i);
+			OldLocationClass start = waypoints.get(i - 1);
+			OldLocationClass end = waypoints.get(i);
+			OldLocationClass startTangent = tangents.get(i - 1);
+			OldLocationClass endTangent = tangents.get(i);
 			switch ((startTangent == null ? 0 : 1) | (endTangent == null ? 0 : 2)) {
 				case 0:
 					splines.add(new SplineCurve(start, end));
@@ -39,10 +39,10 @@ public class Trajectory {
 		for (int i = 0; i < splines.size(); i++) {
 			numPoints += (int)(splines.get(i).getLength() / spacing);
 		}
-		Location[] points = new Location[numPoints];
+		OldLocationClass[] points = new OldLocationClass[numPoints];
 		int index = 0;
 		for (int i = 0; i < splines.size(); i++) {
-			Location[] temp = splines.get(i).getEvenlySpacedPoints(spacing, 0.01);
+			OldLocationClass[] temp = splines.get(i).getEvenlySpacedPoints(spacing, 0.01);
 			System.arraycopy(temp, 0, points, index, temp.length);
 			index += temp.length;
 		}
@@ -52,7 +52,7 @@ public class Trajectory {
 		previousMotion = 0;
 	}
 	
-	private void calculateMotionControlledTrajectory(Location[] points,
+	private void calculateMotionControlledTrajectory(OldLocationClass[] points,
 	                                                 DriveConstraints constraints) {
 		trajectory = new TrajectoryPoint[points.length];
 		for (int i = 0; i < points.length; i++) {

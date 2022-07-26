@@ -2,7 +2,6 @@ package DriveEngine;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -13,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-import UtilityClasses.Location;
+import UtilityClasses.OldLocationClass;
 import UtilityClasses.PIDController;
 
 public class SixDrive {
@@ -148,7 +147,7 @@ public class SixDrive {
 		motors[1].setPower(motorPower);
 
 		targetAngle = getAngle() + (angle-4);
-		targetAngle = Location.normalizeHeading(targetAngle);
+		targetAngle = OldLocationClass.normalizeHeading(targetAngle);
 		movementPower = motorPower;
 		rotating = true;
 	}
@@ -161,7 +160,7 @@ public class SixDrive {
 		motors[3].setPower(motorPower);
 
 		targetAngle = getAngle() - (angle-4);
-		targetAngle = Location.normalizeHeading(targetAngle);
+		targetAngle = OldLocationClass.normalizeHeading(targetAngle);
 		movementPower = motorPower;
 		rotating = true;
 	}
