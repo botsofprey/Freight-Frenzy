@@ -12,19 +12,19 @@ public class Controller {
 			leftBumperHeld = false, rightBumperHeld = false,
 			leftTriggerHeld = false, rightTriggerHeld = false,
 			upHeld = false, downHeld = false, leftHeld = false, rightHeld = false,
-			backHeld = false, startHeld = false,
+			backHeld = false, startHeld = false, rumbling = false,
 	
 			aPressed = false, bPressed = false, xPressed = false, yPressed = false,
 			leftBumperPressed = false, rightBumperPressed = false,
 			leftTriggerPressed = false, rightTriggerPressed = false,
 			upPressed = false, downPressed = false, leftPressed = false, rightPressed = false,
-			backPressed = false, startPressed = false,
+			backPressed = false, startPressed = false, rumblingStarted = false,
 	
 			aReleased = false, bReleased = false, xReleased = false, yReleased = false,
 			leftBumperReleased = false, rightBumperReleased = false,
 			leftTriggerReleased = false, rightTriggerReleased = false,
 			upReleased = false, downReleased = false, leftReleased = false, rightReleased = false,
-			backReleased = false, startReleased = false;
+			backReleased = false, startReleased = false, rumblingStopped = false;
 	
 	public double leftTrigger = 0, rightTrigger = 0;
 	
@@ -121,6 +121,12 @@ public class Controller {
 		startPressed = held && !previous;
 		startReleased = !held && previous;
 		
+		previous = rumbling;
+		held = gamepad.isRumbling();
+		rumbling = held;
+		rumblingStarted = held && !previous;
+		rumblingStopped = !held && previous;
+		
 		leftStick.x = gamepad.left_stick_x;
 		leftStick.y = -gamepad.left_stick_y;
 		leftStick.convertToAngleMagnitude();
@@ -156,8 +162,16 @@ public class Controller {
 	public void rumbleBlips(int blips) {
 		gamepad.rumbleBlips(blips);
 	}
-
+	
 	public boolean isRumbling() {
-		return gamepad.isRumbling();
+		return rumbling;
+	}
+	
+	public boolean notRumbling() {
+		return !rumbling;
+	}
+	
+	public Location getMovement() {
+		return new Location(-leftStick.y, -leftStick.x, -rightStick.x);
 	}
 }
