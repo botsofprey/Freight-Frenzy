@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynchImpl;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class UltrasonicSensor {
@@ -24,7 +23,7 @@ public class UltrasonicSensor {
 
 	public UltrasonicSensor(HardwareMap hw, String name) {
 		RANGE1 = hw.i2cDevice.get(name);
-		RANGE1Reader = new I2cDeviceSynchImpl(RANGE1, RANGE1ADDRESS, false);
+//		RANGE1Reader = new I2cDeviceSynchImpl(RANGE1, RANGE1ADDRESS, false);
 		RANGE1Reader.engage();
 		readUltra = true;
 		readOptic = true;
