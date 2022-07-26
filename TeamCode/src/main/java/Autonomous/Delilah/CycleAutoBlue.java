@@ -1,51 +1,49 @@
-package Autonomous;
+package Autonomous.Delilah;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.NewMecanumDrive;
 import Subsystems.CameraPipelineBlue;
-import Subsystems.CameraPipelineRed;
 import Subsystems.Intake;
 import Subsystems.Lift;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Location;
 
-@Autonomous(name="CycleAutoRed", group="Red Autos", preselectTeleOp="Red TeleOp")
-public class CycleAutoRed extends LinearOpMode {
+@Autonomous(name="CycleAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
+public class CycleAutoBlue extends LinearOpMode {
 	private NewMecanumDrive drive;
 	private Lift lift;
 	private Intake intake;
 
-	private Location shippingHub = new Location(21, -14, 0);
-	private Location warehouseEntrance = new Location(3, 12, 90);
-	private Location warehouse = new Location(-24, 12, 90);
-	private Location wareHouseExit = new Location(5, 13, 90);
-	private Location shippingHubCycle = new Location(23, -17, 90);
+	private Location shippingHub = new Location(-20, -27, 0);
+	private Location warehouseEntrance = new Location(-3, 10, -90);
+	private Location warehouse = new Location(24, 10, -90);
+	private Location wareHouseExit = new Location(-3, 6, -90);
+	private Location shippingHubCycle = new Location(-16, -23, -90);
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
-		drive.rawMove(0.15, -1.0 / 3.5, 0);
+		drive.rawMove(-0.25, -1.0 / 3, 0);
 		while (opModeIsActive() && intake.moving()) {
 			intake.update(System.currentTimeMillis());
 			if (!intake.moving()) break;
 			drive.updateLocation();
 		}
-		drive.rawMove(0.15, 1, 0);
+		drive.rawMove(-0.25, 1, 0);
 		sleep(200);
 		drive.brake();
-		sleep(200);
 		int numMeasurements = 10;
 		double avg = 0;
 		for (int i = 0; i < numMeasurements; i++) {
 			avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
 		}
-		drive.setCurrentLocation(new Location(avg - 49, 8, 90));//todo changes with color
+		drive.setCurrentLocation(new Location(44 - avg, 0, -90));//todo changes with color
 	}
 
 	@Override
 	public void runOpMode() throws InterruptedException {
-		CameraPipelineRed cameraPipeline = new CameraPipelineRed(this);//todo changes with color
+		CameraPipelineBlue cameraPipeline = new CameraPipelineBlue(this);//todo changes with color
 		Camera camera = new Camera(hardwareMap, "Webcam 1", cameraPipeline, this);
 		drive = new NewMecanumDrive(hardwareMap, "RobotConfig.json",
 				new Location(0, 0, 0), this);
@@ -88,7 +86,7 @@ public class CycleAutoRed extends LinearOpMode {
 				lift.update(time);
 				sleep(50);
 			}
-			drive.rotate(90);
+			drive.rotate(-90);
 			lift.positionDown();
 			drive.moveToLocation(warehouseEntrance);
 			if (!opModeIsActive() || i == numCycles) break;
@@ -103,7 +101,7 @@ public class CycleAutoRed extends LinearOpMode {
 			drive.rotate(0);
 		}
 		lift.update(System.currentTimeMillis());
-		drive.rawMove(0.25, -1, 0);
+		drive.rawMove(-0.25, -1, 0);
 		sleep(1000);
 		drive.brake();
 
