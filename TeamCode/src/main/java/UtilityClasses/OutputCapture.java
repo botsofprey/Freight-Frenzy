@@ -29,6 +29,8 @@ import java.util.ArrayList;
  * Currently, saving the data to a file does not work because
  * the directory the code tries to save to is read only.
  * </p>
+ *
+ * @author Alex Prichard
  */
 public class OutputCapture {
 	//stores all powers and positions at one moment in time
