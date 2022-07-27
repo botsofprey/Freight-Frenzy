@@ -276,9 +276,9 @@ public class OldMecanumDriveClass {
 //		Location target = path.interpolateLocation(location);
 		mode.telemetry.addData("target", target.toString());
 		mode.telemetry.addData("position", currentLocation.toString());
-		xController.setTargetPoint(target.getX());
-		yController.setTargetPoint(target.getY());
-		hController.setTargetPoint(target.getHeading());
+		xController.setSP(target.getX());
+		yController.setSP(target.getY());
+		hController.setSP(target.getHeading());
 		double xMovement = xController.calculateAdjustment(currentLocation.getX());
 		double yMovement = yController.calculateAdjustment(currentLocation.getY());
 		double hMovement = hController.calculateAdjustment(currentLocation.getHeading());

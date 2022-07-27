@@ -101,7 +101,7 @@ public class SixDrive {
 			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		}
 		headingPid.reset();
-		headingPid.setTargetPoint(angle);
+		headingPid.setSP(angle);
 		targetAngle = angle;
 
 		opmode.sleep(500);

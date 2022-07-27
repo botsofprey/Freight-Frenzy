@@ -42,7 +42,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
  * @author Alex Prichard
  */
 public class Controller {
-	public class ButtonFunctions {
+	private class ButtonFunctions {
 		private Runnable onHeld;
 		private Runnable onPressed;
 		private Runnable onReleased;

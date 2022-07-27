@@ -202,7 +202,7 @@ public class MecanumDrive {
 		previousTime = currentTime;
 		TrajectoryPoint point = currentTrajectory.getMotion(time);
 		
-		hController.setTargetPoint(point.h);
+		hController.setSP(point.h);
 		double h = hController.calculateAdjustment(currentLocation.getHeading());
 		
 		if (time > currentTrajectory.getDuration()) {
@@ -219,9 +219,9 @@ public class MecanumDrive {
 		OldLocationClass base =
 				path.getAccelControlVelocity(inches / path.getLength(), MAX_SPEED, MAX_ANGULAR);
 		
-		xController.setTargetPoint(targetLocation.getX());
-		yController.setTargetPoint(targetLocation.getY());
-		hController.setTargetPoint(targetLocation.getHeading());
+		xController.setSP(targetLocation.getX());
+		yController.setSP(targetLocation.getY());
+		hController.setSP(targetLocation.getHeading());
 		double x = xController.calculateAdjustment(currentLocation.getX());
 		double y = yController.calculateAdjustment(currentLocation.getY());
 		double h = hController.calculateAdjustment(currentLocation.getHeading());
@@ -251,9 +251,9 @@ public class MecanumDrive {
 		xController.reset();
 		yController.reset();
 		hController.reset();
-		xController.setTargetPoint(targetLocation.getX());
-		yController.setTargetPoint(targetLocation.getY());
-		hController.setTargetPoint(targetLocation.getHeading());
+		xController.setSP(targetLocation.getX());
+		yController.setSP(targetLocation.getY());
+		hController.setSP(targetLocation.getHeading());
 		long startTime = System.currentTimeMillis();
 		long endTime = 1000 + startTime + (long)(1000 *
 				Math.hypot(currentLocation.distanceToLocation(targetLocation) / MAX_SPEED,
@@ -275,7 +275,7 @@ public class MecanumDrive {
 	
 	public void rotate(double angle) {
 		hController.reset();
-		hController.setTargetPoint(angle);
+		hController.setSP(angle);
 		long startTime = System.currentTimeMillis();
 		long endTime = 1000 + startTime + (long)Math.abs(1000 *
 						currentLocation.headingDifference(angle) / MAX_ANGULAR);
