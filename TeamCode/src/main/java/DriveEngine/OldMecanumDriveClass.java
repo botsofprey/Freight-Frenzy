@@ -279,9 +279,9 @@ public class OldMecanumDriveClass {
 		xController.setSP(target.getX());
 		yController.setSP(target.getY());
 		hController.setSP(target.getHeading());
-		double xMovement = xController.calculateAdjustment(currentLocation.getX());
-		double yMovement = yController.calculateAdjustment(currentLocation.getY());
-		double hMovement = hController.calculateAdjustment(currentLocation.getHeading());
+		double xMovement = xController.calculateResponse(currentLocation.getX());
+		double yMovement = yController.calculateResponse(currentLocation.getY());
+		double hMovement = hController.calculateResponse(currentLocation.getHeading());
 		moveRobot(xMovement, yMovement, hMovement);
 	}
 	

@@ -203,7 +203,7 @@ public class MecanumDrive {
 		TrajectoryPoint point = currentTrajectory.getMotion(time);
 		
 		hController.setSP(point.h);
-		double h = hController.calculateAdjustment(currentLocation.getHeading());
+		double h = hController.calculateResponse(currentLocation.getHeading());
 		
 		if (time > currentTrajectory.getDuration()) {
 			currentlyMoving = false;
@@ -222,9 +222,9 @@ public class MecanumDrive {
 		xController.setSP(targetLocation.getX());
 		yController.setSP(targetLocation.getY());
 		hController.setSP(targetLocation.getHeading());
-		double x = xController.calculateAdjustment(currentLocation.getX());
-		double y = yController.calculateAdjustment(currentLocation.getY());
-		double h = hController.calculateAdjustment(currentLocation.getHeading());
+		double x = xController.calculateResponse(currentLocation.getX());
+		double y = yController.calculateResponse(currentLocation.getY());
+		double h = hController.calculateResponse(currentLocation.getHeading());
 		mode.telemetry.addData("X:", x);
 		mode.telemetry.addData("Y:", y);
 		mode.telemetry.addData("H:", h);
@@ -260,9 +260,9 @@ public class MecanumDrive {
 						currentLocation.headingDifference(targetLocation) / MAX_ANGULAR));
 		while (mode.opModeIsActive()) {
 			updateLocation();
-			double x = xController.calculateAdjustment(currentLocation.getX());
-			double y = -yController.calculateAdjustment(currentLocation.getY());
-			double h = hController.calculateAdjustment(currentLocation.getHeading());
+			double x = xController.calculateResponse(currentLocation.getX());
+			double y = -yController.calculateResponse(currentLocation.getY());
+			double h = hController.calculateResponse(currentLocation.getHeading());
 			if (currentLocation.distanceToLocation(targetLocation) < 1
 					&& currentLocation.headingDifference(targetLocation) < 5
 					|| endTime <= System.currentTimeMillis()) {
@@ -281,7 +281,7 @@ public class MecanumDrive {
 						currentLocation.headingDifference(angle) / MAX_ANGULAR);
 		while (mode.opModeIsActive()) {
 			updateLocation();
-			double h = hController.calculateAdjustment(currentLocation.getHeading());
+			double h = hController.calculateResponse(currentLocation.getHeading());
 			if (Math.abs(currentLocation.headingDifference(angle)) < 2
 					|| endTime <= System.currentTimeMillis()) {
 				rawMove(0, 0, 0);

@@ -255,7 +255,7 @@ public class SixDrive {
 		if(rotating){
 		//	double power = Math.min((movementPower/45)*(Math.abs(targetAngle - getAngle())),
 		//			movementPower);
-			double power = headingPid.calculateAdjustment(getAngle());
+			double power = headingPid.calculateResponse(getAngle());
 			System.out.println("Current Motor power: " + power + " Current angle: " + getAngle());
 
 			power = Range.clip(power, -1, 1);
@@ -272,9 +272,9 @@ public class SixDrive {
 		} else if(isBusy()){
 			double difference = 0;
 			if(!backwards){
-				difference = driveHeadingPid.calculateAdjustment(-getAngle());
+				difference = driveHeadingPid.calculateResponse(-getAngle());
 			}else{
-				difference = b_driveHeadingPid.calculateAdjustment(getAngle());
+				difference = b_driveHeadingPid.calculateResponse(getAngle());
 			}
 			System.out.println("Adjustment: " + difference + " Angle: " + getAngle());
 
