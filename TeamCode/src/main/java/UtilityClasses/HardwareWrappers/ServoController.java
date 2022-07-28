@@ -1,11 +1,17 @@
 package UtilityClasses.HardwareWrappers;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.Objects;
 
+/**
+ * This class is a wrapper for a regular(not continuous) servo.
+ * It allows for easier and cleaner initialization.
+ * Feel free to add any additional needed functionality.
+ *
+ * @author Alex Prichard
+ */
 public class ServoController {
 	public Servo servo;
 

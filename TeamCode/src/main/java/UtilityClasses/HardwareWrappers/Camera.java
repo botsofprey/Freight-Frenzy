@@ -11,7 +11,20 @@ import org.openftc.easyopencv.OpenCvPipeline;
 /**
  * This class will initialize a camera from the robot and
  * binds an OpenCvPipeline instance, which actually does the image processing.
- * To use this class, first create a pipeline class in
+ * To use this class, first create a pipeline class in the subsystems directory.
+ * This pipeline will be what processes all of the camera data and will be
+ * what the main program queries for information from the camera.
+ * Initialize the pipeline first and pass it as an argument to the camera during initialization.
+ * Call stop on the camera immediately after you have used the camera for the last time.
+ * The camera will take several seconds to close, but it will close asynchronously
+ * so it will not slow down the main code execution.
+ * If your op mode ends while the camera is active or while it is still closing,
+ * the app will force a crash to kill the program and will then restart.
+ * Restarting the app can take upwards of 30 seconds which
+ * can severely decrease the number of points scored in tele-op.
+ * In some cases, the app can also fail to reconnect to the robot once it restarts,
+ * preventing you from scoring any points in tele-op or endgame.
+ * Moral of the story: close the camera once you're done using it or bad things happen.
  *
  * @author Alex Prichard
  */
@@ -54,7 +67,10 @@ public class Camera {
 	}
 
 	public void stop() {
-		camera.closeCameraDeviceAsync(()->{});
-		isStopped = true;
+		if (!isStopped) {
+			camera.closeCameraDeviceAsync(()->{});
+			open = false;
+			isStopped = true;
+		}
 	}
 }

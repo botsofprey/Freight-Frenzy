@@ -6,6 +6,17 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import UtilityClasses.JSONReader;
 
+/**
+ * This class allows for all input functionality of the encoders associated with a motor,
+ * but does not allow any outputting to the motor.
+ * This is intended to be used with dead wheels on the bottom of the robot.
+ * It distances the encoders from the motors they are plugged into the ports of,
+ * because there is no meaningful connection between them, and it prevents
+ * accidentally setting the corresponding motor's power.
+ * Feel free to add functionality to this class as needed.
+ *
+ * @author Alex Prichard
+ */
 public class OdometryWheel {
     private DcMotorEx odom;
 

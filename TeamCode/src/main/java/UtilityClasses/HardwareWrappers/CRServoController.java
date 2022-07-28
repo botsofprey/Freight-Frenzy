@@ -1,12 +1,20 @@
 package UtilityClasses.HardwareWrappers;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.util.Objects;
 
+/**
+ * This is a wrapper class for a continuous rotation servo.
+ * It makes initialization a bit more clean.
+ * Feel free to add more methods to this class if you need them.
+ * You may want to replicate the automatic limit switch handling from MotorController
+ * as we have used a continuous rotation servo with limit switches before.
+ *
+ * @author Alex Prichard
+ */
 public class CRServoController {
 	public CRServo servo;
 	private String name;
