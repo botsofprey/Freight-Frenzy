@@ -1,0 +1,20 @@
+You should create one subsystem class per system on the robot.
+Each subsystem class should have an update function in it.
+Assume that the update function will be called once per frame.
+The update function should call the update functions of all objects in the
+subsystem that need update called, such as motors with automatic limit switches.
+The other functions in the subsystem should not hold up code execution. ex: no calls to mode.sleep
+If a function needs to affect the robot after the function is initially called, it should update
+a variable in the subsystem that tells the update function to handle the later behavior.
+ex:
+When the drop freight button is pressed, the subsystem records the time the button was pressed,
+and sets the freightDropped variable to true.
+If the update function sees that the freightDropped variable is true, it checks if more time has
+passed than is given for the process of dropping freight.
+If more time has passed, the function sets the dropped time to the current time and turns on a flag
+telling the update function to reset the servo at the right time. It then sets the freightDropped
+variable to false. A later part of the update function follows a similar process.
+If not enough time has passed, the function linearly interpolates between the start and stop time to
+get the position the servo should be at. It then sets the servo to this position, so that the servo
+will move slower than it normally would.
+See the update function of Delilah's Lift class for the code in this example.
