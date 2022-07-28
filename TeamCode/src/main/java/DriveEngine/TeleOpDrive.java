@@ -3,26 +3,20 @@ package DriveEngine;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.util.List;
 
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
-import UtilityClasses.Matrix;
-import UtilityClasses.OldLocationClass;
-import UtilityClasses.PIDController;
-import UtilityClasses.Vec2d;
+import UtilityClasses.OldVec2d;
 
 /**
  * This is a simplified movement class for tele-op.
@@ -114,7 +108,7 @@ public class TeleOpDrive {
 		a *= speed;
 		
 		if (trueNorth) { // rotate movement vector based on robot's orientation
-			Vec2d movementVector = new Vec2d(x, y);
+			OldVec2d movementVector = new OldVec2d(x, y);
 			movementVector.convertToAngleMagnitude();
 			movementVector.angle -= imu.getAngularOrientation(AxesReference.INTRINSIC,
 					AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;

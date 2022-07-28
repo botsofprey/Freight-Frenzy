@@ -99,7 +99,7 @@ public class Controller {
 	
 	public double leftTrigger = 0, rightTrigger = 0;
 	// x is left to right, y is down to up
-	public Vec2d leftStick = new Vec2d(0, 0), rightStick = new Vec2d(0, 0);
+	public OldVec2d leftStick = new OldVec2d(0, 0), rightStick = new OldVec2d(0, 0);
 	
 	public Controller(Gamepad g) {
 		gamepad = g;

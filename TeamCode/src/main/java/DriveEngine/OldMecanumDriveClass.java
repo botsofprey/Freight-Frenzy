@@ -21,7 +21,7 @@ import UtilityClasses.JSONReader;
 import UtilityClasses.OldLocationClass;
 import UtilityClasses.Matrix;
 import UtilityClasses.PIDController;
-import UtilityClasses.Vec2d;
+import UtilityClasses.OldVec2d;
 
 public class OldMecanumDriveClass {
 	private static final double FRONT_LEFT_DRIVE_MOTOR = 0;
@@ -365,7 +365,7 @@ public class OldMecanumDriveClass {
 			a *= 3;
 		}
 		if (trueNorth) {
-			Vec2d movementVector = new Vec2d(x, y);
+			OldVec2d movementVector = new OldVec2d(x, y);
 			movementVector.convertToAngleMagnitude();
 			movementVector.angle -= currentLocation.getHeading();
 			movementVector.convertToXY();
