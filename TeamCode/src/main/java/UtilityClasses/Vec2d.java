@@ -31,12 +31,11 @@ public class Vec2d {
 		y = y_d;
 		angle = x_a;
 		distance = y_d;
+		
 		isCartesian = system;
 		isPolar = !system;
 	}
-	public Vec2d(double x, double y) {
-		this(x, y, CARTESIAN);
-	}
+	public Vec2d(double x, double y) { this(x, y, CARTESIAN); }
 	
 	// Neither of these methods should ever be called manually because
 	// the class will always call them automatically if they are needed.
@@ -70,6 +69,27 @@ public class Vec2d {
 		if (!isPolar) convertToPolar();
 		isCartesian = false;
 		this.distance = magnitude;
+	}
+	
+	public void addX(double x) {
+		if (!isCartesian) convertToCartesian();
+		isPolar = false;
+		this.x += x;
+	}
+	public void addY(double y) {
+		if (!isCartesian) convertToCartesian();
+		isPolar = false;
+		this.y += y;
+	}
+	public void addAngle(double angle) {
+		if (!isPolar) convertToPolar();
+		isCartesian = false;
+		this.angle += angle;
+	}
+	public void addDistance(double magnitude) {
+		if (!isPolar) convertToPolar();
+		isCartesian = false;
+		this.distance += magnitude;
 	}
 	
 	public double getX() {

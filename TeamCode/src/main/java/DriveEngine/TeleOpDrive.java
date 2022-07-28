@@ -16,11 +16,15 @@ import java.util.List;
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
-import UtilityClasses.OldVec2d;
+import UtilityClasses.Vec2d;
 
 /**
  * This is a simplified movement class for tele-op.
  * It doesn't track location; it only responds to input.
+ * This code is partially untested,
+ * so you may need to add or remove a minus sign from the move function.
+ *
+ * @author Alex Prichard
  */
 public class TeleOpDrive {
 	private static final String[] MOTOR_NAMES = {
@@ -103,29 +107,31 @@ public class TeleOpDrive {
 	}
 	
 	public void move(double x, double y, double a) {
+		// handle slow mode or fast mode
 		x *= speed;
 		y *= speed;
 		a *= speed;
 		
 		if (trueNorth) { // rotate movement vector based on robot's orientation
-			OldVec2d movementVector = new OldVec2d(x, y);
-			movementVector.convertToAngleMagnitude();
-			movementVector.angle -= imu.getAngularOrientation(AxesReference.INTRINSIC,
-					AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-			movementVector.convertToXY();
-			x = movementVector.x;
-			y = movementVector.y;
+			Vec2d movementVector = new Vec2d(x, y);
+			movementVector.addAngle(-imu.getAngularOrientation(AxesReference.INTRINSIC,
+					AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+			x = movementVector.getX();
+			y = movementVector.getY();
 		}
 		
+		// express x and y movement vector as the sum of
+		// two vectors at a 45 degree offset from the x direction
 		double rightVector = SQRT_ONE_HALF * (x - y);
 		double leftVector = SQRT_ONE_HALF * (x + y);
+		// movement vectors are aligned with the direction of the wheel's force vectors
 		double[] powers = {
-				rightVector - a,
-				leftVector - a,
-				rightVector + a,
-				leftVector + a
+				rightVector - a,    // front left
+				leftVector - a,     // back left
+				rightVector + a,    // back right
+				leftVector + a      // front left
 		};
-		for (int i = 0; i < powers.length; i++) {
+		for (int i = 0; i < powers.length; i++) { // set motors to calculated powers
 			driveMotors[i].setPower(powers[i]);
 		}
 	}

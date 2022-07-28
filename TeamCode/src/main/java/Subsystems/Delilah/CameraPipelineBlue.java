@@ -1,4 +1,4 @@
-package Subsystems;
+package Subsystems.Delilah;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -33,9 +33,7 @@ public class CameraPipelineBlue extends OpenCvPipeline {
 
 	public volatile int xPos;
 
-	public CameraPipelineBlue(LinearOpMode m) {
-		mode = m;
-	}
+	public CameraPipelineBlue(LinearOpMode m) { mode = m; }
 
 	@Override
 	public Mat processFrame(Mat input) {
@@ -78,7 +76,5 @@ public class CameraPipelineBlue extends OpenCvPipeline {
 		return image;
 	}
 
-	public int getShippingElementLocation() {
-		return location;
-	}
+	public int getShippingElementLocation() { return location; }
 }

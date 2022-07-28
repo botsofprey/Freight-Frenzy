@@ -4,12 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import DriveEngine.MecanumDrive;
-import Subsystems.CameraPipelineRed;
-import Subsystems.Intake;
-import Subsystems.Lift;
-import Subsystems.MotorCarousel;
+import Subsystems.Delilah.CameraPipelineRed;
+import Subsystems.Delilah.Intake;
+import Subsystems.Delilah.Lift;
+import Subsystems.Delilah.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
-import UtilityClasses.OldLocationClass;
+import UtilityClasses.Deprecated.OldLocationClass;
 
 @Autonomous(name="DuckWarehouseAutoRed", group="Red Autos", preselectTeleOp="Red TeleOp")
 public class DuckWarehouseAutoRed extends LinearOpMode {
@@ -32,8 +32,8 @@ public class DuckWarehouseAutoRed extends LinearOpMode {
 		drive = new MecanumDrive(hardwareMap, "RobotConfig.json",
 				new OldLocationClass(0, 0, 0), this);
 		carousel = new MotorCarousel(hardwareMap, this);
-		lift = new Lift(hardwareMap, this, true);
-		intake = new Intake(hardwareMap, this, true);
+		lift = new Lift(hardwareMap, this);
+		intake = new Intake(hardwareMap, this);
 
 		String[] positions = { "Right", "Center", "Left" };
 

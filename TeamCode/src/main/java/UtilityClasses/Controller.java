@@ -2,6 +2,8 @@ package UtilityClasses;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import UtilityClasses.Deprecated.OldVec2d;
+
 /**
  * <p>
  * This class encapsulates the gamepad1 and gamepad2 that the op mode gives to you.

@@ -2,7 +2,7 @@ package DriveEngine;
 
 import java.util.ArrayList;
 
-import UtilityClasses.OldLocationClass;
+import UtilityClasses.Deprecated.OldLocationClass;
 
 public class TrajectoryBuilder {
 	private ArrayList<OldLocationClass> waypoints = new ArrayList<>();

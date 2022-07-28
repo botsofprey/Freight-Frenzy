@@ -2,7 +2,7 @@ package DriveEngine;
 
 import java.util.ArrayList;
 
-import UtilityClasses.OldLocationClass;
+import UtilityClasses.Deprecated.OldLocationClass;
 
 public class Trajectory {
 	private TrajectoryPoint[] trajectory;

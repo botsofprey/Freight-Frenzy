@@ -1,4 +1,6 @@
-package UtilityClasses;
+package UtilityClasses.Deprecated;
+
+import UtilityClasses.Vec2d;
 
 /**
  * @see Vec2d

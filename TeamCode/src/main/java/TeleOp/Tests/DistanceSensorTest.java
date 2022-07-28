@@ -1,17 +1,17 @@
-package TeleOp;
+package TeleOp.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import Subsystems.Intake;
+import Subsystems.Delilah.Intake;
 
 @TeleOp(name="Distance Test", group="test")
 @Disabled
 public class DistanceSensorTest extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
-		Intake intake = new Intake(hardwareMap, this, true);
+		Intake intake = new Intake(hardwareMap, this);
 
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();

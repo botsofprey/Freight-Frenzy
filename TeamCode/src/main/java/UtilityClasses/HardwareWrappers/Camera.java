@@ -8,6 +8,13 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+/**
+ * This class will initialize a camera from the robot and
+ * binds an OpenCvPipeline instance, which actually does the image processing.
+ * To use this class, first create a pipeline class in
+ *
+ * @author Alex Prichard
+ */
 public class Camera {
 	private OpenCvCamera camera;
 
@@ -30,6 +37,7 @@ public class Camera {
 				camera.startStreaming(1920, 1080);
 				camera.setPipeline(pipeline);
 				mode.telemetry.addData("Status", "Camera running");
+				mode.telemetry.update();
 				open = true;
 			}
 

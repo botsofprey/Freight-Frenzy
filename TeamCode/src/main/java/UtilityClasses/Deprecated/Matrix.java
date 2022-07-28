@@ -1,4 +1,4 @@
-package UtilityClasses;
+package UtilityClasses.Deprecated;
 
 import androidx.annotation.NonNull;
 

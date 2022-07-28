@@ -1,4 +1,4 @@
-package TeleOp;
+package TeleOp.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;

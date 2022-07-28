@@ -1,4 +1,4 @@
-package Subsystems;
+package Subsystems.Delilah;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -58,7 +58,7 @@ public class Lift {
 	private boolean freightDropped;
 	private boolean resetServo;
 
-	public Lift(HardwareMap hardwareMap, LinearOpMode opMode, boolean errors) {
+	public Lift(HardwareMap hardwareMap, LinearOpMode opMode) {
 		mode = opMode;
 		usingEncoders = true;
 		braking = false;

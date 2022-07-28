@@ -1,6 +1,8 @@
-package UtilityClasses;
+package UtilityClasses.Deprecated;
 
 import java.util.Objects;
+
+import UtilityClasses.Location;
 
 @Deprecated
 public class OldLocationClass {

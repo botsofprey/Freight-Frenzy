@@ -1,6 +1,6 @@
 package DriveEngine;
 
-import UtilityClasses.OldLocationClass;
+import UtilityClasses.Deprecated.OldLocationClass;
 
 public class TrajectoryPoint {
 	public double t;

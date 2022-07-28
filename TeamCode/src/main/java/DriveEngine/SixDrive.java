@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-import UtilityClasses.OldLocationClass;
+import UtilityClasses.Deprecated.OldLocationClass;
 import UtilityClasses.PIDController;
 
 public class SixDrive {

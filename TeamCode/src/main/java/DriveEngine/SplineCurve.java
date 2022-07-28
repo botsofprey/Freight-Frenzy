@@ -2,8 +2,8 @@ package DriveEngine;
 
 import com.qualcomm.robotcore.util.Range;
 
-import UtilityClasses.OldLocationClass;
-import UtilityClasses.Matrix;
+import UtilityClasses.Deprecated.OldLocationClass;
+import UtilityClasses.Deprecated.Matrix;
 
 public class SplineCurve {
 	public static final boolean FIRST_POINT = true;

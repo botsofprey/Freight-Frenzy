@@ -1,14 +1,14 @@
-package TeleOp;
+package TeleOp.Delilah;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import DriveEngine.OldMecanumDriveClass;
-import Subsystems.Intake;
-import Subsystems.Lift;
-import Subsystems.MotorCarousel;
+import DriveEngine.Deprecated.OldMecanumDriveClass;
+import Subsystems.Delilah.Intake;
+import Subsystems.Delilah.Lift;
+import Subsystems.Delilah.MotorCarousel;
 import UtilityClasses.Controller;
-import UtilityClasses.OldLocationClass;
+import UtilityClasses.Deprecated.OldLocationClass;
 
 @TeleOp(name="Red TeleOp", group="TeleOp")
 public class RedTeleOp extends LinearOpMode {
@@ -18,17 +18,14 @@ public class RedTeleOp extends LinearOpMode {
 	private Controller controller1;
 	private Controller controller2;
 	private OldMecanumDriveClass drive;
-
-	private static final boolean throwErrors = true;
-
-
+	
 	@Override
 	public void runOpMode() throws InterruptedException {
-		lift = new Lift(hardwareMap, this, throwErrors);
-		intake = new Intake(hardwareMap, this, throwErrors);
+		lift = new Lift(hardwareMap, this);
+		intake = new Intake(hardwareMap, this);
 		carousel = new MotorCarousel(hardwareMap, this);
 		drive = new OldMecanumDriveClass(hardwareMap, "RobotConfig.json",
-				new OldLocationClass(0, 0, 0), false, this, throwErrors);
+				new OldLocationClass(0, 0, 0), false, this);
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
 

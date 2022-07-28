@@ -1,4 +1,4 @@
-package DriveEngine;
+package DriveEngine.Deprecated;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -16,13 +16,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.util.List;
 
+import DriveEngine.Path;
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
-import UtilityClasses.OldLocationClass;
-import UtilityClasses.Matrix;
+import UtilityClasses.Deprecated.OldLocationClass;
+import UtilityClasses.Deprecated.Matrix;
 import UtilityClasses.PIDController;
-import UtilityClasses.OldVec2d;
+import UtilityClasses.Deprecated.OldVec2d;
 
+@Deprecated
 public class OldMecanumDriveClass {
 	private static final double FRONT_LEFT_DRIVE_MOTOR = 0;
 	private static final double BACK_LEFT_DRIVE_MOTOR = 1;
@@ -86,11 +88,11 @@ public class OldMecanumDriveClass {
 	private boolean trueNorth;
 	
 	
-	public OldMecanumDriveClass(HardwareMap hw, String fileName, OldLocationClass startLocation, boolean north,
-	                            LinearOpMode m, boolean errors) {
+	public OldMecanumDriveClass(HardwareMap hw, String fileName, OldLocationClass startLocation,
+	                            boolean north, LinearOpMode m) {
 		mode = m;
 		
-		initFromConfig(hw, fileName, errors);
+		initFromConfig(hw, fileName);
 
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -127,7 +129,7 @@ public class OldMecanumDriveClass {
 		previousTime = System.nanoTime();
 	}
 	
-	private void initFromConfig(HardwareMap hw, String fileName, boolean errors) {
+	private void initFromConfig(HardwareMap hw, String fileName) {
 		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");

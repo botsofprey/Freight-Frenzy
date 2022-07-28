@@ -1,7 +1,9 @@
-package UtilityClasses;
+package UtilityClasses.Deprecated;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import UtilityClasses.JSONReader;
 
 @Deprecated
 public class Encoder {

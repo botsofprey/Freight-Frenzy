@@ -1,4 +1,4 @@
-package TeleOp;
+package TeleOp.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import java.util.Arrays;
 
-import Subsystems.Intake;
+import Subsystems.Delilah.Intake;
 
 @TeleOp(name="Color Calibration", group="test")
 @Disabled
@@ -15,7 +15,7 @@ public class ColorCalibration extends LinearOpMode {
 	
 	@Override
 	public void runOpMode() throws InterruptedException {
-		intake = new Intake(hardwareMap, this, true);
+		intake = new Intake(hardwareMap, this);
 		
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();

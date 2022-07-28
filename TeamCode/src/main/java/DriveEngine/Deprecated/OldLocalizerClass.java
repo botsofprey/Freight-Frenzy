@@ -1,4 +1,4 @@
-package DriveEngine;
+package DriveEngine.Deprecated;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -14,9 +14,10 @@ import java.util.List;
 
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
-import UtilityClasses.OldLocationClass;
-import UtilityClasses.Matrix;
+import UtilityClasses.Deprecated.OldLocationClass;
+import UtilityClasses.Deprecated.Matrix;
 
+@Deprecated
 public class OldLocalizerClass {
 	private static final String[] MOTOR_NAMES = {
 			"frontLeftDriveMotor",

@@ -1,4 +1,4 @@
-package Subsystems;
+package Subsystems.Delilah;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -47,7 +47,7 @@ public class Intake {
 	private long freezeTime = 0;
 	private boolean driverControl = true;
 
-	public Intake(HardwareMap hw, LinearOpMode m, boolean errors) {
+	public Intake(HardwareMap hw, LinearOpMode m) {
 		mode = m;
 
 		intakeMotor = new MotorController(hw, "intakeMotor");

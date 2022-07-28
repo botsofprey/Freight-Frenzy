@@ -6,10 +6,11 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+import DriveEngine.Deprecated.OldLocalizerClass;
 import UtilityClasses.HardwareWrappers.MotorController;
 import UtilityClasses.JSONReader;
-import UtilityClasses.OldLocationClass;
-import UtilityClasses.Matrix;
+import UtilityClasses.Deprecated.OldLocationClass;
+import UtilityClasses.Deprecated.Matrix;
 import UtilityClasses.PIDController;
 
 /**

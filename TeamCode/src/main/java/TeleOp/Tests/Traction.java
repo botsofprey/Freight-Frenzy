@@ -1,4 +1,4 @@
-package TeleOp;
+package TeleOp.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import DriveEngine.MecanumDrive;
 import UtilityClasses.Controller;
-import UtilityClasses.OldLocationClass;
+import UtilityClasses.Deprecated.OldLocationClass;
 
 @TeleOp(name="Traction")
 @Disabled
