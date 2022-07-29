@@ -1,29 +1,30 @@
-package TeleOp.Tests;
+package OpModes.TeleOp.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import java.util.Arrays;
+
 import Subsystems.Delilah.Intake;
 
-@TeleOp(name="Distance Test", group="test")
+@TeleOp(name="Color Calibration", group="test")
 @Disabled
-public class DistanceSensorTest extends LinearOpMode {
+public class ColorCalibration extends LinearOpMode {
+	private Intake intake;
+	
 	@Override
 	public void runOpMode() throws InterruptedException {
-		Intake intake = new Intake(hardwareMap, this);
-
+		intake = new Intake(hardwareMap, this);
+		
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 		waitForStart();
-
+		
 		while (opModeIsActive()) {
-			int numMeasurements = 10;
-			double avg = 0;
-			for (int i = 0; i < numMeasurements; i++) {
-				avg += Math.min(intake.getDistance() / numMeasurements, 24.0 / numMeasurements);
-			}
-			telemetry.addData("Distance", avg);
+			int[][] colors = intake.getColor();
+			telemetry.addData("A", Arrays.toString(colors[0]));
+			telemetry.addData("B", Arrays.toString(colors[1]));
 			telemetry.update();
 		}
 	}

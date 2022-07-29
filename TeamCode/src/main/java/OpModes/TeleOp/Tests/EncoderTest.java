@@ -1,15 +1,23 @@
-package TeleOp.Tests;
+package OpModes.TeleOp.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import DriveEngine.Localizer;
 import UtilityClasses.Controller;
-import UtilityClasses.OutputCapture;
+import UtilityClasses.Location;
 
-@TeleOp(name="Capture", group="Autonomous")
-public class Capture extends LinearOpMode {
+@TeleOp(name="Encoder Test", group="test")
+public class EncoderTest extends LinearOpMode {
+	private static final DcMotorSimple.Direction[] DIRECTIONS = {
+			DcMotorSimple.Direction.FORWARD,
+			DcMotorSimple.Direction.FORWARD,
+			DcMotorSimple.Direction.REVERSE,
+			DcMotorSimple.Direction.REVERSE
+	};
 	@Override
 	public void runOpMode() throws InterruptedException {
 		String[] motorNames = {
@@ -24,22 +32,22 @@ public class Capture extends LinearOpMode {
 			motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 			motors[i].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 			motors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+			motors[i].setDirection(DIRECTIONS[i]);
 		}
 		
 		Controller controller = new Controller(gamepad1);
 		
-		OutputCapture capture = new OutputCapture(hardwareMap);
-		
+		Localizer localizer = new Localizer(hardwareMap, "RobotConfig.json");
+		localizer.update(System.nanoTime());
+
 		telemetry.addData("Status", "Initialized");
 		telemetry.update();
 		waitForStart();
-		
-		capture.startCapturing(System.nanoTime());
-		
+		localizer.setLocation(Location.ORIGIN);
+
 		while (opModeIsActive()) {
 			controller.update();
-			
-			capture.capture(System.nanoTime());
+			localizer.update(System.nanoTime());
 			
 			double x = +controller.leftStick.y, y = -controller.leftStick.x,
 					a = -controller.rightStick.x;
@@ -50,15 +58,14 @@ public class Capture extends LinearOpMode {
 					x - y + a,
 					x + y + a
 			};
+
+			double scale = 1;
+			if (controller.leftTriggerHeld) scale /= 5.0;
 			
 			for (int i = 0; i < 4; i++)
-				motors[i].setPower(powers[i]);
+				motors[i].setPower(powers[i] * scale);
 			
-			if (controller.bPressed) capture.pause();
-			if (controller.aPressed) capture.resume();
-			if (controller.xPressed) capture.store("Capture.bin");
-			
-			telemetry.addData("Capturing", capture.isCapturing());
+			telemetry.addData("Location", localizer.getCurrentLocation());
 			telemetry.update();
 		}
 	}

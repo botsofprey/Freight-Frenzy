@@ -1,4 +1,4 @@
-package Autonomous.Delilah;
+package OpModes.Autonomous.Delilah;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,7 +11,7 @@ import Subsystems.Delilah.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Deprecated.OldLocationClass;
 
-@Autonomous(name="DuckAutoBlue", group="Blue Autos", preselectTeleOp="Blue TeleOp")
+@Autonomous(name="DuckAutoBlue", group="Blue Autos", preselectTeleOp="Blue OpModes.TeleOp")
 public class DuckAutoBlue extends LinearOpMode {
 	private MecanumDrive drive;
 	private MotorCarousel carousel;

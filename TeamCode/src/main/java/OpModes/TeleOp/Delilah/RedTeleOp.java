@@ -1,4 +1,4 @@
-package TeleOp.Delilah;
+package OpModes.TeleOp.Delilah;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,9 +8,8 @@ import Subsystems.Delilah.Intake;
 import Subsystems.Delilah.Lift;
 import Subsystems.Delilah.MotorCarousel;
 import UtilityClasses.Controller;
-import UtilityClasses.Deprecated.OldLocationClass;
 
-@TeleOp(name="Red TeleOp", group="TeleOp")
+@TeleOp(name="Red OpModes.TeleOp", group="TeleOp")
 public class RedTeleOp extends LinearOpMode {
 	private Lift lift;
 	private Intake intake;

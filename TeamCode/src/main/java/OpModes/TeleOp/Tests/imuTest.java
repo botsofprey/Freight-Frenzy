@@ -1,4 +1,4 @@
-package TeleOp.Tests;
+package OpModes.TeleOp.Tests;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;

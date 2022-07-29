@@ -1,4 +1,4 @@
-package Autonomous.Delilah;
+package OpModes.Autonomous.Delilah;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,7 +10,7 @@ import Subsystems.Delilah.Lift;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Deprecated.OldLocationClass;
 
-@Autonomous(name="CycleAutoRed", group="Red Autos", preselectTeleOp="Red TeleOp")
+@Autonomous(name="CycleAutoRed", group="Red Autos", preselectTeleOp="Red OpModes.TeleOp")
 public class CycleAutoRed extends LinearOpMode {
 	private MecanumDrive drive;
 	private Lift lift;

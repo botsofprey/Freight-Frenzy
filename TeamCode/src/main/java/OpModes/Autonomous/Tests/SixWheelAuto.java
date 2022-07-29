@@ -1,4 +1,4 @@
-package Autonomous.Tests;
+package OpModes.Autonomous.Tests;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;

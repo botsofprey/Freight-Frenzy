@@ -1,4 +1,4 @@
-package Autonomous.Delilah;
+package OpModes.Autonomous.Delilah;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,18 +11,19 @@ import Subsystems.Delilah.MotorCarousel;
 import UtilityClasses.HardwareWrappers.Camera;
 import UtilityClasses.Deprecated.OldLocationClass;
 
-@Autonomous(name="DuckAutoRed", group="Red Autos", preselectTeleOp="Red TeleOp")
-public class DuckAutoRed extends LinearOpMode {
+@Autonomous(name="DuckWarehouseAutoRed", group="Red Autos", preselectTeleOp="Red OpModes.TeleOp")
+public class DuckWarehouseAutoRed extends LinearOpMode {
 	private MecanumDrive drive;
 	private MotorCarousel carousel;
 	private Lift lift;
 	private Intake intake;
 
-	private static final OldLocationClass carouselLocation = new OldLocationClass(21, 2, 0);
-	private static final OldLocationClass corner1 = new OldLocationClass(10, -36, 0);
-	private static final OldLocationClass shippingHub = new OldLocationClass(-6, -32, -90);
-	private static final OldLocationClass corner2 = new OldLocationClass(10, -36, -90);
-	private static final OldLocationClass depot = new OldLocationClass(20, -18, -90);
+	private static final OldLocationClass carouselLocation = new OldLocationClass(18, 3, 0);
+	private static final OldLocationClass corner1 = new OldLocationClass(10, -31, 0);
+	private static final OldLocationClass shippingHub = new OldLocationClass(-5, -31, -90);
+	private static final OldLocationClass corner2 = new OldLocationClass(10, -31, -90);
+	private static final OldLocationClass corner3 = new OldLocationClass(10, -6, 90);
+	private static final OldLocationClass corner4 = new OldLocationClass(-36, -6, 90);
 
 	@Override
 	public void runOpMode() throws InterruptedException {
@@ -83,9 +84,18 @@ public class DuckAutoRed extends LinearOpMode {
 		}
 		drive.moveToLocation(corner2);
 		lift.positionDown();
+		drive.rotate(90);
 		sleep(200);
-		drive.moveToLocation(depot);
+		drive.moveToLocation(corner3);
+		sleep(200);
+		drive.moveToLocation(corner4);
 		lift.update(System.currentTimeMillis());
+		sleep(200);
+		drive.rotate(100);
+		sleep(200);
+		drive.oldRawMove(0, -1, 0);
+		sleep(1500);
+		drive.brake();
 
 		while (opModeIsActive()) sleep(100);
 	}

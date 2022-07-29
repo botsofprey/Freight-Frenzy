@@ -1,0 +1,28 @@
+Before I left, I was working on adding a movement library called RoadRunner to our codebase. I have
+installed RoadRunner, all of the relevant files should be in the RoadRunner directory of the
+DriveEngine package. I was following the instructions from a website called "learnroadrunner.com".
+It provides clear step-by-step instructions for installing, setting up, and using the RoadRunner
+library.
+
+I had to stop fairly early in the process of setting up the library due to the fact that we
+currently do not have a drive base with odometry wheels. Once that is built, it will be possible for
+you to finish setting up RoadRunner. The library should be much better at navigating the robot than
+my movement library, because it has more features, has been extensively testing and debugged, and is
+written by people who actually know what they are doing.
+
+I would strongly recommend you read up on some of the features of roadrunner and how it works to
+understand how it works and what it can do, and if the team builds a drive base that has odometry
+wheels in the pre season or in the beginning of the season, I would strongly recommend to try to get
+RoadRunner working on the new drive base and to use it to move the robot during autonomous.
+
+I believe getting the library working will help because most of the time I spent writing autonomous
+code last year was spent fighting with the drive code to get the robot to go where I wanted it to
+go, and when I got it to work, it could not accurately move with any speeds close to the max speed
+of the robot. As I have already mentioned, RoadRunner is reliable and well tested, and, if tuned
+properly, will go where you tell it to go. It also allows the robot to move around with
+significantly higher speeds and allows the robot to follow complex series of curves to more
+efficiently navigate the field. There were plenty of times last year where I wished that our robot
+could drive smoothly around obstacles instead of having to make multiple complete stops at corners
+to navigate around them.
+
+I wish you and the rest of the team good luck this year and am confident that you will do well.

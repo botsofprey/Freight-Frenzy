@@ -1,4 +1,4 @@
-package TeleOp.Tests;
+package OpModes.TeleOp.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import UtilityClasses.Controller;
 
-@TeleOp(name="Odometry TeleOp", group="TeleOp")
+@TeleOp(name="Odometry OpModes.TeleOp", group="TeleOp")
 @Disabled
 public class OdometryTest extends LinearOpMode {
 	private static final String[] MOTOR_NAMES = {

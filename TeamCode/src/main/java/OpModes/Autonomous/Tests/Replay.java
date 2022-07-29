@@ -1,4 +1,4 @@
-package Autonomous.Tests;
+package OpModes.Autonomous.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
