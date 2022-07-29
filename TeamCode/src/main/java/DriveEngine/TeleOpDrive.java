@@ -131,8 +131,16 @@ public class TeleOpDrive {
 				rightVector + a,    // back right
 				leftVector + a      // front left
 		};
+		
+		// find power with largest magnitude if largest magnitude is greater than one
+		double maxPower = 1.0;
+		for (double power: powers) {
+			maxPower = Math.max(maxPower, Math.abs(power));
+		}
+		
 		for (int i = 0; i < powers.length; i++) { // set motors to calculated powers
-			driveMotors[i].setPower(powers[i]);
+			// normalize powers to keep them all in the range [-1, 1]
+			driveMotors[i].setPower(powers[i] / maxPower);
 		}
 	}
 	

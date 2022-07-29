@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
+import UtilityClasses.Deprecated.OldLocationClass;
+
 /**
  * This is a class for representing a place on the field.
  * It is similar to the standard cartesian(x, y) plane,
@@ -11,6 +13,17 @@ import java.util.Objects;
  * This means that the x-axis is straight forward and down the field,
  * which makes the coordinates a bit cleaner.
  * A heading of 0 refers to the direction along the x-axis.
+ * Heading increases counterclockwise,
+ * so a heading of 90 is the direction of the y-axis.
+ *
+ *          0
+ *          x
+ *          ^
+ *          |
+ * 90 y <---+---> -90
+ *          |
+ *          v
+ *        -180
  *
  * @author Alex Prichard
  */
@@ -30,10 +43,18 @@ public class Location {
         this.y = y;
         this.heading = normalizeHeading(heading);
     }
-    public Location(double x, double y) {
-        this(x, y, 0);
-    }
+    public Location(double x, double y) { this(x, y, 0); }
     public Location(double heading) { this(0, 0, heading); }
+    
+    // these are for compatibility reasons, do not use
+    public Location(OldLocationClass oldLocation) {
+        x = oldLocation.getY();
+        y = -oldLocation.getX();
+        heading = oldLocation.getHeading();
+    }
+    public OldLocationClass getAsOldLocation() {
+        return new OldLocationClass(-y, +x, heading);
+    }
 
     public double getX() { return x; }
     public double getY() { return y; }

@@ -100,7 +100,7 @@ public class DuckWarehouseAutoBlue extends LinearOpMode {
 		sleep(200);
 //		if (chargeFound)
 //			SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, chargeSoundId);
-		drive.rawMove(0, -1, 0);
+		drive.oldRawMove(0, -1, 0);
 		sleep(1500);
 		drive.brake();
 

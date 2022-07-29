@@ -29,7 +29,7 @@ public class Traction extends LinearOpMode {
 				power += 0.05;
 			}
 
-			drive.rawMove(0, power, 0);
+			drive.oldRawMove(0, power, 0);
 
 			telemetry.addData("Power", power);
 			telemetry.update();

@@ -24,13 +24,13 @@ public class CycleAutoRed extends LinearOpMode {
 
 	private void grabBlock() {
 		intake.intakeNoDelay();
-		drive.rawMove(0.15, -1.0 / 3.5, 0);
+		drive.oldRawMove(0.15, -1.0 / 3.5, 0);
 		while (opModeIsActive() && intake.moving()) {
 			intake.update(System.currentTimeMillis());
 			if (!intake.moving()) break;
 			drive.updateLocation();
 		}
-		drive.rawMove(0.15, 1, 0);
+		drive.oldRawMove(0.15, 1, 0);
 		sleep(200);
 		drive.brake();
 		sleep(200);
@@ -102,7 +102,7 @@ public class CycleAutoRed extends LinearOpMode {
 			drive.rotate(0);
 		}
 		lift.update(System.currentTimeMillis());
-		drive.rawMove(0.25, -1, 0);
+		drive.oldRawMove(0.25, -1, 0);
 		sleep(1000);
 		drive.brake();
 

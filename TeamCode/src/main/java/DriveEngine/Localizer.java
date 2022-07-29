@@ -7,6 +7,11 @@ import UtilityClasses.HardwareWrappers.OdometryWheel;
 import UtilityClasses.JSONReader;
 import UtilityClasses.Location;
 
+/**
+ * This is a class to calculate the robot's current location using odometry wheels.
+ *
+ * @author Alex Prichard
+ */
 public class Localizer {
 	private OdometryWheel leftWheel;
 	private OdometryWheel rightWheel;

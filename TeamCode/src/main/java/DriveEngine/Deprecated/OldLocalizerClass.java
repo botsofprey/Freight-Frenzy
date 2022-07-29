@@ -85,7 +85,14 @@ public class OldLocalizerClass {
 		wheelDiameter = motorReader.getDouble("wheel_diameter");
 	}
 	
-	public void updateLocation() {//  calculate new position from odometry
+	/**
+	 * Calculates the current location based on the previous location and the robot's movement.
+	 * For an explanation of the algorithm implemented here see the link.
+	 * <a href=https://gm0.org/en/latest/docs/software/odometry.html>Explanation link</a>
+	 *
+	 * @author Alex Prichard
+	 */
+	public void updateLocation() { // calculate new position from odometry
 		for (int i = 0; i < 4; i++) {
 			positions[i] = driveMotors[i].getCurrentPosition();
 		}
@@ -93,7 +100,7 @@ public class OldLocalizerClass {
 		
 		long deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
-		double timeDiff = deltaTime / 1_000_000_000.0;//convert nanoseconds to seconds
+		double timeDiff = deltaTime / 1_000_000_000.0; // convert nanoseconds to seconds
 		double[] rotationAngles = new double[4];
 		double[] motorDistances = new double[4];
 		for (int i = 0; i < 4; i++) {
@@ -104,17 +111,19 @@ public class OldLocalizerClass {
 			motorSpeeds[i] = rotationAngles[i] / timeDiff;
 			motorRPMs[i] = rotationAngles[i] * 2 * Math.PI;
 		}
+		// this code just calculates how far forward, sideways, and rotationally we have moved
 		double currentRotation = imu.getAngularOrientation(AxesReference.INTRINSIC,
 				AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle + initHeading;
 		double rotation = Math.toRadians(currentLocation.getHeading() - currentRotation);
 		double xMovement =
-				(/*motorDistances[0]*/ + motorDistances[1] +//1.266 is a manually tuned constant
-						motorDistances[2] + motorDistances[3]) / 3.0 * 0.497;
+				(motorDistances[0] + motorDistances[1] + // 0.497 is a manually tuned constant
+						motorDistances[2] + motorDistances[3]) * 0.25 * 0.497;
 		double yMovement =
-				(/*motorDistances[1] - motorDistances[0]*/ +//0.833 is a manually tuned constant
-						motorDistances[3] - motorDistances[2]) * 0.5 * 0.554;
+				(motorDistances[1] - motorDistances[0] + // 0.554 is a manually tuned constant
+						motorDistances[3] - motorDistances[2]) * 0.25 * 0.554;
 		double currentHeading = -Math.toRadians(currentLocation.getHeading() + 90);
 		
+		// this code is an implementation of the Pose Exponential algorithm
 		Matrix vector = new Matrix(new double[][] {
 				{xMovement,
 				yMovement,
