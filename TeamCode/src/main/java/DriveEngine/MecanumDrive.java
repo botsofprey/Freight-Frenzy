@@ -16,6 +16,7 @@ import UtilityClasses.PIDController;
 
 /**
  * This is a class for moving the robot to set positions on the field.
+ * It also automatically calls the localizer to update the robot's location.
  *
  * @author Alex Prichard
  */
@@ -63,7 +64,7 @@ public class MecanumDrive {
 		
 		initFromConfig(hw, configFileName);
 
-		localizer = new OldLocalizerClass(hw, configFileName, startLocation, mode);
+		localizer = new OldLocalizerClass(hw, configFileName, startLocation);
 		
 		currentlyMoving = false;
 		currentLocation = startLocation;
@@ -116,8 +117,7 @@ public class MecanumDrive {
 	public void oldRawMove(double x, double y, double h) {
 		oldRawMove(x, y, h, 1);
 	}
-	@Deprecated
-	public void oldRawMove(double x, double y, double h, double speed) {
+	private void oldRawMove(double x, double y, double h, double speed) {
 		double[] powers = new double[]{
 				x + y - h,
 				-x + y - h,
@@ -135,16 +135,11 @@ public class MecanumDrive {
 			motors[i].setPower(powers[i]);
 		}
 	}
-	
-	public void move(double x, double y, double h) {
-		oldRawMove(x, y, h);
-	}
 
-	public void moveTrueNorth(double x, double y, double h) {
+	private void moveTrueNorth(double x, double y, double h) {
 		moveTrueNorth(x, y, h, 1.0);
 	}
-	
-	public void moveTrueNorth(double x, double y, double h, double speed) {
+	private void moveTrueNorth(double x, double y, double h, double speed) {
 		Matrix vec = new Matrix(new double[][]{ { x }, { y } });
 		double heading = -Math.toRadians(currentLocation.getHeading());
 		double sin = Math.sin(heading);
@@ -172,8 +167,34 @@ public class MecanumDrive {
 	public void moveToLocation(Location targetLocation, double speed) {
 		moveToLocation(targetLocation.getAsOldLocation(), speed);
 	}
-	@Deprecated
-	public void moveToLocation(OldLocationClass targetLocation, double speed) {
+	
+	/**
+	 * This function implements the underlying movement logic for the drive base.
+	 * It is blocking and suspends execution until it finishes.
+	 * It can move to a location with a different heading from the current heading,
+	 * however turning while moving decreases its ability to stay on a straight path.
+	 * Additionally, due to how mecanum wheels work and some shortcomings of the
+	 * resulting feedback system, the coordinate system it uses is slightly stretched.
+	 * This stretching also changes every time the robot rotates.
+	 * In long autonomous programs, you should expect
+	 * the robot to not quite go where you tell it to.
+	 * Despite the poor accuracy of this movement function, it can actually be quite precise.
+	 *
+	 * To use it in an autonomous op mode, you should first make a list of all
+	 * locations you want the robot to go to as final variables at the top of the class.
+	 * Then, run the program up to the first untuned location.
+	 * Measure how far off the robot was and adjust the location in the code accordingly.
+	 * Repeat this until you can run the entire autonomous program without
+	 * the robot significantly deviating from the locations you set for it.
+	 * After you have a basic working path, readjust the locations
+	 * slightly as needed and test in between each adjustment.
+	 * This process will take a while.
+	 *
+	 * @param targetLocation
+	 * @param speed
+	 * @author Alex Prichard
+	 */
+	private void moveToLocation(OldLocationClass targetLocation, double speed) {
 		xController.reset();
 		yController.reset();
 		hController.reset();
@@ -200,7 +221,8 @@ public class MecanumDrive {
 	}
 	
 	/**
-	 * This rotates the robot to the given heading
+	 * This rotates the robot to the given heading.
+	 * It works pretty well and reliably.
 	 *
 	 * @param angle
 	 * @author Alex Prichard
@@ -223,6 +245,7 @@ public class MecanumDrive {
 		}
 	}
 	
+	// there's not much reason to use this method
 	public void update() {
 		updateLocation();
 		oldRawMove(0, 0, 0);

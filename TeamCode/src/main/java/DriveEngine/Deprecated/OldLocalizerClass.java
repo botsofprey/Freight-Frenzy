@@ -2,7 +2,6 @@ package DriveEngine.Deprecated;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -40,8 +39,9 @@ public class OldLocalizerClass {
 
 	
 	
-	public OldLocalizerClass(HardwareMap hw, String fileName, OldLocationClass startLocation, LinearOpMode m) {
-		initFromConfig(hw, fileName, m);
+	public OldLocalizerClass(HardwareMap hw, String fileName,
+	                         OldLocationClass startLocation) {
+		initFromConfig(hw, fileName);
 		
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 		
@@ -70,7 +70,7 @@ public class OldLocalizerClass {
 		previousTime = System.nanoTime();
 	}
 	
-	private void initFromConfig(HardwareMap hw, String fileName, LinearOpMode m) {
+	private void initFromConfig(HardwareMap hw, String fileName) {
 		JSONReader reader = new JSONReader(hw, fileName);
 		for (int i = 0; i < 4; i++) {
 			String motorName = reader.getString(MOTOR_NAMES[i] + "Name");

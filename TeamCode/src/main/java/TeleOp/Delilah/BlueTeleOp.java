@@ -29,8 +29,7 @@ public class BlueTeleOp extends LinearOpMode {
 		lift = new Lift(hardwareMap, this);
 		intake = new Intake(hardwareMap, this);
 		carousel = new MotorCarousel(hardwareMap, this);
-		drive = new OldMecanumDriveClass(hardwareMap, "RobotConfig.json",
-				new OldLocationClass(0, 0, 0), false, this);
+		drive = new OldMecanumDriveClass(hardwareMap, "RobotConfig.json");
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
 		analog = hardwareMap.get(AnalogInput.class, "forceSensor");
